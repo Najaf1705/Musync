@@ -1,0 +1,352 @@
+body{
+  padding-top: 3.3rem;
+  background-color: #c4c4c4;
+}
+
+.curpoint{
+  cursor: pointer;
+}
+
+.home{
+  padding-top: 1rem;
+  background-color: #913c3c;
+  /* background-image: url(./images/doodle.jpg); */
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-position: center;
+  background-attachment: fixed;
+  min-height: 95vh;
+  /* width: 100vw; */
+}
+
+.home input{
+  padding: 0 1rem;
+  border: none;
+  background-color: #212121;
+  width: 15rem;
+  color: aliceblue;
+}
+
+.home input::placeholder{
+  color: aliceblue;
+}
+
+.home button{
+  border: none;
+  background-color: #212121;
+  width: 5rem;
+  border-radius: .5rem;
+  height: 2.3rem;
+  color: aliceblue;
+  transition: 0.4s;
+}
+
+.home button:hover{
+  background-color: #ff9f9f;
+  color: black;
+}
+
+.home button:active{
+  transform: scale(.9);
+  /* background-color: red; */
+
+}
+
+.home .vidclosebt{
+  background-color: rgb(255, 40, 40);
+  border-radius: 0;
+  width: 2rem;
+  height: 2rem;
+}
+
+.home .back-blur{
+  border-radius: 3rem;
+  align-self: center;
+  padding: .7rem 1.5rem;
+  background-color: rgba(255, 255, 255, 0.6);
+  width:fit-content;
+  color: #212121;
+  backdrop-filter: blur(100px);
+}
+
+.card-deck {
+  border-radius: 1rem;
+  padding-top: 2rem;
+  background-color: rgba(61, 61, 61, 0.5);
+  /* background-color: #212121; */
+  backdrop-filter: blur(15px);
+  margin: 0 1rem;
+}
+
+.card-title{
+  font-weight: 700;
+}
+
+.card-deck::before {
+  content: "";
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+  z-index: -1;
+}
+
+.home .card{
+  background-image: linear-gradient(to top, #ebc0fd 0%, #d9ded8 100%);
+  /* background-image: url(./images/bg3.jpg); */
+  max-width: 16rem;
+  padding-bottom: 1rem;
+}
+
+
+
+.home .cardbuts{
+  position: absolute;
+  bottom: .5rem;
+}
+
+.home .cardbuts .downbt{
+  width: 6rem;
+  margin-right: .5rem;
+}
+
+.home .cardbuts .fa-heart{
+  cursor: pointer;
+}
+
+
+
+nav{
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 10;
+  /* background-color: pink; */
+  /* border-bottom: 1px solid black; */
+}
+
+nav::before{
+  content: "";
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+  backdrop-filter: blur(15px);
+  z-index: -1;
+}
+
+nav ul li .a{
+  color: rgb(7, 7, 7);
+  font-weight: 600;
+  text-decoration: none;
+  font-size: 1.1rem;
+  position: relative;
+}
+
+nav ul li .a::after{
+  content: "";
+  width: 0;
+  height: .2rem;
+  background-color: #00ffb8;
+  position: absolute;
+  left: 0;
+  bottom: -0.2rem;
+  transition: .2s ease;
+}
+
+nav ul li .a:hover{
+  color: blue;
+}
+
+nav ul li .a:hover::after{
+  width: 100%;
+}
+.activa {
+  color: #00ffb8;
+}
+
+.sinlog{
+  position: absolute;
+  right: 0;
+}
+
+.msignup, .mlogin{
+  min-width: 97vw;
+  min-height: 98vh;
+  padding: 5rem 0 ;
+  background-color: #c4c4c4;
+  background-image: url(./images/doodle3.jpg);
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-attachment: fixed;
+}
+
+.mlogin{
+  padding-top: 6rem;
+}
+
+.signup, .login{
+  background-color: rgba(107, 107, 107, 0.4);
+  backdrop-filter: blur(15px);
+  /* height: 30rem; */
+  padding: 2rem 2rem 1rem 2rem;
+  color: black;
+  z-index: 10;
+  box-shadow: 0px 0px 10px 3px #212121;
+  border: solid black 1px;
+}
+
+.msignup h2, .mlogin h2{
+  color: white;
+  margin-bottom: 1rem;
+}
+
+.msignup .line-container, .mlogin .line-container{
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+
+.msignup .line-container::before,
+.msignup .line-container::after,
+.mlogin .line-container::before,
+.mlogin .line-container::after {
+  content: "";
+  border-bottom: 1px solid #212121;
+  flex: 1 0 auto;
+  height: 0.1em;
+  margin: 0;
+  /* padding-bottom: 0.1rem; */
+}
+
+.msignup .text-between, .mlogin .text-between {
+  text-align: center;
+  flex: 0.1 0 auto;
+  margin: 0;
+}
+
+.signup input, .login input, .signup select,option{
+  border-radius: 0;
+  border-bottom: 1px solid white;
+  border-left: none;
+  border-top: none;
+  border-right: none;
+  background-color: transparent;
+  color: white;
+  /* background-color: rgb(146, 146, 146); */
+}
+
+.signup input::placeholder, .login input::placeholder{
+  color: white;
+}
+
+.signup input:focus, .login input:focus{
+  outline: none;
+  color: white;
+  background-color: rgb(41, 41, 41);
+}
+
+.signbtn{
+  background-color: rgb(44, 44, 44);
+  color: white;
+  width: 6rem;
+  height: 2.5rem;
+  border: none;
+  border-radius: .2rem;
+  transition: 0.2s;
+}
+
+.signbtn:hover{
+  background-color: rgb(70, 70, 70);
+}
+
+.signbtn:active{
+  transform: translateY(5px);
+}
+
+.already{
+  margin-top: .7rem;
+  left: 2rem;
+  color: black;
+  text-decoration: none;
+}
+
+.already:hover{
+  color: white;
+}
+
+.sociallog{
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: .7rem;
+  width: 100%;
+}
+
+.input-box{
+  display: flex;
+  font-style: none
+}
+
+.eye{
+  cursor: pointer;
+  padding-top: .5rem;
+  padding-left: .5rem;
+  /* position: absolute;
+  left: 0; */
+}
+
+#hideeye1{
+  display: none;
+}
+
+.error{
+  height: 100vh;
+  background-image: url("./images/error.png");
+  background-size: cover;
+}
+
+.inerror button{
+  margin-top: 10rem;
+  margin-right: 4rem;
+}
+
+/* .inerror{
+  width: 40rem;
+  height: 20rem;
+  background-image: url("./images/error2.jpg");
+  background-size: cover;
+} */
+
+.floating-video{
+  position: fixed;
+  bottom: 0%;
+  right: 0%;
+  /* left: 60%; */
+}
+
+
+@media (max-width: 992px){
+  nav ul li {
+    padding: .5rem 0;
+    align-self: center;
+  }
+
+  .sinlog{
+    position: relative;
+  }
+  
+.error{
+  background-image: url("./images/errorph.png");
+  background-size: contain;
+  }
+
+  .floating-video{
+    position: fixed;
+    bottom: 0;
+    right: 0;
+  }
+}
