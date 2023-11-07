@@ -42,7 +42,7 @@ const App = () => {
         <Route path="/signup" element={<Signup />} />
         <Route path="*" element={<Errorpage />} />
       </Routes>
-      <ToastContainer />
+      <ToastContainer position="bottom-right" />
     </>
   )
 }

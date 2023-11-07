@@ -204,25 +204,24 @@ const Signup = () => {
               <span className="text-between">or</span>
             </div>
             <div className="sociallog">
-              <GoogleOAuthProvider clientId={process.env.REACT_APP_GOOGLE_CLIENT_ID}
-              className="col-md-6">
-                <GoogleLogin 
-                  onSuccess={(credentialResponse) => {
-                    const decoded = jwtDecode(credentialResponse.credential);
-                    const googleEmail = decoded.email; 
-                    const name = decoded.name; 
-                    const image = decoded.picture; 
+            <GoogleOAuthProvider clientId={process.env.REACT_APP_GOOGLE_CLIENT_ID}>
+              <GoogleLogin 
+                onSuccess={(credentialResponse) => {
+                  const decoded = jwtDecode(credentialResponse.credential);
+                  const googleEmail = decoded.email; 
+                  const name = decoded.name; 
+                  const image = decoded.picture; 
 
-                    sendGoogleSignUpInfo(googleEmail,name,image);
-                    navigate("/login");
-                    console.log(decoded);
-                  }}
-                  onFailure={(error) => {
-                    console.error(error);
-                  }}
-                >
-                  <span>Sign in with Google</span>
-                </GoogleLogin>
+                  sendGoogleSignUpInfo(googleEmail,name,image);
+                  navigate("/login");
+                  console.log(decoded);
+                }}
+                onFailure={(error) => {
+                  console.error(error);
+                }}
+              >
+                <span>Sign in with Google</span>
+              </GoogleLogin>
               </GoogleOAuthProvider>
             </div>
           </form>

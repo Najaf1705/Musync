@@ -255,10 +255,10 @@ const handleLikeSong = async (e, trackId) => {
               <div className="mt-2">
                 <h4 className="mb-1">Search Results</h4>
               </div>
-              <div className="card-deck row d-flex justify-content-center mx-1 my-3 pb-3">
+              <div className="card-deck row d-flex justify-content-center my-3 pb-3 mx-1">
                 {songData.tracks.items.map((item) => (
                   <div
-                    className="card col-md-3 col-6 mb-3"
+                    className="card col-5 col-md-4 col-lg-3 mb-3 mx-2"
                     key={item.id}
                   >
                     <img
@@ -272,16 +272,16 @@ const handleLikeSong = async (e, trackId) => {
                         {item.artists.map((artist) => artist.name).join(", ")}
                       </p>
                       <div className="cardbuts">
-                        <button
-                          className="downbt"
+                        <i
+                          className="fa-solid fa-download fa-xl mr-2"
+                          style={{ marginRight: "1rem" }}
                           onClick={() =>
                             handleDownload(
                               item.name + " " + item.artists[0].name
                             )
                           }
                         >
-                          Download
-                        </button>
+                        </i>
                         {isSongLiked(item.id) ? (
                           <i
                             className="fa-solid fa-heart fa-xl"
