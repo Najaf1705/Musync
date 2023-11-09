@@ -30,9 +30,9 @@ const getAccessToken = async () => {
 };
 
 
-// API endpoint to search for a song by name and get all related songs
+//song API endpoint to search for a by name
 router.get('/api/search', async (req, res) => {
-  const songName = req.query.name; // Get the song name from the query parameters
+  const songName = req.query.name;
   const accessToken = await getAccessToken();
 
   // Use the Spotify API to search for tracks with the given name
@@ -46,9 +46,27 @@ router.get('/api/search', async (req, res) => {
   res.json(searchData);
 });
 
+
+// playlist API endpoint to search for a by name
+router.get('/api/search-playlists', async (req, res) => {
+  const playlistName = req.query.name;
+  const accessToken = await getAccessToken();
+
+  // Use the Spotify API to search for playlists with the given name
+  const response = await fetch(`https://api.spotify.com/v1/search?q=${playlistName}&type=playlist`, {
+    headers: {
+      'Authorization': `Bearer ${accessToken}`,
+    },
+  });
+
+  const searchData = await response.json();
+  res.json(searchData);
+});
+
 router.get("/api/top", async (req,res)=>{
   const accessToken = await getAccessToken();
-  const response = await fetch(`https://api.spotify.com/v1/browse/featured-playlists?country=JP`, {
+  const country = req.query.country; 
+  const response = await fetch(`https://api.spotify.com/v1/browse/featured-playlists?country=${country}`, {
     headers: {
       'Authorization': `Bearer ${accessToken}`,
     },
@@ -57,5 +75,24 @@ router.get("/api/top", async (req,res)=>{
   const playListData = await response.json();
   res.json(playListData);
 })
+
+
+
+// Tracks in the playlist
+router.get('/api/playlist-tracks/:playlistId', async (req, res) => {
+  const playlistId = req.params.playlistId;
+  const accessToken = await getAccessToken();
+
+  // Use the Spotify API to get the tracks of the selected playlist
+  const response = await fetch(`https://api.spotify.com/v1/playlists/${playlistId}/tracks`, {
+    headers: {
+      'Authorization': `Bearer ${accessToken}`,
+    },
+  });
+
+  const playlistTracksData = await response.json();
+  res.json(playlistTracksData);
+});
+
 
 module.exports=router;

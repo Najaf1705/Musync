@@ -2,14 +2,14 @@ const dotenv = require("dotenv");
 dotenv.config({path:'./config.env'});
 const port=process.env.PORT;
 const express = require("express");
-// const cors = require('cors');
+const cors = require('cors');
 const app=express();
 const cookieParser = require('cookie-parser');
 
 require('./db/conn');
 // const User=require('./models/userSchema');
 app.use(cookieParser());
-// app.use(cors());
+app.use(cors());
 app.use(express.json());
 app.use(require('./router/auth'));
 app.use(require('./router/spotapi'));

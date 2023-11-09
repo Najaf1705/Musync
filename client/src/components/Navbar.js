@@ -16,6 +16,14 @@ const Navbar = (props) => {
     if(isLoggedIn){
       props.onLogStateChange(false);
       fetchProfilePicture(); 
+
+      const checkCookieExpiration = setInterval(() => {
+        const expirationDate = new Date(localStorage.getItem('cookieExpiration'));
+        if (expirationDate < new Date()) {
+          handleLogout();
+          clearInterval(checkCookieExpiration); 
+        }
+      }, 1000*60*60*24);
     }else{
       props.onLogStateChange(true);
     }
@@ -24,6 +32,7 @@ const Navbar = (props) => {
   const handleLogout = async () => {
     try {
       localStorage.setItem('isLoggedIn', 'false');
+      localStorage.removeItem('cookieExpiration');
       const response = await fetch('/logout', {
         method: 'POST',
         headers: {
@@ -74,7 +83,7 @@ const Navbar = (props) => {
                 <img
                   src={profilePictureURL}
                   alt=""
-                  style={{ width: "2.2rem", height: "2.2rem", borderRadius: "50%", marginRight: "1rem" }}
+                  style={{ width: "2rem", height: "2rem", borderRadius: "50%", marginRight: "1rem" }}
                 />
               ):("")}
             <i
@@ -113,6 +122,15 @@ const Navbar = (props) => {
                   to="/discover"
                 >
                   Discover
+                </NavLink>
+              </li>
+              <li className="nav-item px-2">
+                <NavLink
+                  className="a active"
+                  aria-current="page"
+                  to="/playlists"
+                >
+                  Playlists
                 </NavLink>
               </li>
               <li className="nav-item px-2">

@@ -11,6 +11,7 @@ import Download from './components/Download';
 import Profile from './components/Profile';
 import Login from './components/Login';
 import Signup from './components/Signup';
+// import Playlists from './components/Playlists';
 import {Route,Routes} from "react-router-dom";
 import Errorpage from './components/Errorpage';
 // const dotenv = require("dotenv");
@@ -40,6 +41,7 @@ const App = () => {
         <Route path="/profile" element={<Profile />} />
         <Route path="/login" element={<Login  onLogStateChange={logChange} />} />
         <Route path="/signup" element={<Signup />} />
+        {/* <Route path="/playlists" element={<Playlists />} /> */}
         <Route path="*" element={<Errorpage />} />
       </Routes>
       <ToastContainer position="bottom-right" />
