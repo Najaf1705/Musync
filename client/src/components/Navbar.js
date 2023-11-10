@@ -72,28 +72,28 @@ const Navbar = (props) => {
 
   return (
     <div>
-      <nav className="navbar navbar-expand-lg navbar-dark fixed-top">
+      <nav className="navbar navbar-expand-lg navbar-lg fixed-top">
         <div className="container-fluid">
           <NavLink
             className="navbar-brand mr-1"
-            to="/profile"
-            style={{ color: "black" }}
+            to="/"
+            style={{ color: "white" }}
             >
             {isLoggedIn?(
+              <NavLink to="/profile">
                 <img
                   src={profilePictureURL}
                   alt=""
                   style={{ width: "2rem", height: "2rem", borderRadius: "50%", marginRight: "1rem" }}
                 />
+              </NavLink>
               ):("")}
             <i
               className="fa-solid fa-backward-step "
-              style={{ color: "#000000" }}
             ></i>{" "}
             Musync{" "}
             <i
               className="fa-solid fa-forward-step"
-              style={{ color: "#000000" }}
             ></i>
           </NavLink>
           <button

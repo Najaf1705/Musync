@@ -22,8 +22,7 @@ const TopPL = (props) => {
   }; 
   
   const countries = [
-    { name: 'United States', code: 'US' },{ name: 'India', code: 'IN' },{ name: 'Brazil', code: 'BR' },{ name: 'Pakistan', code: 'PK' },{ name: 'United Kingdom', code: 'GB' },{ name: 'Germany', code: 'DE' },{ name: 'France', code: 'FR' },{ name: 'Italy', code: 'IT' },{ name: 'Canada', code: 'CA' },{ name: 'Australia', code: 'AU' },{ name: 'Japan', code: 'JP' },{ name: 'South Korea', code: 'KR' },{ name: 'Mexico', code: 'MX' },{ name: 'Russia', code: 'RU' },{ name: 'Spain', code: 'ES' },{ name: 'Netherlands', code: 'NL' },{ name: 'Argentina', code: 'AR' },{ name: 'Sweden', code: 'SE' },{ name: 'Switzerland', code: 'CH' },{ name: 'Norway', code: 'NO' }
-  ];
+    { name: 'Argentina', code: 'AR' },{ name: 'Australia', code: 'AU' },{ name: 'Brazil', code: 'BR' },{ name: 'Canada', code: 'CA' },{ name: 'France', code: 'FR' },{ name: 'Germany', code: 'DE' },{ name: 'India', code: 'IN' },{ name: 'Italy', code: 'IT' },{ name: 'Japan', code: 'JP' },{ name: 'Mexico', code: 'MX' },{ name: 'Netherlands', code: 'NL' },{ name: 'Norway', code: 'NO' },{ name: 'Pakistan', code: 'PK' },{ name: 'Russia', code: 'RU' },{ name: 'South Korea', code: 'KR' },{ name: 'Spain', code: 'ES' },{ name: 'Sweden', code: 'SE' },{ name: 'Switzerland', code: 'CH' },{ name: 'United Kingdom', code: 'GB' },{ name: 'United States', code: 'US' }];
 
   const handleCountryChange = (event) => {
     setSelectedCountry(event.target.value);
@@ -50,19 +49,19 @@ const TopPL = (props) => {
     setSelectedPlaylistName(null);
   };
 
-  useEffect(() => {
-    async function fetchData() {
-      try {
-        const response = await fetch(`/api/top`);
-        const data = await response.json();
-        setPlaylists(data.playlists.items);
-      } catch (error) {
-        console.error(error);
-      }
-    }
+  // useEffect(() => {
+  //   async function fetchData() {
+  //     try {
+  //       const response = await fetch(`/api/top`);
+  //       const data = await response.json();
+  //       setPlaylists(data.playlists.items);
+  //     } catch (error) {
+  //       console.error(error);
+  //     }
+  //   }
 
-    fetchData();
-  }, []);
+  //   fetchData();
+  // }, []);
 
   useEffect(() => {
     async function fetchPlaylistTracks() {
@@ -90,7 +89,6 @@ const TopPL = (props) => {
     <div className="toppl">
       {selectedPlaylist == null ? (
         <div>
-          <h4 className="text-center my-2">Top Playlists on Spotify</h4>
           <div className="country-select my-3">
             <label htmlFor="countrySelect" className="pr-4">
               Select Country: 
@@ -107,6 +105,7 @@ const TopPL = (props) => {
               ))}
             </select>
           </div>
+          <h4 className="text-center my-2">Top Playlists on Spotify</h4>
 
           <div className="row card-deck d-flex justify-content-center mx-1">
             {playlists.map((playlist) => (
@@ -139,62 +138,63 @@ const TopPL = (props) => {
               <i
                 className="fa-solid fa-xmark fa-xl curpoint"
                 style={{
-                  color: "black",
                   marginLeft: "1rem",
-                  marginBottom: "2rem",
+                  marginBottom: "2rem"
                 }}
                 onClick={clearSelectedPlaylist}
               ></i>
               {loading && (
                 <div className="text-center my-5">
-                  <i class="fa-solid fa-rotate fa-spin fa-2xl"></i>
+                  <i className="fa-solid fa-rotate fa-spin fa-2xl"></i>
                   {/* <h4>Loading...</h4> */}
                 </div>
               )}
             </div>
             {currentItems.map((item) => (
-              <div
-                className="card col-5 col-md-4 col-lg-3 mb-3 mx-2"
-                key={item.track.id}
-              >
-                <img
-                  src={item.track.album.images[0].url}
-                  className="card-img-top pt-2"
-                  alt={item.name}
-                />
-                <div className="card-body">
-                  <p className="card-text">
-                    {item.track.name.slice(0, 30)} -{" "}
-                    {item.track.artists
-                      .map((artist) => artist.name)
-                      .join(", ")
-                      .slice(0, 30)}
-                  </p>
-                  <div className="cardbuts">
-                    <i
-                      className="fa-solid fa-download fa-xl mr-2"
-                      style={{ marginRight: "1rem" }}
-                      onClick={() =>
-                        props.handleDownload(
-                          item.track.name + " " + item.track.artists[0].name
-                        )
-                      }
-                    ></i>
-                    {props.isSongLiked(item.track.id) ? (
+              item.track?.id && item.track?.album?.images[0]?.url && item.track?.name && item.track?.artists ? (
+                <div
+                  className="card col-5 col-md-4 col-lg-3 mb-3 mx-2"
+                  key={item.track.id}
+                >
+                  <img
+                    src={item.track.album.images[0].url}
+                    className="card-img-top pt-2"
+                    alt={item.name}
+                  />
+                  <div className="card-body">
+                    <p className="card-text">
+                      {item.track.name.slice(0, 30)} -{" "}
+                      {item.track.artists
+                        .map((artist) => artist.name)
+                        .join(", ")
+                        .slice(0, 30)}
+                    </p>
+                    <div className="cardbuts">
                       <i
-                        className="fa-solid fa-heart fa-xl"
-                        style={{ color: "#ff3838" }}
-                        onClick={(e) => props.handleLikeSong(e, item.track.id)}
+                        className="fa-solid fa-download fa-xl mr-2"
+                        style={{ marginRight: "1rem" }}
+                        onClick={() =>
+                          props.handleDownload(
+                            item.track.name + " " + item.track.artists[0].name
+                          )
+                        }
                       ></i>
-                    ) : (
-                      <i
-                        className="fa-regular fa-heart fa-xl"
-                        onClick={(e) => props.handleLikeSong(e, item.track.id)}
-                      ></i>
-                    )}
+                      {props.isSongLiked(item.track.id) ? (
+                        <i
+                          className="fa-solid fa-heart fa-xl"
+                          style={{ color: "#ff3838" }}
+                          onClick={(e) => props.handleLikeSong(e, item.track.id)}
+                        ></i>
+                      ) : (
+                        <i
+                          className="fa-regular fa-heart fa-xl"
+                          onClick={(e) => props.handleLikeSong(e, item.track.id)}
+                        ></i>
+                      )}
+                    </div>
                   </div>
                 </div>
-              </div>
+              ):null
             ))}
             <div className="pagination justify-content-center mt-3">
               <div aria-label="Page navigation example">

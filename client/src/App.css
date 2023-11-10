@@ -1,3 +1,7 @@
+html{
+  background-color: #212121;
+}
+
 body{
   padding-top: 3.3rem;
   background-color: #c4c4c4;
@@ -8,9 +12,10 @@ body{
 }
 
 .home{
+  color: white;
   padding-top: 1rem;
-  background-color: #913c3c;
-  /* background-image: url(./images/doodle.jpg); */
+  /* background-color: #913c3c; */
+  background-image: url(./images/bg1);
   background-repeat: no-repeat;
   background-size: cover;
   background-position: center;
@@ -73,7 +78,7 @@ body{
   font-size: .9rem;
   border-radius: 1rem;
   padding-top: 2rem;
-  background-color: rgba(255, 255, 255, 0.5);
+  background-color: rgba(255, 255, 255, 0.205);
   /* background-color: #212121; */
   backdrop-filter: blur(15px);
   margin:   1rem;
@@ -81,6 +86,10 @@ body{
 
 .card-title{
   font-weight: 700;
+}
+
+.card .card-body{
+  padding: .7rem 0;
 }
 
 .card-deck::before {
@@ -122,7 +131,7 @@ nav{
   top: 0;
   left: 0;
   z-index: 10;
-  /* background-color: pink; */
+  background-color: rgba(0, 0, 0, 0.473);
   /* border-bottom: 1px solid black; */
 }
 
@@ -138,7 +147,8 @@ nav::before{
 }
 
 nav ul li .a{
-  color: rgb(7, 7, 7);
+  color: white;
+  /* color: rgb(7, 7, 7); */
   font-weight: 600;
   text-decoration: none;
   font-size: 1.1rem;
@@ -157,7 +167,7 @@ nav ul li .a::after{
 }
 
 nav ul li .a:hover{
-  color: blue;
+  color: rgb(255, 163, 163);
 }
 
 nav ul li .a:hover::after{
