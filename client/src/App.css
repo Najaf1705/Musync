@@ -103,7 +103,7 @@ body{
 }
 
 .home .card{
-  background-image: linear-gradient(to top, #ebc0fd 0%, #d9ded8 100%);
+  /* background-image: linear-gradient(to top, #ebc0fd 0%, #d9ded8 100%); */
   /* background-image: url(./images/bg3.jpg); */
   max-width: 12rem;
   padding-bottom: 1rem;

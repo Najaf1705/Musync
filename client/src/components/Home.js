@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 // import Download from './Download';
 import { useNavigate, Outlet } from 'react-router-dom';
 import { toast } from 'react-toastify';
+import {ColorExtractor} from 'react-color-extractor';
 import TopPL from './TopPL'
 
 const Home = (props) => {
@@ -15,6 +16,8 @@ const Home = (props) => {
   const [selectedPlaylist, setSelectedPlaylist] = useState(null);
   const [selectedPlaylistName, setSelectedPlaylistName] = useState(null);
   const [playlistTracks, setPlaylistTracks] = useState([]);
+  // const [backgroundColor, setBackgroundColor] = useState(''); // Set default background color
+  // const [textColor, setTextColor] = useState('#000000'); // Set default text color
 
 
   const sitemsPerPage = 10;
@@ -40,6 +43,44 @@ const Home = (props) => {
   const ptotalPages = Math.ceil(
     (playlistData && playlistData.playlists && playlistData.playlists.items ? playlistData.playlists.items.length : 0) / pitemsPerPage
   );
+
+  const [cardColors, setCardColors] = useState([]);
+  const [cardTextColors, setCardTextColors] = useState([]);
+
+  // ... (other state variables)
+
+  const handleColors = (colors, cardIndex) => {
+    if (colors && colors.length > 0) {
+      const dominantColor = colors[0];
+      const hexColor = dominantColor.replace(/^#/, "");
+
+      // Convert to RGB
+      let bigint = parseInt(hexColor, 16);
+      let r = (bigint >> 16) & 255;
+      let g = (bigint >> 8) & 255;
+      let b = bigint & 255;
+
+      // Calculate perceived brightness using YIQ formula
+      const brightness = (r * 299 + g * 587 + b * 114) / 1000;
+
+      // Choose a text color based on perceived brightness
+      const textColor = brightness > 128 ? "#000000" : "#FFFFFF";
+      // const textColor = colors[36];
+  
+      // Use the cardIndex to update the specific card's colors in the arrays
+      setCardColors((prevColors) => {
+        const updatedColors = [...prevColors];
+        updatedColors[cardIndex] = dominantColor;
+        return updatedColors;
+      });
+  
+      setCardTextColors((prevTextColors) => {
+        const updatedTextColors = [...prevTextColors];
+        updatedTextColors[cardIndex] = textColor;
+        return updatedTextColors;
+      });
+    }
+  };
 
   
   const spaginate = (spageNumber) => {
@@ -270,7 +311,7 @@ const handleLikeSong = async (e, trackId) => {
               placeholder="Enter Song Name"
               value={songName}
               required
-              onChange={(e) =>{
+              onChange={(e) => {
                 setSongName(e.target.value);
                 clearSelectedPlaylist();
               }}
@@ -306,16 +347,25 @@ const handleLikeSong = async (e, trackId) => {
                 </div>
                 <h3>Songs</h3>
 
-                {scurrentItems.map((item) => (
+                {scurrentItems.map((item, index) => (
+                  // <ColorExtractor getColors={handleColors}>
                   <div
                     className="card col-5 col-md-4 col-lg-3 mb-3 mx-2"
                     key={item.id}
+                    style={{
+                      backgroundColor: cardColors[index] || "",
+                      color: cardTextColors[index] || "",
+                    }}
                   >
-                    <img
-                      src={item.album.images[0].url}
-                      className="card-img-top pt-2"
-                      alt={item.name}
-                    />
+                    <ColorExtractor
+                      getColors={(colors) => handleColors(colors, index)}
+                    >
+                      <img
+                        src={item.album.images[0].url}
+                        className="card-img-top pt-2"
+                        alt={item.name}
+                      />
+                    </ColorExtractor>
                     <div className="card-body">
                       <p className="card-text">
                         {item.name.slice(0, 30)} -{" "}
@@ -337,7 +387,7 @@ const handleLikeSong = async (e, trackId) => {
                         {isSongLiked(item.id) ? (
                           <i
                             className="fa-solid fa-heart fa-xl"
-                            style={{ color: "#ff3838" }}
+                            // style={{ color: "#ff3838" }}
                             onClick={(e) => handleLikeSong(e, item.id)}
                           ></i>
                         ) : (
@@ -349,6 +399,7 @@ const handleLikeSong = async (e, trackId) => {
                       </div>
                     </div>
                   </div>
+                  // </ColorExtractor>
                 ))}
                 <div className="pagination justify-content-center mt-3">
                   <div aria-label="Page navigation example">
@@ -382,9 +433,9 @@ const handleLikeSong = async (e, trackId) => {
                 playlistData.playlists &&
                 playlistData.playlists.items.length > 0 && (
                   // <div className="card-deck row d-flex justify-content-center my-3 pb-3">
-                  <div >
+                  <div>
                     {selectedPlaylist == null ? (
-                      <div className='card-deck row d-flex justify-content-center my-3 pb-3'>
+                      <div className="card-deck row d-flex justify-content-center my-3 pb-3">
                         <h3>Playlists</h3>
                         {pcurrentItems.map((playlist) => (
                           <div
@@ -447,7 +498,7 @@ const handleLikeSong = async (e, trackId) => {
                               className="fa-solid fa-xmark fa-xl curpoint"
                               style={{
                                 marginLeft: "1rem",
-                                marginBottom: "2rem"
+                                marginBottom: "2rem",
                               }}
                               onClick={clearSelectedPlaylist}
                             ></i>
@@ -458,17 +509,26 @@ const handleLikeSong = async (e, trackId) => {
                               </div>
                             )}
                           </div>
-                          {playlistTracks.map((item) => (
-                            item.track?.id && item.track?.album?.images[0]?.url && item.track?.name && item.track?.artists ? (
+                          {playlistTracks.map((item, index) =>
+                            item.track?.id &&
+                            item.track?.album?.images[0]?.url &&
+                            item.track?.name &&
+                            item.track?.artists ? (
                               <div
                                 className="card col-5 col-md-4 col-lg-3 mb-3 mx-2"
                                 key={item.track.id}
+                                style={{
+                                  backgroundColor: cardColors[index] || "",
+                                  color: cardTextColors[index] || "",
+                                }}
                               >
-                                <img
-                                  src={item.track.album.images[0].url}
-                                  className="card-img-top pt-2"
-                                  alt={item.name}
-                                />
+                                <ColorExtractor getColors={(colors) =>handleColors(colors, index)}>
+                                  <img
+                                    src={item.track.album.images[0].url}
+                                    className="card-img-top pt-2"
+                                    alt={item.name}
+                                  />
+                                </ColorExtractor>
                                 <div className="card-body">
                                   <p className="card-text">
                                     {item.track.name.slice(0, 30)} -{" "}
@@ -492,7 +552,7 @@ const handleLikeSong = async (e, trackId) => {
                                     {isSongLiked(item.track.id) ? (
                                       <i
                                         className="fa-solid fa-heart fa-xl"
-                                        style={{ color: "#ff3838" }}
+                                        // style={{ color: "#ff3838" }}
                                         onClick={(e) =>
                                           handleLikeSong(e, item.track.id)
                                         }
@@ -509,7 +569,7 @@ const handleLikeSong = async (e, trackId) => {
                                 </div>
                               </div>
                             ) : null
-                          ))}
+                          )}
                           {/* <div className="pagination justify-content-center mt-3">
                             <div aria-label="Page navigation example">
                               <ul className="pagination">

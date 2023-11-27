@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import {ColorExtractor} from 'react-color-extractor';
 const TopPL = (props) => {
   
   const [playlists, setPlaylists] = useState([]);
@@ -7,6 +8,41 @@ const TopPL = (props) => {
   const [playlistTracks, setPlaylistTracks] = useState([]);
   const [loading, setLoading] = useState(false);  
   const [selectedCountry, setSelectedCountry] = useState('JP');
+  const [cardColors, setCardColors] = useState([]);
+  const [cardTextColors, setCardTextColors] = useState([]);
+
+  const handleColors = (colors, cardIndex) => {
+    if (colors && colors.length > 0) {
+      const dominantColor = colors[0];
+      const hexColor = dominantColor.replace(/^#/, "");
+
+      // Convert to RGB
+      let bigint = parseInt(hexColor, 16);
+      let r = (bigint >> 16) & 255;
+      let g = (bigint >> 8) & 255;
+      let b = bigint & 255;
+
+      // Calculate perceived brightness using YIQ formula
+      const brightness = (r * 299 + g * 587 + b * 114) / 1000;
+
+      // Choose a text color based on perceived brightness
+      const textColor = brightness > 128 ? "#000000" : "#FFFFFF";
+      // const textColor = colors[39];
+  
+      // Use the cardIndex to update the specific card's colors in the arrays
+      setCardColors((prevColors) => {
+        const updatedColors = [...prevColors];
+        updatedColors[cardIndex] = dominantColor;
+        return updatedColors;
+      });
+  
+      setCardTextColors((prevTextColors) => {
+        const updatedTextColors = [...prevTextColors];
+        updatedTextColors[cardIndex] = textColor;
+        return updatedTextColors;
+      });
+    }
+  };
 
   const itemsPerPage = 18;
   const [currentPage, setCurrentPage] = useState(1);
@@ -150,17 +186,24 @@ const TopPL = (props) => {
                 </div>
               )}
             </div>
-            {currentItems.map((item) => (
+            {currentItems.map((item,index) => (
               item.track?.id && item.track?.album?.images[0]?.url && item.track?.name && item.track?.artists ? (
                 <div
                   className="card col-5 col-md-4 col-lg-3 mb-3 mx-2"
                   key={item.track.id}
+                  style={{
+                    backgroundColor: cardColors[index] || "",
+                    color: cardTextColors[index] || ""
+                  }}
                 >
+                <ColorExtractor getColors={(colors) => handleColors(colors, index)}>
                   <img
                     src={item.track.album.images[0].url}
                     className="card-img-top pt-2"
                     alt={item.name}
                   />
+                </ColorExtractor>
+
                   <div className="card-body">
                     <p className="card-text">
                       {item.track.name.slice(0, 30)} -{" "}
@@ -182,7 +225,7 @@ const TopPL = (props) => {
                       {props.isSongLiked(item.track.id) ? (
                         <i
                           className="fa-solid fa-heart fa-xl"
-                          style={{ color: "#ff3838" }}
+                          // style={{ color: "#ff3838" }}
                           onClick={(e) => props.handleLikeSong(e, item.track.id)}
                         ></i>
                       ) : (
