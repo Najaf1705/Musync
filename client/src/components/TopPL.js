@@ -153,11 +153,13 @@ const TopPL = (props) => {
                   setSelectedPlaylistName(playlist.name);
                 }}
               >
-                <img
-                  src={playlist.images[0].url}
-                  alt={playlist.name}
-                  className="card-img-top mx-0"
-                />
+                <div style={{minHeight: "6rem", minWidth: "100%"}}>
+                  <img
+                    src={playlist.images[0].url}
+                    alt={playlist.name}
+                    className="card-img-top mx-0"
+                  />
+                </div>
                 <div className="card-body mt-1">
                   <p className="card-title mb-0">{playlist.name}</p>
                   <p className="card-text">By {playlist.owner.display_name}</p>
@@ -196,13 +198,15 @@ const TopPL = (props) => {
                     color: cardTextColors[index] || ""
                   }}
                 >
-                <ColorExtractor getColors={(colors) => handleColors(colors, index)}>
-                  <img
-                    src={item.track.album.images[0].url}
-                    className="card-img-top pt-2"
-                    alt={item.name}
-                  />
-                </ColorExtractor>
+                <div style={{minHeight: "8rem", minWidth: "100%"}}>
+                  <ColorExtractor getColors={(colors) => handleColors(colors, index)}>
+                    <img
+                      src={item.track.album.images[0].url}
+                      className="card-img-top pt-2"
+                      alt={item.name}
+                    />
+                  </ColorExtractor>
+                </div>
 
                   <div className="card-body">
                     <p className="card-text">

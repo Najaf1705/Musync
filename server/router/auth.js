@@ -91,7 +91,7 @@ router.post('/serverlogin',async(req,res)=>{
       token=await userExists.generateAuthToken();
       console.log(token);
       res.cookie("jtoken",token,{
-        expires:new Date(Date.now()+(60000*60*24)),
+        // expires:new Date(Date.now()+(60000*60*24)),
         httpOnly:true
       });
       if(!passmatch){
@@ -119,7 +119,7 @@ router.post('/googleserverlogin', async (req, res) => {
       const token = await userExists.generateAuthToken();
       console.log(token);
       res.cookie("jtoken", token, {
-        expires: new Date(Date.now() + (60000 * 60 * 24)),
+        // expires: new Date(Date.now() + (60000 * 60 * 24)),
         httpOnly: true,
       });
       return res.status(200).json({ message: "Logged in successfully" });

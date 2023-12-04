@@ -46,6 +46,7 @@ const Home = (props) => {
 
   const [cardColors, setCardColors] = useState([]);
   const [cardTextColors, setCardTextColors] = useState([]);
+  // const [userName,setUserName] = useState('');
 
   // ... (other state variables)
 
@@ -167,7 +168,7 @@ const getUserInfo = async () => {
       },
       credentials: 'include',
     });
-
+    // console.log(response);
     return response; 
 
   } catch (error) {
@@ -272,6 +273,7 @@ const handleLikeSong = async (e, trackId) => {
         const userdata = await res.json();
         // console.log(userdata._id);
         const userId = userdata._id;
+        // console.log(userdata)
   
         const likedSongsResponse = await fetch(`/api/liked-songs/${userId}`);
         // console.log(likedSongsResponse);
@@ -297,13 +299,13 @@ const handleLikeSong = async (e, trackId) => {
   return (
     <div className="home  pb-3">
       <div className="mx-2">
-        <div className="mx-2 d-flex flex-column my-2">
+        <div className="mx-2 d-flex flex-column mb-2">
           <div className="">
-            <h3 className="text-center">Search Song</h3>
+            <h3 className="">Ohiyooo {props.userName}</h3>
           </div>
           <form
             onSubmit={handleSubmit}
-            className="input-group d-flex justify-content-center mt-3"
+            className="input-group d-flex justify-content-center mt-1"
           >
             <input
               type="text"
@@ -357,15 +359,15 @@ const handleLikeSong = async (e, trackId) => {
                       color: cardTextColors[index] || "",
                     }}
                   >
-                    <ColorExtractor
-                      getColors={(colors) => handleColors(colors, index)}
-                    >
-                      <img
-                        src={item.album.images[0].url}
-                        className="card-img-top pt-2"
-                        alt={item.name}
-                      />
-                    </ColorExtractor>
+                    <div style={{minHeight: "8rem", minWidth: "100%"}}>
+                      <ColorExtractor getColors={(colors) => handleColors(colors, index)}>
+                        <img loading="lazy"
+                          src={item.album.images[0].url}
+                          className="card-img-top pt-2"
+                          alt={item.name}
+                        />
+                      </ColorExtractor>
+                    </div>
                     <div className="card-body">
                       <p className="card-text">
                         {item.name.slice(0, 30)} -{" "}
@@ -446,11 +448,14 @@ const handleLikeSong = async (e, trackId) => {
                               setSelectedPlaylistName(playlist.name);
                             }}
                           >
-                            <img
-                              src={playlist.images[0].url}
-                              className="card-img-top pt-2"
-                              alt={playlist.name}
-                            />
+                            <div style={{minHeight: "6rem", minWidth: "100%"}}>
+                              <img loading="lazy"
+                                src={playlist.images[0].url}
+                                className="card-img-top pt-2"
+                                alt={playlist.name}
+                                // style={{minHeight: "15rem"}}
+                              />
+                            </div>
                             <div className="card-body">
                               <p
                                 className="card-text"
@@ -522,13 +527,15 @@ const handleLikeSong = async (e, trackId) => {
                                   color: cardTextColors[index] || "",
                                 }}
                               >
+                              <div style={{minHeight: "8rem", minWidth: "100%"}}>
                                 <ColorExtractor getColors={(colors) =>handleColors(colors, index)}>
-                                  <img
+                                  <img loading="lazy"
                                     src={item.track.album.images[0].url}
                                     className="card-img-top pt-2"
                                     alt={item.name}
                                   />
                                 </ColorExtractor>
+                              </div>
                                 <div className="card-body">
                                   <p className="card-text">
                                     {item.track.name.slice(0, 30)} -{" "}

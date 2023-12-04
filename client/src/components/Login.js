@@ -22,6 +22,26 @@ const Login = (props) => {
   const [email, setEmail] = useState("");
   // const [gemail, setGemail] = useState("");
   const [password, setPassword] = useState("");
+  // const [userData, setUserData] = useState({});
+
+  const getUserInfo = async () => {
+  try {
+    const response = await fetch('/serverprofile', {
+      method: 'GET',
+      headers: {
+        Accept: 'application/json',
+        'Content-Type': 'application/json',
+      },
+      credentials: 'include',
+    });
+    // console.log(response);
+    return response; 
+
+  } catch (error) {
+    console.error("Error:", error);
+    throw error;
+  }
+};
 
   const loginUser=async (e)=>{
     e.preventDefault();
@@ -45,10 +65,13 @@ const Login = (props) => {
       }, 3000); 
       return;
     }else{
-      document.getElementById("wrongpassword").innerHTML=""
-      toast.success("Logged in successfully");
+      toast.success("Logged in Successfully");
+      const res = await getUserInfo();
+      const user = await res.json();
+      // setUserData(res.json());
+      props.onLogStateChange(false,user.name);
+      console.log(user.name);
       localStorage.setItem('isLoggedIn', 'true');
-      props.onLogStateChange(false);
       navigate("/");
     }
   }
@@ -74,7 +97,11 @@ const Login = (props) => {
       }
       else {
         toast.success("Logged in Successfully");
-        props.onLogStateChange(false);
+        const res = await getUserInfo();
+        const user = await res.json();
+        // setUserData(res.json());
+        props.onLogStateChange(false,user.name);
+        console.log(user.name);
         localStorage.setItem('isLoggedIn', 'true');
         navigate("/");
       }

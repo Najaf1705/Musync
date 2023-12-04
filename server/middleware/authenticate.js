@@ -13,6 +13,7 @@ const authenticate=async (req, res, next)=>{
     req.token=token;
     req.rootuser=rootuser;
     req.userID=rootuser._id;
+    req.userName = rootuser.name;
     next();
 
   } catch (error) {

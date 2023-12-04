@@ -14,19 +14,20 @@ const Navbar = (props) => {
   // const { login } =props;
   useEffect(()=>{
     if(isLoggedIn){
-      props.onLogStateChange(false);
+      // props.onLogStateChange(false);
       fetchProfilePicture(); 
 
-      const checkCookieExpiration = setInterval(() => {
-        const expirationDate = new Date(localStorage.getItem('cookieExpiration'));
-        if (expirationDate < new Date()) {
-          handleLogout();
-          clearInterval(checkCookieExpiration); 
-        }
-      }, 1000*60*60*24);
-    }else{
-      props.onLogStateChange(true);
+      // const checkCookieExpiration = setInterval(() => {
+      //   const expirationDate = new Date(localStorage.getItem('cookieExpiration'));
+      //   if (expirationDate < new Date()) {
+      //     handleLogout();
+      //     clearInterval(checkCookieExpiration); 
+      //   }
+      // }, 1000*60*60*24);
     }
+    // else{
+    //   props.onLogStateChange(true);
+    // }
   })
 
   const handleLogout = async () => {
@@ -81,7 +82,7 @@ const Navbar = (props) => {
             >
             {isLoggedIn?(
               <NavLink to="/profile">
-                <img
+                <img className="hover-container"
                   src={profilePictureURL}
                   alt=""
                   style={{ width: "2rem", height: "2rem", borderRadius: "50%", marginRight: "1rem" }}

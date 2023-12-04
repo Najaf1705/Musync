@@ -1,6 +1,7 @@
 import React from 'react';
 import { useState } from 'react';
 import { ToastContainer } from 'react-toastify';
+import {Route,Routes} from "react-router-dom";
 import 'react-toastify/dist/ReactToastify.css';
 import "./App.css";
 import "./main.js";
@@ -11,20 +12,27 @@ import Download from './components/Download';
 import Profile from './components/Profile';
 import Login from './components/Login';
 import Signup from './components/Signup';
-// import Playlists from './components/Playlists';
-import {Route,Routes} from "react-router-dom";
 import Errorpage from './components/Errorpage';
+// import Playlists from './components/Playlists';
 // const dotenv = require("dotenv");
 // dotenv.config({path:'../clientconfig.env'});
 
 const App = () => {
   const [selectedSong, setSelectedSong] = useState('');
+  const [userName, setUserName] = useState('');
   const [login, setLogin] = useState(false);
   const handleSelectedSongChange = (songDetails) => {
     setSelectedSong(songDetails);
   };
-  const logChange = (logstate) => {
-    logstate?setLogin(false):setLogin(true)
+  const logChange = (logstate,name) => {
+    if(logstate){
+      setLogin(false);
+      setUserName("");
+    }
+    else{
+      setLogin(true);
+      setUserName(name.split(' ')[0]);
+    }
   };
 
   return (
@@ -32,7 +40,7 @@ const App = () => {
     <Navbar login={login} onLogStateChange={logChange} />
       <Routes>
         <Route path="" element={<Home selectedSong={selectedSong} 
-        onSelectedSongChange={handleSelectedSongChange} />}>
+        onSelectedSongChange={handleSelectedSongChange} userName={userName} />}>
           
         </Route>
         <Route path="/discover" element={<Discover selectedSong={selectedSong} 
