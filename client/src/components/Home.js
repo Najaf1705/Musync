@@ -3,6 +3,8 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate, Outlet } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import {ColorExtractor} from 'react-color-extractor';
+import Skeleton from 'react-loading-skeleton'
+// import 'react-loading-skeleton/dist/skeleton.css'
 import TopPL from './TopPL'
 
 const Home = (props) => {
@@ -16,6 +18,7 @@ const Home = (props) => {
   const [selectedPlaylist, setSelectedPlaylist] = useState(null);
   const [selectedPlaylistName, setSelectedPlaylistName] = useState(null);
   const [playlistTracks, setPlaylistTracks] = useState([]);
+  const [recentSearches, setRecentSearches] = useState([]);
   // const [backgroundColor, setBackgroundColor] = useState(''); // Set default background color
   // const [textColor, setTextColor] = useState('#000000'); // Set default text color
 
@@ -43,6 +46,7 @@ const Home = (props) => {
   const ptotalPages = Math.ceil(
     (playlistData && playlistData.playlists && playlistData.playlists.items ? playlistData.playlists.items.length : 0) / pitemsPerPage
   );
+
 
   const [cardColors, setCardColors] = useState([]);
   const [cardTextColors, setCardTextColors] = useState([]);
@@ -147,8 +151,34 @@ const Home = (props) => {
     fetchPlaylistTracks();
   }, [selectedPlaylist]);
 
+  useEffect(() => {
+    // Load recent searches from local storage when the component mounts
+    const storedSearches = JSON.parse(localStorage.getItem('recentSearches')) || [];
+    setRecentSearches(storedSearches);
+  }, []);
+
+  const saveRecentSearchesToLocalStorage = (searches) => {
+    // Save recent searches to local storage
+    localStorage.setItem('recentSearches', JSON.stringify(searches));
+  };
+
+  // const handleRemoveRecent = (index) => {
+  //   const updatedSearches = [...recentSearches];
+  //   updatedSearches.splice(index, 1);
+
+  //   setRecentSearches(updatedSearches);
+
+  //   // Save recent searches to local storage
+  //   saveRecentSearchesToLocalStorage(updatedSearches);
+  // };
+
   const handleSubmit = async (e) => {
     e.preventDefault(); 
+    if (songName.trim() !== '' && !recentSearches.includes(songName)) {
+      const updatedSearches = [songName, ...recentSearches.slice(0, 4)];
+      setRecentSearches(updatedSearches);
+      saveRecentSearchesToLocalStorage(updatedSearches);
+    }
     await searchSong();
     setSongName('');
   };
@@ -324,10 +354,36 @@ const handleLikeSong = async (e, trackId) => {
               </button>
             </div>
           </form>
+          <div>
+            <h6 style={{paddingTop: ".5rem"}}>Recents</h6>
+            <ul style={{ display: "flex", listStyle: "none",marginBottom: "0",padding: "0" }}>
+              <div style={{display: "flex",overflow: "auto"}}>
+                {recentSearches.map((search, index) => (
+                  <li className='curpoint' style={{ margin: "0 1rem",padding: "0 1rem",borderRadius: ".5rem",background: "grey" }}
+                  key={index}
+                  onClick={(e)=>{
+                    setSongName(search);
+                    // handleSubmit(e);
+                  }}>
+                    
+                    {/* <i
+                      className="fa-solid fa-xmark curpoint"
+                      style={{ paddingRight: ".5rem" }}
+                      // onClick={() => {
+                      //   handleRemoveRecent(index);
+                      //   // setSongData(null);
+                      // }}
+                    ></i> */}
+                    {search}
+                  </li>
+                ))}
+              </div>
+            </ul>
+          </div>
 
           {songData && songData.tracks && songData.tracks.items.length > 0 && (
             <div>
-              <div className="d-flex align-items-center mt-4">
+              <div className="d-flex align-items-center mt-2">
                 <i
                   className="fa-solid fa-xmark fa-xl curpoint"
                   style={{ paddingBottom: ".5rem" }}
@@ -338,10 +394,10 @@ const handleLikeSong = async (e, trackId) => {
                 ></i>
                 <h4 className="mx-2">{`Search Results`}</h4>
               </div>
-              <div className="card-deck row d-flex justify-content-center my-3 pb-3 mx-1">
+              <div className="card-deck row d-flex justify-content-center pb-3 mx-1">
                 <div>
                   {loading && (
-                    <div className="text-center my-5">
+                    <div className="text-center my-1">
                       <i className="fa-solid fa-rotate fa-spin fa-2xl"></i>
                       {/* <h4>Loading...</h4> */}
                     </div>
@@ -359,9 +415,12 @@ const handleLikeSong = async (e, trackId) => {
                       color: cardTextColors[index] || "",
                     }}
                   >
-                    <div style={{minHeight: "8rem", minWidth: "100%"}}>
-                      <ColorExtractor getColors={(colors) => handleColors(colors, index)}>
-                        <img loading="lazy"
+                    <div style={{ minHeight: "8rem", minWidth: "100%" }}>
+                      <ColorExtractor
+                        getColors={(colors) => handleColors(colors, index)}
+                      >
+                        <img
+                          loading="lazy"
                           src={item.album.images[0].url}
                           className="card-img-top pt-2"
                           alt={item.name}
@@ -370,7 +429,7 @@ const handleLikeSong = async (e, trackId) => {
                     </div>
                     <div className="card-body">
                       <p className="card-text">
-                        {item.name.slice(0, 30)} -{" "}
+                        {item.name.slice(0, 30) || <Skeleton />} -{" "}
                         {item.artists
                           .map((artist) => artist.name)
                           .join(", ")
@@ -448,8 +507,11 @@ const handleLikeSong = async (e, trackId) => {
                               setSelectedPlaylistName(playlist.name);
                             }}
                           >
-                            <div style={{minHeight: "6rem", minWidth: "100%"}}>
-                              <img loading="lazy"
+                            <div
+                              style={{ minHeight: "6rem", minWidth: "100%" }}
+                            >
+                              <img
+                                loading="lazy"
                                 src={playlist.images[0].url}
                                 className="card-img-top pt-2"
                                 alt={playlist.name}
@@ -527,15 +589,25 @@ const handleLikeSong = async (e, trackId) => {
                                   color: cardTextColors[index] || "",
                                 }}
                               >
-                              <div style={{minHeight: "8rem", minWidth: "100%"}}>
-                                <ColorExtractor getColors={(colors) =>handleColors(colors, index)}>
-                                  <img loading="lazy"
-                                    src={item.track.album.images[0].url}
-                                    className="card-img-top pt-2"
-                                    alt={item.name}
-                                  />
-                                </ColorExtractor>
-                              </div>
+                                <div
+                                  style={{
+                                    minHeight: "8rem",
+                                    minWidth: "100%",
+                                  }}
+                                >
+                                  <ColorExtractor
+                                    getColors={(colors) =>
+                                      handleColors(colors, index)
+                                    }
+                                  >
+                                    <img
+                                      loading="lazy"
+                                      src={item.track.album.images[0].url}
+                                      className="card-img-top pt-2"
+                                      alt={item.name}
+                                    />
+                                  </ColorExtractor>
+                                </div>
                                 <div className="card-body">
                                   <p className="card-text">
                                     {item.track.name.slice(0, 30)} -{" "}

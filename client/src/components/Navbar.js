@@ -6,29 +6,47 @@ import 'bootstrap/dist/css/bootstrap.css';
 import { toast } from 'react-toastify';
 import profilePicture from '../images/doodle.jpg';
 
-const Navbar = (props) => {
+  const Navbar = (props) => {
   
-  const [profilePictureURL, setProfilePictureURL] = useState('');
+  const [profilePictureURL, setProfilePictureURL] = useState(profilePicture);
   const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
 
-  // const { login } =props;
-  useEffect(()=>{
-    if(isLoggedIn){
-      // props.onLogStateChange(false);
-      fetchProfilePicture(); 
-
-      // const checkCookieExpiration = setInterval(() => {
-      //   const expirationDate = new Date(localStorage.getItem('cookieExpiration'));
-      //   if (expirationDate < new Date()) {
-      //     handleLogout();
-      //     clearInterval(checkCookieExpiration); 
-      //   }
-      // }, 1000*60*60*24);
+  const getUserInfo = async () => {
+  try {
+    const response = await fetch('/serverprofile', {
+      method: 'GET',
+      headers: {
+        Accept: 'application/json',
+        'Content-Type': 'application/json',
+      },
+      credentials: 'include',
+    });
+    // console.log(response);
+    return response; 
+  } catch (error) {
+      console.error("Error:", error);
+      throw error;
     }
-    // else{
-    //   props.onLogStateChange(true);
-    // }
-  })
+  };
+
+  // const { login } =props;
+  useEffect(() => {
+    const fetchData = async () => {
+      if (isLoggedIn) {
+        try {
+          const res = await getUserInfo();
+          const user = await res.json();
+          props.onLogStateChange(false, user.name);
+          fetchProfilePicture();  
+        } catch (error) {
+          console.error("Error fetching user data:", error);
+        }
+      } else {
+        // props.onLogStateChange(true);
+      }
+    };
+    fetchData();
+  }, [isLoggedIn, props]);
 
   const handleLogout = async () => {
     try {
@@ -42,7 +60,7 @@ const Navbar = (props) => {
       });
   
       if (response.status === 200) {
-        props.onLogStateChange(true); 
+        props.onLogStateChange(true,""); 
         toast.success("Logged out Successfully");
       } else {
         console.error('Logout failed with status: ' + response.status);

@@ -158,8 +158,8 @@ nav ul li .a{
 nav ul li .a::after{
   content: "";
   width: 0;
-  height: .2rem;
-  background-color: #00ffb8;
+  height: .1rem;
+  background-color: white;
   position: absolute;
   left: 0;
   bottom: -0.2rem;
@@ -167,7 +167,8 @@ nav ul li .a::after{
 }
 
 nav ul li .a:hover{
-  color: rgb(255, 163, 163);
+  color: rgb(182, 182, 182);
+  /* color: black; */
 }
 
 nav ul li .a:hover::after{

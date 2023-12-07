@@ -3,6 +3,7 @@ import { useState } from 'react';
 import { ToastContainer } from 'react-toastify';
 import {Route,Routes} from "react-router-dom";
 import 'react-toastify/dist/ReactToastify.css';
+// import { SkeletonTheme } from 'react-loading-skeleton';
 import "./App.css";
 import "./main.js";
 import Navbar from './components/Navbar';
@@ -37,21 +38,21 @@ const App = () => {
 
   return (
     <>
-    <Navbar login={login} onLogStateChange={logChange} />
-      <Routes>
-        <Route path="" element={<Home selectedSong={selectedSong} 
-        onSelectedSongChange={handleSelectedSongChange} userName={userName} />}>
-          
-        </Route>
-        <Route path="/discover" element={<Discover selectedSong={selectedSong} 
-        onSelectedSongChange={handleSelectedSongChange}/>} />
-        <Route path="/download" element={<Download selectedSong={selectedSong}/>} />
-        <Route path="/profile" element={<Profile />} />
-        <Route path="/login" element={<Login  onLogStateChange={logChange} />} />
-        <Route path="/signup" element={<Signup />} />
-        {/* <Route path="/playlists" element={<Playlists />} /> */}
-        <Route path="*" element={<Errorpage />} />
-      </Routes>
+      <Navbar login={login} onLogStateChange={logChange} />
+        <Routes>
+          <Route path="" element={<Home selectedSong={selectedSong} 
+          onSelectedSongChange={handleSelectedSongChange} userName={userName} />}>
+            
+          </Route>
+          <Route path="/discover" element={<Discover selectedSong={selectedSong} 
+          onSelectedSongChange={handleSelectedSongChange}/>} />
+          <Route path="/download" element={<Download selectedSong={selectedSong}/>} />
+          <Route path="/profile" element={<Profile />} />
+          <Route path="/login" element={<Login  onLogStateChange={logChange} />} />
+          <Route path="/signup" element={<Signup />} />
+          {/* <Route path="/playlists" element={<Playlists />} /> */}
+          <Route path="*" element={<Errorpage />} />
+        </Routes>
       <ToastContainer position="bottom-right" />
     </>
   )
