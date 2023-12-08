@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 // import Download from './Download';
 import { useNavigate, Outlet } from 'react-router-dom';
 import { toast } from 'react-toastify';
@@ -107,10 +107,11 @@ const Home = (props) => {
   
   useEffect(() => {
     likedSongsArray();
+    // searchSong();
   } ); 
   
 
-  const searchSong = async () => {
+  const searchSong = useCallback(async () => {
     try {
       setLoading(true);
       const songResponse = await fetch(`/api/search?name=${songName}`);
@@ -119,14 +120,14 @@ const Home = (props) => {
 
       const playlistsResponse = await fetch(`/api/search-playlists?name=${songName}`);
       const playlistsData = await playlistsResponse.json();
-      console.log(playlistsData);
+      // console.log(playlistsData);
       setPlaylistData(playlistsData);
     } catch (error) {
       console.error(error);
     }finally{
       setLoading(false);
     }
-  };
+  },[songName]);
 
 
   useEffect(() => {
@@ -162,15 +163,12 @@ const Home = (props) => {
     localStorage.setItem('recentSearches', JSON.stringify(searches));
   };
 
-  // const handleRemoveRecent = (index) => {
-  //   const updatedSearches = [...recentSearches];
-  //   updatedSearches.splice(index, 1);
-
-  //   setRecentSearches(updatedSearches);
-
-  //   // Save recent searches to local storage
-  //   saveRecentSearchesToLocalStorage(updatedSearches);
-  // };
+  // const handleRecents=async()=>{
+  //   console.log(songName);
+  //   // setSongName(search);
+  //   await searchSong();
+  //   // setSongName("");
+  // }
 
   const handleSubmit = async (e) => {
     e.preventDefault(); 
@@ -179,8 +177,8 @@ const Home = (props) => {
       setRecentSearches(updatedSearches);
       saveRecentSearchesToLocalStorage(updatedSearches);
     }
-    await searchSong();
-    setSongName('');
+    // await searchSong();
+    // setSongName('');
   };
   
   const handleDownload = (songDetails) => {
@@ -258,8 +256,6 @@ const sendUnlikeSong = async (userId, trackId) => {
   }
 };
 
-
-
 const handleLikeSong = async (e, trackId) => {
   e.preventDefault();
 
@@ -324,6 +320,10 @@ const handleLikeSong = async (e, trackId) => {
   };
 
   const isSongLiked = (trackId) => likedSongs.includes(trackId);
+
+  useEffect(() => {
+    searchSong();
+  }, [songName, searchSong]);
   
 
   return (
@@ -359,10 +359,11 @@ const handleLikeSong = async (e, trackId) => {
             <ul style={{ display: "flex", listStyle: "none",marginBottom: "0",padding: "0" }}>
               <div style={{display: "flex",overflow: "auto"}}>
                 {recentSearches.map((search, index) => (
-                  <li className='curpoint' style={{ margin: "0 1rem",padding: "0 1rem",borderRadius: ".5rem",background: "grey" }}
+                  <li className='curpoint' style={{whiteSpace: "nowrap", margin: "0 1rem",padding: "0 1rem",borderRadius: ".5rem",background: "grey" }}
                   key={index}
-                  onClick={(e)=>{
+                  onClick={() => {
                     setSongName(search);
+                    // console.log(songName);
                     // handleSubmit(e);
                   }}>
                     
@@ -407,59 +408,61 @@ const handleLikeSong = async (e, trackId) => {
 
                 {scurrentItems.map((item, index) => (
                   // <ColorExtractor getColors={handleColors}>
-                  <div
-                    className="card col-5 col-md-4 col-lg-3 mb-3 mx-2"
-                    key={item.id}
-                    style={{
-                      backgroundColor: cardColors[index] || "",
-                      color: cardTextColors[index] || "",
-                    }}
-                  >
-                    <div style={{ minHeight: "8rem", minWidth: "100%" }}>
-                      <ColorExtractor
-                        getColors={(colors) => handleColors(colors, index)}
-                      >
-                        <img
-                          loading="lazy"
-                          src={item.album.images[0].url}
-                          className="card-img-top pt-2"
-                          alt={item.name}
-                        />
-                      </ColorExtractor>
-                    </div>
-                    <div className="card-body">
-                      <p className="card-text">
-                        {item.name.slice(0, 30) || <Skeleton />} -{" "}
-                        {item.artists
-                          .map((artist) => artist.name)
-                          .join(", ")
-                          .slice(0, 30)}
-                      </p>
-                      <div className="cardbuts">
-                        <i
-                          className="fa-solid fa-download fa-xl mr-2"
-                          style={{ marginRight: "1rem" }}
-                          onClick={() =>
-                            handleDownload(
-                              item.name + " " + item.artists[0].name
-                            )
-                          }
-                        ></i>
-                        {isSongLiked(item.id) ? (
+                  item.id && item.album?.images[0]?.url && item.name && item.artists ? (
+                    <div
+                      className="card col-5 col-md-4 col-lg-3 mb-3 mx-2"
+                      key={item.id}
+                      style={{
+                        backgroundColor: cardColors[index] || "",
+                        color: cardTextColors[index] || "",
+                      }}
+                    >
+                      <div style={{ minHeight: "8rem", minWidth: "100%" }}>
+                        <ColorExtractor
+                          getColors={(colors) => handleColors(colors, index)}
+                        >
+                          <img
+                            loading="lazy"
+                            src={item.album?.images[0]?.url}
+                            className="card-img-top pt-2"
+                            alt={item.name}
+                          />
+                        </ColorExtractor>
+                      </div>
+                      <div className="card-body">
+                        <p className="card-text">
+                          {item.name.slice(0, 30) || <Skeleton />} -{" "}
+                          {item.artists
+                            .map((artist) => artist.name)
+                            .join(", ")
+                            .slice(0, 30)}
+                        </p>
+                        <div className="cardbuts">
                           <i
-                            className="fa-solid fa-heart fa-xl"
-                            // style={{ color: "#ff3838" }}
-                            onClick={(e) => handleLikeSong(e, item.id)}
+                            className="fa-solid fa-download fa-xl mr-2"
+                            style={{ marginRight: "1rem" }}
+                            onClick={() =>
+                              handleDownload(
+                                item.name + " " + item.artists[0].name
+                              )
+                            }
                           ></i>
-                        ) : (
-                          <i
-                            className="fa-regular fa-heart fa-xl"
-                            onClick={(e) => handleLikeSong(e, item.id)}
-                          ></i>
-                        )}
+                          {isSongLiked(item.id) ? (
+                            <i
+                              className="fa-solid fa-heart fa-xl"
+                              // style={{ color: "#ff3838" }}
+                              onClick={(e) => handleLikeSong(e, item.id)}
+                            ></i>
+                          ) : (
+                            <i
+                              className="fa-regular fa-heart fa-xl"
+                              onClick={(e) => handleLikeSong(e, item.id)}
+                            ></i>
+                          )}
+                        </div>
                       </div>
                     </div>
-                  </div>
+                  ):null
                   // </ColorExtractor>
                 ))}
                 <div className="pagination justify-content-center mt-3">
@@ -499,35 +502,37 @@ const handleLikeSong = async (e, trackId) => {
                       <div className="card-deck row d-flex justify-content-center my-3 pb-3">
                         <h3>Playlists</h3>
                         {pcurrentItems.map((playlist) => (
-                          <div
-                            className="col-4 col-md-4 col-lg-2 mb-3 curpoint"
-                            key={playlist.id}
-                            onClick={() => {
-                              setSelectedPlaylist(playlist.id);
-                              setSelectedPlaylistName(playlist.name);
-                            }}
-                          >
+                          playlist.id && playlist.images[0]?.url && playlist.name && playlist.owner.display_name ? (
                             <div
-                              style={{ minHeight: "6rem", minWidth: "100%" }}
+                              className="col-4 col-md-4 col-lg-2 mb-3 curpoint"
+                              key={playlist.id}
+                              onClick={() => {
+                                setSelectedPlaylist(playlist.id);
+                                setSelectedPlaylistName(playlist.name);
+                              }}
                             >
-                              <img
-                                loading="lazy"
-                                src={playlist.images[0].url}
-                                className="card-img-top pt-2"
-                                alt={playlist.name}
-                                // style={{minHeight: "15rem"}}
-                              />
-                            </div>
-                            <div className="card-body">
-                              <p
-                                className="card-text"
-                                style={{ fontSize: ".9rem", fontWeight: "600" }}
+                              <div
+                                style={{ minHeight: "6rem", minWidth: "100%" }}
                               >
-                                {playlist.name} - {playlist.owner.display_name}
-                              </p>
-                              {/* Add more details or buttons as needed */}
+                                <img
+                                  loading="lazy"
+                                  src={playlist.images[0].url}
+                                  className="card-img-top pt-2"
+                                  alt={playlist.name}
+                                  // style={{minHeight: "15rem"}}
+                                />
+                              </div>
+                              <div className="card-body">
+                                <p
+                                  className="card-text"
+                                  style={{ fontSize: ".9rem", fontWeight: "600" }}
+                                >
+                                  {playlist.name} - {playlist.owner.display_name}
+                                </p>
+                                {/* Add more details or buttons as needed */}
+                              </div>
                             </div>
-                          </div>
+                          ):null
                         ))}
                         <div className="pagination justify-content-center mt-3">
                           <div aria-label="Page navigation example">

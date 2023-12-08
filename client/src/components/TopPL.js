@@ -198,15 +198,15 @@ const TopPL = (props) => {
                     color: cardTextColors[index] || ""
                   }}
                 >
-                <div style={{minHeight: "8rem", minWidth: "100%"}}>
-                  <ColorExtractor getColors={(colors) => handleColors(colors, index)}>
-                    <img
-                      src={item.track.album.images[0].url}
-                      className="card-img-top pt-2"
-                      alt={item.name}
-                    />
-                  </ColorExtractor>
-                </div>
+                  <div style={{minHeight: "8rem", minWidth: "100%"}}>
+                    <ColorExtractor getColors={(colors) => handleColors(colors, index)}>
+                      <img
+                        src={item.track.album.images[0].url}
+                        className="card-img-top pt-2"
+                        alt={item.name}
+                      />
+                    </ColorExtractor>
+                  </div>
 
                   <div className="card-body">
                     <p className="card-text">
