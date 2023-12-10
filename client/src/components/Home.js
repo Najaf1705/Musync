@@ -180,6 +180,12 @@ const Home = (props) => {
     // await searchSong();
     // setSongName('');
   };
+
+  const handleRemoveRecent = (removedItem) => {
+  const updatedSearches = recentSearches.filter(item => item !== removedItem);
+  setRecentSearches(updatedSearches);
+  saveRecentSearchesToLocalStorage(updatedSearches);
+};
   
   const handleDownload = (songDetails) => {
     props.onSelectedSongChange(songDetails);
@@ -359,23 +365,26 @@ const handleLikeSong = async (e, trackId) => {
             <ul style={{ display: "flex", listStyle: "none",marginBottom: "0",padding: "0" }}>
               <div style={{display: "flex",overflow: "auto"}}>
                 {recentSearches.map((search, index) => (
-                  <li className='curpoint' style={{whiteSpace: "nowrap", margin: "0 1rem",padding: "0 1rem",borderRadius: ".5rem",background: "grey" }}
+                  <li className='recents curpoint' style={{ }}
                   key={index}
-                  onClick={() => {
+                  >
+                    <i
+                    className="fa-solid fa-xmark curpoint"
+                    style={{ paddingRight: ".2rem" }}
+                      onClick={() => {
+                      // setSongData(null);
+                      handleRemoveRecent(search);
+                      }}
+                    ></i>
+                    
+                    <div
+                    onClick={() => {
                     setSongName(search);
                     // console.log(songName);
                     // handleSubmit(e);
                   }}>
-                    
-                    {/* <i
-                      className="fa-solid fa-xmark curpoint"
-                      style={{ paddingRight: ".5rem" }}
-                      // onClick={() => {
-                      //   handleRemoveRecent(index);
-                      //   // setSongData(null);
-                      // }}
-                    ></i> */}
-                    {search}
+                      {search}
+                    </div>
                   </li>
                 ))}
               </div>

@@ -1,52 +1,62 @@
-// import React, { useState } from 'react';
+import React, { useState } from 'react';
 
-// const Playlist = () => {
-//   const [playlist, setPlaylist] = useState([
-//     { id: 1, title: 'Song 1', artist: 'Artist 1' },
-//     { id: 2, title: 'Song 2', artist: 'Artist 2' },
-//     { id: 3, title: 'Song 3', artist: 'Artist 3' },
-//   ]);
-//   const [currentTrack, setCurrentTrack] = useState(null);
+const Playlist = (props) => {
 
-//   const playTrack = (track) => {
-//     setCurrentTrack(track);
-//   };
+  const [displaySongs, setDisplaySongs] = useState(false);
 
-//   const pauseTrack = () => {
-//     setCurrentTrack(null);
-//   };
+  const showSongs=()=>{
+    setDisplaySongs(true)
+  }
 
-//   const skipTrack = () => {
-//     const currentIndex = playlist.findIndex((track) => track === currentTrack);
-//     if (currentIndex !== -1 && currentIndex < playlist.length - 1) {
-//       setCurrentTrack(playlist[currentIndex + 1]);
-//     }
-//   };
+  const dontShowSongs=()=>{
+    setDisplaySongs(false)
+  }
 
-//   return (
-//     <div className='home'>
-//       <div className="mx-2">
-//         <h2>Playlist</h2>
-//         <ul>
-//           {playlist.map((track) => (
-//             <li key={track.id}>
-//               {track.title} - {track.artist}
-//               <button onClick={() => playTrack(track)}>Play</button>
-//             </li>
-//           ))}
-//         </ul>
-//         <div>
-//           {currentTrack && (
-//             <div>
-//               <h3>Now Playing: {currentTrack.title}</h3>
-//               <button onClick={pauseTrack}>Pause</button>
-//               <button onClick={skipTrack}>Skip</button>
-//             </div>
-//           )}
-//         </div>
-//       </div>
-//     </div>
-//   );
-// };
+  return (
+    <div className='home'>
+      <div className="mx-2">
+        <h2 className='mx-4 mt-3'>Playlist</h2>
+        <div className="row card-deck d-flex justify-content-center mx-1">
+          {displaySongs===false?(
+            <div
+              className="col-4 col-md-4 col-lg-3 mb-3 curpoint"
+              onClick={showSongs}
+            >
+              <div style={{minHeight: "6rem", minWidth: "100%", overflow: "hidden"}}>
+                <img
+                  src="/images/playlists.png"
+                  alt="heheh"
+                  className="card-img-top mx-0"
+                  style={{ width: "100%", height: "100%", objectFit: "cover" }}
+                />
+              </div>
+              <div className="card-body mt-1">
+                <h6 className="card-title mb-0">💗Liked Songs</h6>
+                {/* <p className="card-text">By You</p> */}
+              </div>
+            </div>
+            ):(
+            <>
+              <i
+                className="fa-solid fa-xmark fa-xl curpoint"
+                style={{
+                  marginLeft: "1rem",
+                  marginBottom: "2rem"
+                }}
+                onClick={dontShowSongs}
+              ></i>
+              <div>
+                get items using track id and display
+              </div>
+            </>
+          )}
+        </div>
+        <div id='gg'>
+          {displaySongs}
+        </div>
+      </div>
+    </div>
+  );
+};
 
-// export default Playlist;
+export default Playlist;

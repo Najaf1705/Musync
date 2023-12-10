@@ -94,5 +94,22 @@ router.get('/api/playlist-tracks/:playlistId', async (req, res) => {
   res.json(playlistTracksData);
 });
 
+// track info from trackID
+router.get('/api/:track_info', async (req, res) => {
+  const trackid = req.params.track_info;
+  const accessToken = await getAccessToken();
+
+  // Use the Spotify API to get the tracks of the selected playlist
+  const response = await fetch(`https://api.spotify.com/v1/tracks/${trackid}`, {
+    headers: {
+      'Authorization': `Bearer ${accessToken}`,
+    },
+  });
+
+  const trackinfo = await response.json();
+  res.json(trackinfo);
+  console.log(trackinfo);
+});
+
 
 module.exports=router;

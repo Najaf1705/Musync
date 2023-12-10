@@ -93,27 +93,30 @@ import profilePicture from '../images/doodle.jpg';
     <div>
       <nav className="navbar navbar-expand-lg navbar-lg fixed-top">
         <div className="container-fluid">
+          {isLoggedIn ? (
+            <>
+              <NavLink to="/profile">
+                <img
+                  className="hover-container"
+                  src={profilePictureURL}
+                  alt=""
+                  style={{
+                    width: "2rem",
+                    height: "2rem",
+                    borderRadius: "50%",
+                    marginRight: "1rem",
+                  }}
+                />
+              </NavLink>
+            </>
+          ) : ("")}
           <NavLink
             className="navbar-brand mr-1"
             to="/"
             style={{ color: "white" }}
-            >
-            {isLoggedIn?(
-              <NavLink to="/profile">
-                <img className="hover-container"
-                  src={profilePictureURL}
-                  alt=""
-                  style={{ width: "2rem", height: "2rem", borderRadius: "50%", marginRight: "1rem" }}
-                />
-              </NavLink>
-              ):("")}
-            <i
-              className="fa-solid fa-backward-step "
-            ></i>{" "}
-            Musync{" "}
-            <i
-              className="fa-solid fa-forward-step"
-            ></i>
+          >
+            <i className="fa-solid fa-backward-step "></i> Musync{" "}
+            <i className="fa-solid fa-forward-step"></i>
           </NavLink>
           <button
             className="navbar-toggler"
@@ -144,13 +147,17 @@ import profilePicture from '../images/doodle.jpg';
                 </NavLink>
               </li>
               <li className="nav-item px-2">
-                <NavLink
-                  className="a active"
-                  aria-current="page"
-                  to="/playlists"
-                >
-                  Playlists
-                </NavLink>
+                {props.login ? (
+                  <NavLink
+                    className="a active"
+                    aria-current="page"
+                    to="/playlists"
+                  >
+                    Playlists
+                  </NavLink>
+                ) : (
+                  ""
+                )}
               </li>
               <li className="nav-item px-2">
                 <NavLink
@@ -162,9 +169,11 @@ import profilePicture from '../images/doodle.jpg';
                 </NavLink>
               </li>
               {/* <li className="nav-item px-2">
-                <NavLink className="a active" aria-current="page" to="/profile">
-                  Profile
-                </NavLink>
+                {props.login?(
+                  <NavLink className="a active" aria-current="page" to="/profile">
+                    Profile
+                  </NavLink>
+                ):("")}
               </li> */}
               <li className="sinlog nav-item px-3">
                 {props.login ? (

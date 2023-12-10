@@ -10,11 +10,11 @@ import Navbar from './components/Navbar';
 import Home from './components/Home';
 import Discover from './components/Discover';
 import Download from './components/Download';
-import Profile from './components/Profile';
+// import Profile from './components/Profile';
 import Login from './components/Login';
 import Signup from './components/Signup';
 import Errorpage from './components/Errorpage';
-// import Playlists from './components/Playlists';
+import Playlists from './components/Playlists';
 // const dotenv = require("dotenv");
 // dotenv.config({path:'../clientconfig.env'});
 
@@ -47,10 +47,10 @@ const App = () => {
           <Route path="/discover" element={<Discover selectedSong={selectedSong} 
           onSelectedSongChange={handleSelectedSongChange}/>} />
           <Route path="/download" element={<Download selectedSong={selectedSong}/>} />
-          <Route path="/profile" element={<Profile />} />
+          {/* <Route path="/profile" element={<Profile />} /> */}
           <Route path="/login" element={<Login  onLogStateChange={logChange} />} />
           <Route path="/signup" element={<Signup />} />
-          {/* <Route path="/playlists" element={<Playlists />} /> */}
+          <Route path="/playlists" element={<Playlists />} />
           <Route path="*" element={<Errorpage />} />
         </Routes>
       <ToastContainer position="bottom-right" />
