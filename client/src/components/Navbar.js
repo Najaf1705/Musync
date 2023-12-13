@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { NavLink } from 'react-router-dom';
 import 'bootstrap/dist/css/bootstrap.css';
 import { toast } from 'react-toastify';
-import profilePicture from '../images/doodle.jpg';
+const profilePicture = process.env.PUBLIC_URL + '/images/doodle.jpg';
 
   const Navbar = (props) => {
   
@@ -36,17 +36,18 @@ import profilePicture from '../images/doodle.jpg';
         try {
           const res = await getUserInfo();
           const user = await res.json();
-          props.onLogStateChange(false, user.name);
+          props.onLogStateChange(false, user);
+          console.log("gg");
           fetchProfilePicture();  
         } catch (error) {
           console.error("Error fetching user data:", error);
         }
       } else {
-        // props.onLogStateChange(true);
+        props.onLogStateChange(true,null);
       }
     };
     fetchData();
-  }, [isLoggedIn, props]);
+  }, []);
 
   const handleLogout = async () => {
     try {
@@ -60,7 +61,8 @@ import profilePicture from '../images/doodle.jpg';
       });
   
       if (response.status === 200) {
-        props.onLogStateChange(true,""); 
+        props.onLogStateChange(true,null);
+        console.log("ggout");
         toast.success("Logged out Successfully");
       } else {
         console.error('Logout failed with status: ' + response.status);
@@ -93,31 +95,33 @@ import profilePicture from '../images/doodle.jpg';
     <div>
       <nav className="navbar navbar-expand-lg navbar-lg fixed-top">
         <div className="container-fluid">
-          {isLoggedIn ? (
-            <>
-              <NavLink to="/profile">
-                <img
-                  className="hover-container"
-                  src={profilePictureURL}
-                  alt=""
-                  style={{
-                    width: "2rem",
-                    height: "2rem",
-                    borderRadius: "50%",
-                    marginRight: "1rem",
-                  }}
-                />
-              </NavLink>
-            </>
-          ) : ("")}
-          <NavLink
-            className="navbar-brand mr-1"
-            to="/"
-            style={{ color: "white" }}
-          >
-            <i className="fa-solid fa-backward-step "></i> Musync{" "}
-            <i className="fa-solid fa-forward-step"></i>
-          </NavLink>
+          <div style={{display: "flex", alignItems: "center"}}>
+            {isLoggedIn ? (
+              <>
+                <NavLink to="/profile">
+                  <img
+                    className="hover-container"
+                    src={profilePictureURL}
+                    alt=""
+                    style={{
+                      width: "2rem",
+                      height: "2rem",
+                      borderRadius: "50%",
+                      marginRight: "1rem",
+                    }}
+                  />
+                </NavLink>
+              </>
+            ) : ("")}
+            <NavLink
+              className="navbar-brand mr-1"
+              to="/"
+              style={{ color: "white" }}
+            >
+              <i className="fa-solid fa-backward-step "></i> Musync{" "}
+              <i className="fa-solid fa-forward-step"></i>
+            </NavLink>
+          </div>
           <button
             className="navbar-toggler"
             type="button"
@@ -146,8 +150,8 @@ import profilePicture from '../images/doodle.jpg';
                   Discover
                 </NavLink>
               </li>
-              <li className="nav-item px-2">
-                {props.login ? (
+              {props.login ? (
+                <li className="nav-item px-2">
                   <NavLink
                     className="a active"
                     aria-current="page"
@@ -155,10 +159,10 @@ import profilePicture from '../images/doodle.jpg';
                   >
                     Playlists
                   </NavLink>
+                </li>
                 ) : (
                   ""
-                )}
-              </li>
+              )}
               <li className="nav-item px-2">
                 <NavLink
                   className="a active"

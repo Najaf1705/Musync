@@ -9,19 +9,17 @@ import TopPL from './TopPL'
 
 const Home = (props) => {
   const navigate = useNavigate();
+
   const [songName, setSongName] = useState('');
   const [songData, setSongData] = useState(null);
   const [playlistData, setPlaylistData] = useState(null);
-  const [likedSongs, setLikedSongs] = useState([]);
-  const [likedSongsState, setLikedSongsState] = useState(likedSongs);
+  const [likedSongs, setLikedSongs] = useState(props.userDetails.likedSongs || []);
+  // const [likedSongsState, setLikedSongsState] = useState(likedSongs);
   const [loading, setLoading] = useState(false);  
   const [selectedPlaylist, setSelectedPlaylist] = useState(null);
   const [selectedPlaylistName, setSelectedPlaylistName] = useState(null);
   const [playlistTracks, setPlaylistTracks] = useState([]);
   const [recentSearches, setRecentSearches] = useState([]);
-  // const [backgroundColor, setBackgroundColor] = useState(''); // Set default background color
-  // const [textColor, setTextColor] = useState('#000000'); // Set default text color
-
 
   const sitemsPerPage = 10;
   const [scurrentPage, setScurrentPage] = useState(1);
@@ -48,11 +46,20 @@ const Home = (props) => {
   );
 
 
+// immediatly update likedSongs
+  useEffect(() => {
+    setLikedSongs(props.userDetails.likedSongs || []);
+}, [props.userDetails.likedSongs,props.updateUserDetails]);
+
+const gg=()=>{
+  console.log();
+}
+
+gg();
+
+
   const [cardColors, setCardColors] = useState([]);
   const [cardTextColors, setCardTextColors] = useState([]);
-  // const [userName,setUserName] = useState('');
-
-  // ... (other state variables)
 
   const handleColors = (colors, cardIndex) => {
     if (colors && colors.length > 0) {
@@ -105,10 +112,6 @@ const Home = (props) => {
     setSelectedPlaylistName(null);
   };
   
-  useEffect(() => {
-    likedSongsArray();
-    // searchSong();
-  } ); 
   
 
   const searchSong = useCallback(async () => {
@@ -163,12 +166,6 @@ const Home = (props) => {
     localStorage.setItem('recentSearches', JSON.stringify(searches));
   };
 
-  // const handleRecents=async()=>{
-  //   console.log(songName);
-  //   // setSongName(search);
-  //   await searchSong();
-  //   // setSongName("");
-  // }
 
   const handleSubmit = async (e) => {
     e.preventDefault(); 
@@ -192,23 +189,32 @@ const Home = (props) => {
     navigate('/download');
   };
 
-const getUserInfo = async () => {
-  try {
-    const response = await fetch('/serverprofile', {
-      method: 'GET',
-      headers: {
-        Accept: 'application/json',
-        'Content-Type': 'application/json',
-      },
-      credentials: 'include',
-    });
-    // console.log(response);
-    return response; 
+// const getUserInfo = async () => {
+//   try {
+//     const response = await fetch('/serverprofile', {
+//       method: 'GET',
+//       headers: {
+//         Accept: 'application/json',
+//         'Content-Type': 'application/json',
+//       },
+//       credentials: 'include',
+//     });
+//     // console.log(response);
+//     return response; 
 
-  } catch (error) {
-    console.error("Error:", error);
-    throw error;
-  }
+//   } catch (error) {
+//     console.error("Error:", error);
+//     throw error;
+//   }
+// };
+
+ // update likedSongs in the parent (App.js) component
+ const handleUpdateLikedSongs = (newLikedSongs) => {
+  const newUserDetails = {
+    ...props.userDetails,
+    likedSongs: newLikedSongs,
+  };
+  props.updateUserDetails(newUserDetails);
 };
 
 
@@ -223,9 +229,12 @@ const sendLikeSong = async (userId, trackId) => {
     });
 
     if (response.status === 200) {
+
     } else if (response.status === 400) {
-      const updatedLikedSongs = likedSongsState.filter((id) => id !== trackId);
-      setLikedSongsState(updatedLikedSongs);
+      const updatedLikedSongs = likedSongs.filter((id) => id !== trackId);
+      setLikedSongs(updatedLikedSongs);
+      // update in parent App.js
+      handleUpdateLikedSongs(updatedLikedSongs);
       // Unlike it
       await sendUnlikeSong(userId, trackId);
     } else {
@@ -250,8 +259,10 @@ const sendUnlikeSong = async (userId, trackId) => {
     } else if (response.status === 400) {
       // console.error('Song not found in liked songs');
 
-      const updatedLikedSongs = [...likedSongsState, trackId];
-      setLikedSongsState(updatedLikedSongs);
+      const updatedLikedSongs = [...likedSongs, trackId];
+      setLikedSongs(updatedLikedSongs);
+      // update in parent App.js
+      handleUpdateLikedSongs(updatedLikedSongs);
       // Like it
       await sendLikeSong(userId, trackId);
     } else {
@@ -262,68 +273,91 @@ const sendUnlikeSong = async (userId, trackId) => {
   }
 };
 
+// const handleLikeSong = async (e, trackId) => {
+//   e.preventDefault();
+
+//   try {
+//     const res = await getUserInfo();
+
+//     if (res.status === 200) {
+//       const userdata = await res.json();
+//       // console.log('User Data:', userdata);
+//       const userId=await userdata._id;
+//       // console.log(userId);
+
+//       if (likedSongsState.includes(trackId)) {
+//         const updatedLikedSongs = likedSongsState.filter((id) => id !== trackId);
+//         setLikedSongsState(updatedLikedSongs);
+//         // Unlike it
+//         await sendUnlikeSong(userId, trackId);
+//       } else {
+//         const updatedLikedSongs = [...likedSongsState, trackId];
+//         setLikedSongsState(updatedLikedSongs);
+//         // Like it
+//         await sendLikeSong(userId, trackId);
+//       }
+//     } else if (res.status === 401) {
+//       toast.warning("You need to login to like a song");
+//     } else {
+//       throw new Error('Request failed with status ' + res.status);
+//     }
+//   } catch (error) {
+//     console.error(error);
+//     navigate('/login');
+//   }
+// };
+
 const handleLikeSong = async (e, trackId) => {
   e.preventDefault();
 
-  try {
-    const res = await getUserInfo();
-
-    if (res.status === 200) {
-      const userdata = await res.json();
-      // console.log('User Data:', userdata);
-      const userId=await userdata._id;
+    if (props.login) {
+      const userId=await props.userDetails._id;
       // console.log(userId);
 
-      if (likedSongsState.includes(trackId)) {
-        const updatedLikedSongs = likedSongsState.filter((id) => id !== trackId);
-        setLikedSongsState(updatedLikedSongs);
+      if (likedSongs.includes(trackId)) {
+        const updatedLikedSongs = likedSongs.filter((id) => id !== trackId);
+        setLikedSongs(updatedLikedSongs);
         // Unlike it
         await sendUnlikeSong(userId, trackId);
       } else {
-        const updatedLikedSongs = [...likedSongsState, trackId];
-        setLikedSongsState(updatedLikedSongs);
+        const updatedLikedSongs = [...likedSongs, trackId];
+        setLikedSongs(updatedLikedSongs);
         // Like it
         await sendLikeSong(userId, trackId);
       }
-    } else if (res.status === 401) {
-      toast.warning("You need to login to like a song");
     } else {
-      throw new Error('Request failed with status ' + res.status);
+      toast.warning("You need to login to like a song");
     }
-  } catch (error) {
-    console.error(error);
-    navigate('/login');
-  }
 };
 
 
-  const likedSongsArray = async () => {
-    try {
-      const res = await getUserInfo();
+  // const likedSongsArray = async () => {
+  //   try {
+  //     const res = await getUserInfo();
   
-      if (res.status === 200) {
-        const userdata = await res.json();
-        // console.log(userdata._id);
-        const userId = userdata._id;
-        // console.log(userdata)
+  //     if (res.status === 200) {
+  //       const userdata = await res.json();
+  //       // console.log(userdata._id);
+  //       const userId = userdata._id;
+  //       // console.log(userdata)
   
-        const likedSongsResponse = await fetch(`/api/liked-songs/${userId}`);
-        // console.log(likedSongsResponse);
+  //       const likedSongsResponse = await fetch(`/api/liked-songs/${userId}`);
+  //       // console.log(likedSongsResponse);
         
-        if (likedSongsResponse.status === 200) {
-          const likedSongs = await likedSongsResponse.json();
-          // console.log("Liked Songs:", likedSongs);
-          setLikedSongs(likedSongs);
-        } else {
-          console.error("Error fetching liked songs. Status:", likedSongsResponse.status);
-        }
-      } else {
-        console.log("User not authenticated.");
-      }
-    } catch (error) {
-      console.error("LikedSongsArray error:", error);
-    }
-  };
+  //       if (likedSongsResponse.status === 200) {
+  //         const likedSongs = await likedSongsResponse.json();
+  //         // console.log("Liked Songs:", likedSongs);
+  //         setLikedSongs(likedSongs);
+  //       } else {
+  //         console.error("Error fetching liked songs. Status:", likedSongsResponse.status);
+  //       }
+  //     } else {
+  //       console.log("User not authenticated.");
+  //     }
+  //   } catch (error) {
+  //     console.error("LikedSongsArray error:", error);
+  //   }
+  // };
 
   const isSongLiked = (trackId) => likedSongs.includes(trackId);
 
@@ -337,7 +371,7 @@ const handleLikeSong = async (e, trackId) => {
       <div className="mx-2">
         <div className="mx-2 d-flex flex-column mb-2">
           <div className="">
-            <h3 className="">Ohiyooo {props.userName}</h3>
+            <h3 className="">Ohiyooo {props.userDetails.name?(props.userDetails.name.split(" ")[0]):'Luffy'}</h3>
           </div>
           <form
             onSubmit={handleSubmit}

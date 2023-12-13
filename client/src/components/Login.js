@@ -18,6 +18,8 @@ const Login = (props) => {
     }
   }
 
+  // const [userDetails,setUserDetails]=useState(null);
+
   const navigate=useNavigate();
   const [email, setEmail] = useState("");
   // const [gemail, setGemail] = useState("");
@@ -69,8 +71,8 @@ const Login = (props) => {
       const res = await getUserInfo();
       const user = await res.json();
       // setUserData(res.json());
-      props.onLogStateChange(false,user.name);
-      console.log(user.name);
+      props.onLogStateChange(false,user);
+      // console.log(user.name);
       localStorage.setItem('isLoggedIn', 'true');
       navigate("/");
     }
@@ -100,8 +102,8 @@ const Login = (props) => {
         const res = await getUserInfo();
         const user = await res.json();
         // setUserData(res.json());
-        props.onLogStateChange(false,user.name);
-        console.log(user.name);
+        props.onLogStateChange(false,user);
+        // console.log(user);
         localStorage.setItem('isLoggedIn', 'true');
         navigate("/");
       }
