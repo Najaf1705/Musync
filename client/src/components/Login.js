@@ -71,7 +71,7 @@ const Login = (props) => {
       const res = await getUserInfo();
       const user = await res.json();
       // setUserData(res.json());
-      props.onLogStateChange(false,user);
+      await props.onLogStateChange(false,user);
       // console.log(user.name);
       localStorage.setItem('isLoggedIn', 'true');
       navigate("/");
@@ -102,7 +102,7 @@ const Login = (props) => {
         const res = await getUserInfo();
         const user = await res.json();
         // setUserData(res.json());
-        props.onLogStateChange(false,user);
+        await props.onLogStateChange(false,user);
         // console.log(user);
         localStorage.setItem('isLoggedIn', 'true');
         navigate("/");

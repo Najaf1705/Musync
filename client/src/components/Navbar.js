@@ -8,9 +8,10 @@ const profilePicture = process.env.PUBLIC_URL + '/images/doodle.jpg';
 
   const Navbar = (props) => {
   
-  const [profilePictureURL, setProfilePictureURL] = useState(profilePicture);
+  const [profilePictureURL, setProfilePictureURL] = useState(props.userDetails.image || profilePicture);
   const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
 
+  // to check if user has logged in in this device
   const getUserInfo = async () => {
   try {
     const response = await fetch('/serverprofile', {
@@ -21,8 +22,17 @@ const profilePicture = process.env.PUBLIC_URL + '/images/doodle.jpg';
       },
       credentials: 'include',
     });
-    // console.log(response);
-    return response; 
+        // Check if the response status is OK (status code 200)
+        if (response.ok) {
+          // Parse JSON data if the server returns JSON
+          const data = await response.json();
+          // Do something with the parsed data
+          console.log('User info:', data);
+          return data; // Return the parsed data
+        } else {
+          // If the server returns an error status, throw an error
+          throw new Error(`Server returned ${response.status} ${response.statusText}`);
+        }
   } catch (error) {
       console.error("Error:", error);
       throw error;
@@ -34,8 +44,8 @@ const profilePicture = process.env.PUBLIC_URL + '/images/doodle.jpg';
     const fetchData = async () => {
       if (isLoggedIn) {
         try {
-          const res = await getUserInfo();
-          const user = await res.json();
+          const user = await getUserInfo();
+          // const user = await res.json();
           props.onLogStateChange(false, user);
           console.log("gg");
           fetchProfilePicture();  
@@ -72,23 +82,32 @@ const profilePicture = process.env.PUBLIC_URL + '/images/doodle.jpg';
     }
   };
 
-  const fetchProfilePicture = async () => {
-    try {
-      const response = await fetch('/serverprofile'); // Replace with your server route
-      if (response.status === 200) {
-        const data = await response.json();
-        if (data.image) {
-          setProfilePictureURL(data.image); 
-        } else {
+  // const fetchProfilePicture = async () => {
+  //   try {
+  //     const response = await fetch('/serverprofile'); // Replace with your server route
+  //     if (response.status === 200) {
+  //       const data = await response.json();
+  //       if (data.image) {
+  //         setProfilePictureURL(data.image); 
+  //       } else {
+  //         setProfilePictureURL(profilePicture); 
+  //       }
+  //     } else {
+    //       console.error('Failed to fetch profile picture:', response.status);
+    //     }
+    //   } catch (error) {
+      //     console.error('Error while fetching profile picture:', error);
+      //   }
+      // };
+      
+      const fetchProfilePicture=async()=>{
+        if(props.userDetails.image){
+          setProfilePictureURL(props.userDetails.image);
+        }else{
           setProfilePictureURL(profilePicture); 
-        }
-      } else {
-        console.error('Failed to fetch profile picture:', response.status);
-      }
-    } catch (error) {
-      console.error('Error while fetching profile picture:', error);
+
     }
-  };
+  }
   
 
   return (

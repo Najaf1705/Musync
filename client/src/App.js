@@ -29,10 +29,12 @@ const App = () => {
     if(logstate){
       setLogin(false);
       setUserDetails({});
+      // console.log(userDetails);
     }
     else{
       setLogin(true);
       setUserDetails(userDets);
+      // console.log(userDetails);
     }
   };
 

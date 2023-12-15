@@ -309,7 +309,6 @@ const sendUnlikeSong = async (userId, trackId) => {
 
 const handleLikeSong = async (e, trackId) => {
   e.preventDefault();
-
     if (props.login) {
       const userId=await props.userDetails._id;
       // console.log(userId);
@@ -363,8 +362,7 @@ const handleLikeSong = async (e, trackId) => {
 
   useEffect(() => {
     searchSong();
-  }, [songName, searchSong]);
-  
+  }, [songName, searchSong]);  
 
   return (
     <div className="home  pb-3">
@@ -394,36 +392,38 @@ const handleLikeSong = async (e, trackId) => {
               </button>
             </div>
           </form>
-          <div>
-            <h6 style={{paddingTop: ".5rem"}}>Recents</h6>
-            <ul style={{ display: "flex", listStyle: "none",marginBottom: "0",padding: "0" }}>
-              <div style={{display: "flex",overflow: "auto"}}>
-                {recentSearches.map((search, index) => (
-                  <li className='recents curpoint' style={{ }}
-                  key={index}
-                  >
-                    <i
-                    className="fa-solid fa-xmark curpoint"
-                    style={{ paddingRight: ".2rem" }}
+          {recentSearches.length>0?(
+            <div>
+              <h6 style={{paddingTop: ".5rem"}}>Recents</h6>
+              <ul style={{ display: "flex", listStyle: "none",marginBottom: "0",padding: "0" }}>
+                <div style={{display: "flex",overflow: "auto"}}>
+                  {recentSearches.map((search, index) => (
+                    <li className='recents curpoint' style={{ }}
+                    key={index}
+                    >
+                      <i
+                      className="fa-solid fa-xmark curpoint"
+                      style={{ paddingRight: ".2rem" }}
+                        onClick={() => {
+                        // setSongData(null);
+                        handleRemoveRecent(search);
+                        }}
+                      ></i>
+                      
+                      <div
                       onClick={() => {
-                      // setSongData(null);
-                      handleRemoveRecent(search);
-                      }}
-                    ></i>
-                    
-                    <div
-                    onClick={() => {
-                    setSongName(search);
-                    // console.log(songName);
-                    // handleSubmit(e);
-                  }}>
-                      {search}
-                    </div>
-                  </li>
-                ))}
-              </div>
-            </ul>
-          </div>
+                      setSongName(search);
+                      // console.log(songName);
+                      // handleSubmit(e);
+                    }}>
+                        {search}
+                      </div>
+                    </li>
+                  ))}
+                </div>
+              </ul>
+            </div>
+          ):("")}
 
           {songData && songData.tracks && songData.tracks.items.length > 0 && (
             <div>

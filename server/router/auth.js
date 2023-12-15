@@ -141,7 +141,7 @@ router.post('/logout', (req, res) => {
 
 router.get('/serverprofile', authenticate ,(req,res)=>{
   // console.log("serverprofile");
-  res.send(req.rootuser)
+  res.send(req.rootuser);
 })
 
 module.exports=router;
