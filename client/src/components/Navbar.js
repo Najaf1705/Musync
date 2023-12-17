@@ -1,13 +1,14 @@
 import React from 'react';
 // import {  } from 'react';
 import { useState, useEffect } from 'react';
-import { NavLink } from 'react-router-dom';
+import { NavLink, useNavigate } from 'react-router-dom';
 import 'bootstrap/dist/css/bootstrap.css';
 import { toast } from 'react-toastify';
 const profilePicture = process.env.PUBLIC_URL + '/images/doodle.jpg';
 
   const Navbar = (props) => {
-  
+
+    const navigate = useNavigate();  
   const [profilePictureURL, setProfilePictureURL] = useState(props.userDetails.image || profilePicture);
   const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
 
@@ -73,6 +74,7 @@ const profilePicture = process.env.PUBLIC_URL + '/images/doodle.jpg';
       if (response.status === 200) {
         props.onLogStateChange(true,null);
         console.log("ggout");
+        navigate('/');
         toast.success("Logged out Successfully");
       } else {
         console.error('Logout failed with status: ' + response.status);

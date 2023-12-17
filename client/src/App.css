@@ -3,8 +3,8 @@ html{
 }
 
 body{
-  padding-top: 3.3rem;
-  background-color: #c4c4c4;
+  /* padding-top: 3.3rem; */
+  background-color: black;
 }
 
 .curpoint{
@@ -13,7 +13,8 @@ body{
 
 .home{
   color: white;
-  padding-top: 1rem;
+  /* padding-top: 1rem; */
+  padding-top: 4.3rem;
   /* background-color: #913c3c; */
   background-image: url(../public/images/bg1);
   background-repeat: no-repeat;
@@ -131,7 +132,7 @@ nav{
   top: 0;
   left: 0;
   z-index: 10;
-  background-color: rgba(0, 0, 0, 0.473);
+  background-color: rgba(0, 0, 0, 0.1);
   /* border-bottom: 1px solid black; */
 }
 
@@ -184,9 +185,12 @@ nav ul li .a:hover::after{
 }
 
 .msignup, .mlogin{
+  display: flex;
+  align-items: center;
   min-width: 97vw;
   min-height: 98vh;
-  padding: 5rem 0 ;
+  /* padding: 5rem 0 ;  +3.3 */
+  /* padding-top: 3.3rem; */
   background-color: #c4c4c4;
   background-image: url(../public/images/doodle3.jpg);
   background-repeat: no-repeat;
@@ -194,13 +198,9 @@ nav ul li .a:hover::after{
   background-attachment: fixed;
 }
 
-.mlogin{
-  padding-top: 6rem;
-}
-
 .signup, .login{
   background-color: rgba(180, 178, 178, 0.205);
-  backdrop-filter: blur(15px);
+  backdrop-filter: blur(20px);
   /* height: 30rem; */
   padding: 2rem 2rem 1rem 2rem;
   color: black;
@@ -210,7 +210,9 @@ nav ul li .a:hover::after{
 }
 
 .msignup h2, .mlogin h2{
-  color: white;
+  display: flex;
+  justify-content: center;
+  color: black;
   margin-bottom: 1rem;
 }
 

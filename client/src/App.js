@@ -56,7 +56,7 @@ const App = () => {
           <Route path="/profile" element={<Profile />} />
           <Route path="/login" element={<Login  onLogStateChange={logChange} />} />
           <Route path="/signup" element={<Signup />} />
-          <Route path="/playlists" element={<Playlists />} />
+          <Route path="/playlists" element={<Playlists userDetails={userDetails} />} />
           <Route path="*" element={<Errorpage />} />
         </Routes>
       <ToastContainer position="bottom-right" />

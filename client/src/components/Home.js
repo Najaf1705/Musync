@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 // import Download from './Download';
-import { useNavigate, Outlet } from 'react-router-dom';
+import { useNavigate, Outlet, Link } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import {ColorExtractor} from 'react-color-extractor';
 import Skeleton from 'react-loading-skeleton'
@@ -51,11 +51,11 @@ const Home = (props) => {
     setLikedSongs(props.userDetails.likedSongs || []);
 }, [props.userDetails.likedSongs,props.updateUserDetails]);
 
-const gg=()=>{
-  console.log();
-}
+// const gg=()=>{
+//   console.log();
+// }
 
-gg();
+// gg();
 
 
   const [cardColors, setCardColors] = useState([]);
@@ -325,7 +325,12 @@ const handleLikeSong = async (e, trackId) => {
         await sendLikeSong(userId, trackId);
       }
     } else {
-      toast.warning("You need to login to like a song");
+      // toast.warning("You need to login to like a song");
+      toast.warning(
+        <span>
+          You need to <Link to="/login">login</Link> to like a song
+        </span>
+      );
     }
 };
 

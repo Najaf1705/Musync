@@ -103,7 +103,7 @@ const Login = (props) => {
         const user = await res.json();
         // setUserData(res.json());
         await props.onLogStateChange(false,user);
-        // console.log(user);
+        console.log(user);
         localStorage.setItem('isLoggedIn', 'true');
         navigate("/");
       }
@@ -116,9 +116,9 @@ const Login = (props) => {
     <>
     <div className="mlogin">
       <div className="container mt-3 d-flex flex-column align-items-center">
-        <h2>Login</h2>
         <form onSubmit={loginUser} className='login col-md-5'>
-            <div className="form-group  mb-3">
+            <div className="form-group mb-3">
+              <h2>Login</h2>
               <label htmlFor="email"><i className="fa-solid fa-envelope"></i> Email</label>
               <input
                 type="email"

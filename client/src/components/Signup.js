@@ -107,9 +107,10 @@ const Signup = () => {
     <>
       <div className="msignup">
         <div className="container mt-3 d-flex flex-column align-items-center">
-          <h2>Registration Form</h2>
+          {/* <h2>Registration Form</h2> */}
           <form onSubmit={postData} className="signup col-md-8">
             <div className="row">
+              <h2>Registration</h2>
               <div className="form-group col-md-6 mb-3">
                 <label htmlFor="firstName">
                   <i className="fa-solid fa-user"></i> Name
