@@ -14,6 +14,7 @@ app.use(express.json());
 app.use(require('./router/auth'));
 app.use(require('./router/spotapi'));
 app.use(require('./router/likedsongs'));
+app.use(require('./router/createplaylist'));
 app.use(require('./router/recommend'));
 
 app.get("/", (req,res)=>{

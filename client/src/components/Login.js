@@ -90,7 +90,7 @@ const Login = (props) => {
       // console.log("Response: ", response);
 
       const data = await response.json();
-      // console.log("Data: ", data);
+      console.log("Data: ", data);
       
       if(response.status===401||!data){
         toast.error("User dosen't exists!! Try registering");

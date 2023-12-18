@@ -1,13 +1,18 @@
 import React, { useState,useEffect } from 'react';
 import {ColorExtractor} from 'react-color-extractor';
+import { useNavigate } from 'react-router-dom';
 
 
 const Playlist = (props) => {
+
+  const navigate = useNavigate();
+
 
   const [loading, setLoading] = useState(false);  
   const [displaySongs, setDisplaySongs] = useState(false);
   const [likedSongsIDArray, setLikedSongsIDArray] = useState([]);
   const [likedSongsData, setLikedSongsData] = useState([]);
+  const [userPlaylists, setUserPlaylists] = useState(props.userDetails.playlists || []);
   
   const [cardColors, setCardColors] = useState([]);
   const [cardTextColors, setCardTextColors] = useState([]);
@@ -48,7 +53,9 @@ const Playlist = (props) => {
     useEffect(()=>{
       // setLikedSongsIDArray([...props.userDetails.likedSongs].reverse());
       setLikedSongsIDArray(props.userDetails.likedSongs);
-    },[props.userDetails.likedSongs]);
+      setUserPlaylists(props.userDetails.playlists || []);
+      console.log("heheheh");
+    },[props.userDetails]);
   
   useEffect(() => {
     const fetchSongDetails = async () => {
@@ -89,6 +96,10 @@ const Playlist = (props) => {
   //   console.log(likedSongsData);
   // },[likedSongsData]);
 
+  const navigateToCreatePlaylist = () => {
+    navigate('/createplaylist');
+  };
+
   return (
     <div className='home'>
       <div className="mx-2">
@@ -99,23 +110,59 @@ const Playlist = (props) => {
         )}
         <div className="row card-deck d-flex justify-content-center mx-1">
           {displaySongs===false?(
-            <div
-              className="col-4 col-md-4 col-lg-3 mb-3 curpoint"
-              onClick={showSongs}
-            >
-              <div style={{minHeight: "6rem", minWidth: "100%", overflow: "hidden"}}>
-                <img
-                  src="/images/playlists.png"
-                  alt="heheh"
-                  className="card-img-top mx-0"
-                  style={{ width: "100%", height: "100%", objectFit: "cover" }}
-                />
+            <>
+              <div
+                className="col-4 col-md-4 col-lg-3 mb-3 curpoint"
+                onClick={showSongs}
+              >
+                <div style={{minHeight: "6rem", minWidth: "100%", overflow: "hidden"}}>
+                  <img
+                    src="/images/playlists.png"
+                    alt="heheh"
+                    className="card-img-top mx-0"
+                    style={{ width: "100%", height: "100%", objectFit: "cover" }}
+                  />
+                </div>
+                <div className="card-body mt-1">
+                  <h6 className="card-title mb-0">💗Liked Songs</h6>
+                  {/* <p className="card-text">By You</p> */}
+                </div>
               </div>
-              <div className="card-body mt-1">
-                <h6 className="card-title mb-0">💗Liked Songs</h6>
-                {/* <p className="card-text">By You</p> */}
+              { userPlaylists.map((items,index)=>(
+                <div
+                  className="col-4 col-md-4 col-lg-3 mb-3 curpoint"
+                  onClick={showSongs}
+                  key={index}
+                >
+                  <div style={{minHeight: "6rem", minWidth: "100%", overflow: "hidden"}}>
+                    <img
+                      src="/images/playlists.png"
+                      alt="heheh"
+                      className="card-img-top mx-0"
+                      style={{ width: "100%", height: "100%", objectFit: "cover" }}
+                    />
+                  </div>
+                  <div className="card-body mt-1">
+                    <h6 className="card-title mb-0">{items.playlistName}</h6>
+                    {/* <p className="card-text">By You</p> */}
+                  </div>
+                </div>
+              ))}
+              <div
+                className="d-flex justify-content-center align-items-center col-4 col-md-4 col-lg-3 mb-3 curpoint"
+                // onClick={showSongs}
+                // style={{background: "green"}}
+              >
+                <div className="d-flex flex-column justify-content-center align-items-center card-body mt-1"
+                // style={{background: "pink"}}
+                >
+                  {/* <h6 className="card-title mb-0">hehehe</h6> */}
+                  <i className="fa-solid fa-circle-plus fa-5x" onClick={navigateToCreatePlaylist}></i>
+                  <h4 style={{textAlign:"center"}}>Create playlist</h4>
+                  {/* <p className="card-text">By You</p> */}
+                </div>
               </div>
-            </div>
+            </>
             ):(
             <>
               <i

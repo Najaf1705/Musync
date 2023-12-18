@@ -1,20 +1,13 @@
 const mongoose = require('mongoose');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
+
 const userSchema = new mongoose.Schema({
   name: {
     type: String,
     required: true,
   },
   email: {
-    type: String,
-    // required: true,
-  },
-  googleEmail: {
-    type: String,
-    // required: true,
-  },
-  facebookEmail: {
     type: String,
     // required: true,
   },
@@ -39,6 +32,15 @@ const userSchema = new mongoose.Schema({
     }
   ],
   likedSongs: [String],
+  playlists: [
+    {
+      playlistName: {
+        type: String,
+        required: true,
+      },
+      songs: [String],
+    },
+  ],
 });
 
 // hashing password
