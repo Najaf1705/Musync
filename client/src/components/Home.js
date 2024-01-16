@@ -6,6 +6,7 @@ import {ColorExtractor} from 'react-color-extractor';
 import Skeleton from 'react-loading-skeleton'
 // import 'react-loading-skeleton/dist/skeleton.css'
 import TopPL from './TopPL'
+import {Popover} from "@headlessui/react";
 
 const Home = (props) => {
   const navigate = useNavigate();
@@ -49,13 +50,9 @@ const Home = (props) => {
 // immediatly update likedSongs
   useEffect(() => {
     setLikedSongs(props.userDetails.likedSongs || []);
-}, [props.userDetails.likedSongs,props.updateUserDetails]);
+    setPlaylists(props.userDetails.playlists);
+}, [props.userDetails.likedSongs,props.userDetails.playlists,props.updateUserDetails]);
 
-// const gg=()=>{
-//   console.log();
-// }
-
-// gg();
 
 
   const [cardColors, setCardColors] = useState([]);
@@ -111,8 +108,13 @@ const Home = (props) => {
     setSelectedPlaylist(null);
     setSelectedPlaylistName(null);
   };
+
+  const [playlists,setPlaylists]=useState(props.userDetails.playlists);
+  // const [listOpen,setListOpen]=useState(false);
+  // const [menuPosition, setMenuPosition] = useState({ top: 0, left: 0 });
   
-  
+
+
 
   const searchSong = useCallback(async () => {
     try {
@@ -485,34 +487,59 @@ const handleLikeSong = async (e, trackId) => {
                             .join(", ")
                             .slice(0, 30)}
                         </p>
-                        <div className="cardbuts">
-                          <i
-                            className="fa-solid fa-download fa-xl mr-2"
-                            style={{ marginRight: "1rem" }}
-                            onClick={() =>
-                              handleDownload(
-                                item.name + " " + item.artists[0].name
-                              )
-                            }
-                          ></i>
-                          {isSongLiked(item.id) ? (
+                        <Popover>
+                          <div className="cardbuts absolute">
                             <i
-                              className="fa-solid fa-heart fa-xl"
-                              // style={{ color: "#ff3838" }}
-                              onClick={(e) => handleLikeSong(e, item.id)}
+                              className="fa-solid fa-download fa-xl mr-2"
+                              style={{ marginRight: "1rem" }}
+                              onClick={() =>
+                                handleDownload(
+                                  item.name + " " + item.artists[0].name
+                                )
+                              }
                             ></i>
-                          ) : (
-                            <i
-                              className="fa-regular fa-heart fa-xl"
-                              onClick={(e) => handleLikeSong(e, item.id)}
-                            ></i>
-                          )}
-                        </div>
+                            {isSongLiked(item.id) ? (
+                              <i
+                                className="fa-solid fa-heart fa-xl"
+                                // style={{ color: "#ff3838" }}
+                                onClick={(e) => handleLikeSong(e, item.id)}
+                              ></i>
+                            ) : (
+                              <i
+                                className="fa-regular fa-heart fa-xl"
+                                onClick={(e) => handleLikeSong(e, item.id)}
+                              ></i>
+                            )}
+                            {/* <Popover> */}
+                              <Popover.Button className="fa-solid fa-plus fa-xl" 
+                              style={{width: "0", padding: "0", margin: "0", 
+                              background: "rgba(33, 33, 33)", marginLeft: "1rem",
+                              color: cardTextColors[index]}}>
+                                {/* <i className="fa-solid fa-plus fa-xl"
+                                  style={{ marginLeft: "1rem" }}
+                                > */}
+                                  {/* <Popover.Button></Popover.Button> */}
+                                {/* </i> */}
+                                 
+                              </Popover.Button>
+                              <Popover.Panel className="poppanel">
+                                <div>
+                                    {
+                                      playlists.map((plist)=>(
+                                        <li className='curpoint'>{plist.playlistName}</li>
+                                      ))
+                                    }
+                                    <button>Create</button>
+                                </div>
+                              </Popover.Panel>
+                            {/* </Popover> */}
+                          </div>
+                        </Popover>                        
                       </div>
                     </div>
                   ):null
                   // </ColorExtractor>
-                ))}
+                  ))}
                 <div className="pagination justify-content-center mt-3">
                   <div aria-label="Page navigation example">
                     <ul className="pagination">

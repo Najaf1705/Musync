@@ -1,16 +1,41 @@
 import React from 'react';
 // import {  } from 'react';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
 import 'bootstrap/dist/css/bootstrap.css';
 import { toast } from 'react-toastify';
 const profilePicture = process.env.PUBLIC_URL + '/images/doodle.jpg';
 
-  const Navbar = (props) => {
+const Navbar = (props) => {
 
-    const navigate = useNavigate();  
+  const navigate = useNavigate();  
   const [profilePictureURL, setProfilePictureURL] = useState(props.userDetails.image || profilePicture);
   const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
+  const [isNavbarOpen, setIsNavbarOpen] = useState(false);
+
+  const navbarRef = useRef(null);
+
+  const handleNavbarToggle = () => {
+    setIsNavbarOpen(!isNavbarOpen);
+  };
+
+  const closeNavbar = () => {
+    setIsNavbarOpen(false);
+  };
+
+  const handleDocumentClick = (event) => {
+    if (navbarRef.current && !navbarRef.current.contains(event.target)) {
+      closeNavbar();
+    }
+  };
+
+  useEffect(() => {
+    document.addEventListener('click', handleDocumentClick);
+
+    return () => {
+      document.removeEventListener('click', handleDocumentClick);
+    };
+  }, []);
 
   // to check if user has logged in in this device
   const getUserInfo = async () => {
@@ -102,12 +127,11 @@ const profilePicture = process.env.PUBLIC_URL + '/images/doodle.jpg';
       //   }
       // };
       
-      const fetchProfilePicture=async()=>{
-        if(props.userDetails.image){
-          setProfilePictureURL(props.userDetails.image);
-        }else{
-          setProfilePictureURL(profilePicture); 
-
+    const fetchProfilePicture=async()=>{
+      if(props.userDetails.image){
+        setProfilePictureURL(props.userDetails.image);
+      }else{
+        setProfilePictureURL(profilePicture); 
     }
   }
   
@@ -115,7 +139,7 @@ const profilePicture = process.env.PUBLIC_URL + '/images/doodle.jpg';
   return (
     <div>
       <nav className="navbar navbar-expand-lg navbar-lg fixed-top">
-        <div className="container-fluid">
+        <div className="container-fluid" ref={navbarRef}>
           <div style={{display: "flex", alignItems: "center"}}>
             {isLoggedIn ? (
               <>
@@ -152,10 +176,11 @@ const profilePicture = process.env.PUBLIC_URL + '/images/doodle.jpg';
             aria-controls="navbarSupportedContent"
             aria-expanded="false"
             aria-label="Toggle navigation"
+            onClick={handleNavbarToggle}
           >
-            <span className="navbar-toggler-icon"></span>
+          <span className="navbar-toggler-icon"></span>
           </button>
-          <div className="collapse navbar-collapse" id="navbarSupportedContent">
+          <div className={`collapse navbar-collapse ${isNavbarOpen ? 'show' : ''}`} id="navbarSupportedContent">
             <ul className="navbar-nav ml-0">
               <li className="nav-item px-2">
                 <NavLink className="a active" aria-current="page" to="">
