@@ -32,4 +32,37 @@ router.post('/api/create-playlist/:playlistName/:userId', async (req, res) => {
   }
 });
 
+
+router.post('/api/addToPlaylist/:playlistName/:songId/:userId', async(req,res)=>{
+  try {
+    const {playlistName,songId,userId}=req.params;
+
+    const user=await User.findById(userId);
+    if(!user){
+      console.log("user mkc");
+      alert("user mkc");
+      return res.status(404).json({error:'User not found'});
+    }
+    
+    const playlistIndex=user.playlists.findIndex((playlist)=>
+    playlist.playlistName===playlistName
+    )
+    if(playlistIndex===-1){
+      console.log("playlist mkc");
+      alert("playlist mkc");
+      return res.status(404).json({error: "Playlist not found"});
+    }
+
+    if(user.playlists[playlistIndex].songs.includes(songId)){
+      return res.status(400).json({ error: `Song already exists in ${playlistName}` });
+    }
+    
+    user.playlists[playlistIndex].songs.push(songId);
+    await user.save();
+    return res.status(200).json({ message: 'Song added to the playlist' });
+  } catch (error) {
+    console.log("Error adding to playlist: ", error)
+  }
+});
+
 module.exports = router;

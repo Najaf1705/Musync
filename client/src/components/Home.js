@@ -369,14 +369,53 @@ const handleLikeSong = async (e, trackId) => {
 
   useEffect(() => {
     searchSong();
-  }, [songName, searchSong]);  
+  }, [songName, searchSong]);
+  
+
+
+  const addToPlaylist = async (e, playlistName, songId) => {
+    e.preventDefault();
+    console.log(props.userDetails._id);
+    try {
+      const response = await fetch(
+        `/api/addToPlaylist/${playlistName}/${songId}/${props.userDetails._id}`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+      if (response.status===200) {
+        // const data = await response.json();
+        toast.success(`Song added to ${playlistName}`);
+      } else if (response.status === 404) {
+        toast.warning(`Playlist not found or user not found`);
+      } else if (response.status === 400) {
+        const errorData = await response.json();
+        toast.warning(`Could not add song to ${playlistName}: ${errorData.error}`);
+      } else {
+        toast.warning(`Could not add song to ${playlistName}!! Try again`);
+      }
+    } catch (error) {
+      console.error("addToPlaylist error:", error);
+    }
+  };
+  
+
+
 
   return (
     <div className="home  pb-3">
       <div className="mx-2">
         <div className="mx-2 d-flex flex-column mb-2">
           <div className="">
-            <h3 className="">Ohiyooo {props.userDetails.name?(props.userDetails.name.split(" ")[0]):'Luffy'}</h3>
+            <h3 className="">
+              Ohiyooo{" "}
+              {props.userDetails.name
+                ? props.userDetails.name.split(" ")[0]
+                : "Luffy"}
+            </h3>
           </div>
           <form
             onSubmit={handleSubmit}
@@ -399,30 +438,36 @@ const handleLikeSong = async (e, trackId) => {
               </button>
             </div>
           </form>
-          {recentSearches.length>0?(
+          {recentSearches.length > 0 ? (
             <div>
-              <h6 style={{paddingTop: ".5rem"}}>Recents</h6>
-              <ul style={{ display: "flex", listStyle: "none",marginBottom: "0",padding: "0" }}>
-                <div style={{display: "flex",overflow: "auto"}}>
+              <h6 style={{ paddingTop: ".5rem" }}>Recents</h6>
+              <ul
+                style={{
+                  display: "flex",
+                  listStyle: "none",
+                  marginBottom: "0",
+                  padding: "0",
+                }}
+              >
+                <div style={{ display: "flex", overflow: "auto" }}>
                   {recentSearches.map((search, index) => (
-                    <li className='recents curpoint' style={{ }}
-                    key={index}
-                    >
+                    <li className="recents curpoint" style={{}} key={index}>
                       <i
-                      className="fa-solid fa-xmark curpoint"
-                      style={{ paddingRight: ".2rem" }}
+                        className="fa-solid fa-xmark curpoint"
+                        style={{ paddingRight: ".2rem" }}
                         onClick={() => {
-                        // setSongData(null);
-                        handleRemoveRecent(search);
+                          // setSongData(null);
+                          handleRemoveRecent(search);
                         }}
                       ></i>
-                      
+
                       <div
-                      onClick={() => {
-                      setSongName(search);
-                      // console.log(songName);
-                      // handleSubmit(e);
-                    }}>
+                        onClick={() => {
+                          setSongName(search);
+                          // console.log(songName);
+                          // handleSubmit(e);
+                        }}
+                      >
                         {search}
                       </div>
                     </li>
@@ -430,7 +475,9 @@ const handleLikeSong = async (e, trackId) => {
                 </div>
               </ul>
             </div>
-          ):("")}
+          ) : (
+            ""
+          )}
 
           {songData && songData.tracks && songData.tracks.items.length > 0 && (
             <div>
@@ -456,9 +503,12 @@ const handleLikeSong = async (e, trackId) => {
                 </div>
                 <h3>Songs</h3>
 
-                {scurrentItems.map((item, index) => (
+                {scurrentItems.map((item, index) =>
                   // <ColorExtractor getColors={handleColors}>
-                  item.id && item.album?.images[0]?.url && item.name && item.artists ? (
+                  item.id &&
+                  item.album?.images[0]?.url &&
+                  item.name &&
+                  item.artists ? (
                     <div
                       className="card col-5 col-md-4 col-lg-3 mb-3 mx-2"
                       key={item.id}
@@ -511,35 +561,49 @@ const handleLikeSong = async (e, trackId) => {
                               ></i>
                             )}
                             {/* <Popover> */}
-                              <Popover.Button className="fa-solid fa-plus fa-xl" 
-                              style={{width: "0", padding: "0", margin: "0", 
-                              background: "rgba(33, 33, 33)", marginLeft: "1rem",
-                              color: cardTextColors[index]}}>
-                                {/* <i className="fa-solid fa-plus fa-xl"
-                                  style={{ marginLeft: "1rem" }}
-                                > */}
-                                  {/* <Popover.Button></Popover.Button> */}
-                                {/* </i> */}
-                                 
-                              </Popover.Button>
-                              <Popover.Panel className="poppanel">
-                                <div>
-                                    {
-                                      playlists.map((plist)=>(
-                                        <li className='curpoint'>{plist.playlistName}</li>
-                                      ))
-                                    }
+                            {props.login ? (
+                              <>
+                                <Popover.Button
+                                  className="fa-solid fa-plus fa-xl"
+                                  style={{
+                                    width: "0",
+                                    padding: "0",
+                                    margin: "0",
+                                    background: "rgba(33, 33, 33)",
+                                    marginLeft: "1rem",
+                                    color: cardTextColors[index],
+                                  }}
+                                >
+                                  {/* <i className="fa-solid fa-plus fa-xl"
+                                    style={{ marginLeft: "1rem" }}
+                                  >
+                                  </i> */}
+                                </Popover.Button>
+                                <Popover.Panel className="poppanel">
+                                  <div>
+                                    {playlists.map((plist, index) => (
+                                      <>
+                                        <li className="curpoint"
+                                        onClick={(e) =>addToPlaylist(e,plist.playlistName,item.id)}
+                                        >
+                                          {plist.playlistName}
+                                        </li>
+                                        {/* <hr /> */}
+                                      </>
+                                    ))}
                                     <button>Create</button>
-                                </div>
-                              </Popover.Panel>
+                                  </div>
+                                </Popover.Panel>
+                              </>
+                            ) : null}
                             {/* </Popover> */}
                           </div>
-                        </Popover>                        
+                        </Popover>
                       </div>
                     </div>
-                  ):null
+                  ) : null
                   // </ColorExtractor>
-                  ))}
+                )}
                 <div className="pagination justify-content-center mt-3">
                   <div aria-label="Page navigation example">
                     <ul className="pagination">
@@ -576,8 +640,11 @@ const handleLikeSong = async (e, trackId) => {
                     {selectedPlaylist == null ? (
                       <div className="card-deck row d-flex justify-content-center my-3 pb-3">
                         <h3>Playlists</h3>
-                        {pcurrentItems.map((playlist) => (
-                          playlist.id && playlist.images[0]?.url && playlist.name && playlist.owner.display_name ? (
+                        {pcurrentItems.map((playlist) =>
+                          playlist.id &&
+                          playlist.images[0]?.url &&
+                          playlist.name &&
+                          playlist.owner.display_name ? (
                             <div
                               className="col-4 col-md-4 col-lg-2 mb-3 curpoint"
                               key={playlist.id}
@@ -600,15 +667,19 @@ const handleLikeSong = async (e, trackId) => {
                               <div className="card-body">
                                 <p
                                   className="card-text"
-                                  style={{ fontSize: ".9rem", fontWeight: "600" }}
+                                  style={{
+                                    fontSize: ".9rem",
+                                    fontWeight: "600",
+                                  }}
                                 >
-                                  {playlist.name} - {playlist.owner.display_name}
+                                  {playlist.name} -{" "}
+                                  {playlist.owner.display_name}
                                 </p>
                                 {/* Add more details or buttons as needed */}
                               </div>
                             </div>
-                          ):null
-                        ))}
+                          ) : null
+                        )}
                         <div className="pagination justify-content-center mt-3">
                           <div aria-label="Page navigation example">
                             <ul className="pagination">
@@ -696,35 +767,72 @@ const handleLikeSong = async (e, trackId) => {
                                       .join(", ")
                                       .slice(0, 30)}
                                   </p>
-                                  <div className="cardbuts">
-                                    <i
-                                      className="fa-solid fa-download fa-xl mr-2"
-                                      style={{ marginRight: "1rem" }}
-                                      onClick={() =>
-                                        handleDownload(
-                                          item.track.name +
-                                            " " +
-                                            item.track.artists[0].name
-                                        )
-                                      }
-                                    ></i>
-                                    {isSongLiked(item.track.id) ? (
+                                  <Popover>
+                                    <div className="cardbuts">
                                       <i
-                                        className="fa-solid fa-heart fa-xl"
-                                        // style={{ color: "#ff3838" }}
-                                        onClick={(e) =>
-                                          handleLikeSong(e, item.track.id)
+                                        className="fa-solid fa-download fa-xl mr-2"
+                                        style={{ marginRight: "1rem" }}
+                                        onClick={() =>
+                                          handleDownload(
+                                            item.track.name +
+                                              " " +
+                                              item.track.artists[0].name
+                                          )
                                         }
                                       ></i>
-                                    ) : (
-                                      <i
-                                        className="fa-regular fa-heart fa-xl"
-                                        onClick={(e) =>
-                                          handleLikeSong(e, item.track.id)
-                                        }
-                                      ></i>
-                                    )}
-                                  </div>
+                                      {isSongLiked(item.track.id) ? (
+                                        <i
+                                          className="fa-solid fa-heart fa-xl"
+                                          // style={{ color: "#ff3838" }}
+                                          onClick={(e) =>
+                                            handleLikeSong(e, item.track.id)
+                                          }
+                                        ></i>
+                                      ) : (
+                                        <i
+                                          className="fa-regular fa-heart fa-xl"
+                                          onClick={(e) =>
+                                            handleLikeSong(e, item.track.id)
+                                          }
+                                        ></i>
+                                      )}
+                                      {props.login ? (
+                                        <>
+                                          <Popover.Button
+                                            className="fa-solid fa-plus fa-xl"
+                                            style={{
+                                              width: "0",
+                                              padding: "0",
+                                              margin: "0",
+                                              background: "rgba(33, 33, 33)",
+                                              marginLeft: "1rem",
+                                              color: cardTextColors[index],
+                                            }}
+                                          >
+                                            {/* <i className="fa-solid fa-plus fa-xl"
+                                              style={{ marginLeft: "1rem" }}
+                                            >
+                                            </i> */}
+                                          </Popover.Button>
+                                          <Popover.Panel className="poppanel">
+                                            <div>
+                                              {playlists.map((plist, index) => (
+                                                <>
+                                                  <li className="curpoint"
+                                                  onClick={(e) =>addToPlaylist(e,plist.playlistName,item.track.id)}
+                                                  >
+                                                    {plist.playlistName}
+                                                  </li>
+                                                  {/* <hr /> */}
+                                                </>
+                                              ))}
+                                              <button>Create</button>
+                                            </div>
+                                          </Popover.Panel>
+                                        </>
+                                      ) : null}
+                                    </div>
+                                  </Popover>
                                 </div>
                               </div>
                             ) : null

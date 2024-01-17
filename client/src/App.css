@@ -414,16 +414,21 @@ nav ul li .a:hover::after{
   align-items: center;
   color: black;
   font-size: 1rem;
-  top: -1rem;
+  top: 1rem;
+  left: 6rem;
   background: rgb(165, 165, 165);
   z-index: 100;
 }
 
 .home .poppanel div li{
-  padding: .2rem 1rem;
+  display: flex;
+  justify-content: center;
+  padding: 0.2rem 1rem;
   margin: 0;
   list-style: none;
   text-decoration: none;
+  width: 100%;
+  border-bottom: solid black 0.1rem;
 }
 
 
