@@ -1,5 +1,7 @@
+import { Popover } from '@headlessui/react';
 import React, { useState, useEffect } from 'react';
 import {ColorExtractor} from 'react-color-extractor';
+
 const TopPL = (props) => {
   
   const [playlists, setPlaylists] = useState([]);
@@ -216,29 +218,68 @@ const TopPL = (props) => {
                         .join(", ")
                         .slice(0, 30)}
                     </p>
-                    <div className="cardbuts">
-                      <i
-                        className="fa-solid fa-download fa-xl mr-2"
-                        style={{ marginRight: "1rem" }}
-                        onClick={() =>
-                          props.handleDownload(
-                            item.track.name + " " + item.track.artists[0].name
-                          )
-                        }
-                      ></i>
-                      {props.isSongLiked(item.track.id) ? (
+                    <Popover>
+                      <div className="cardbuts">
                         <i
-                          className="fa-solid fa-heart fa-xl"
-                          // style={{ color: "#ff3838" }}
-                          onClick={(e) => props.handleLikeSong(e, item.track.id)}
+                          className="fa-solid fa-download fa-xl mr-2"
+                          style={{ marginRight: "1rem" }}
+                          onClick={() =>
+                            props.handleDownload(
+                              item.track.name + " " + item.track.artists[0].name
+                            )
+                          }
                         ></i>
-                      ) : (
-                        <i
-                          className="fa-regular fa-heart fa-xl"
-                          onClick={(e) => props.handleLikeSong(e, item.track.id)}
-                        ></i>
-                      )}
-                    </div>
+                        {props.isSongLiked(item.track.id) ? (
+                          <i
+                            className="fa-solid fa-heart fa-xl"
+                            // style={{ color: "#ff3838" }}
+                            onClick={(e) => props.handleLikeSong(e, item.track.id)}
+                          ></i>
+                        ) : (
+                          <i
+                            className="fa-regular fa-heart fa-xl"
+                            onClick={(e) => props.handleLikeSong(e, item.track.id)}
+                          ></i>
+                        )}
+                        {props.login ? (
+                          <>
+                            <Popover.Button
+                              className="fa-solid fa-plus fa-xl"
+                              style={{
+                                width: "0",
+                                padding: "0",
+                                margin: "0",
+                                background: "rgba(33, 33, 33)",
+                                marginLeft: "1rem",
+                                color: cardTextColors[index],
+                              }}
+                            >
+                              {/* <i className="fa-solid fa-plus fa-xl"
+                                style={{ marginLeft: "1rem" }}
+                              >
+                              </i> */}
+                            </Popover.Button>
+                            <Popover.Panel className="poppanel">
+                              <div>
+                                {props.playlists.map((plist, index) => (
+                                  <>
+                                    <li className="curpoint"
+                                    onClick={(e) =>props.addToPlaylist(e,plist.playlistName,item.track.id)}
+                                    >
+                                      {plist.playlistName}
+                                    </li>
+                                    {/* <hr /> */}
+                                  </>
+                                ))}
+                                <button
+                                  onClick={()=>{props.setPlaylistModal(true)}}
+                                >Create</button>
+                              </div>
+                            </Popover.Panel>
+                          </>
+                        ) : null}
+                      </div>
+                    </Popover>
                   </div>
                 </div>
               ):null

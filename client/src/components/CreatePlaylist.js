@@ -1,15 +1,15 @@
 import React, {useState} from 'react'
 import { toast } from 'react-toastify';
-import { useNavigate } from 'react-router-dom';
+// import { useNavigate } from 'react-router-dom';
 
 const CreatePlaylist = (props) => {
 
-  const navigate = useNavigate();
+  // const navigate = useNavigate();
   const [playlistName,setPlaylistName]=useState('');
 
   const handleCreate = async () => {
     try {
-      const response = await fetch(`/api/create-playlist/${playlistName}/${props.userDetails._id}`, {
+      const response = await fetch(`/api/create-playlist/${playlistName.trim()}/${props.userDetails._id}`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -29,30 +29,51 @@ const CreatePlaylist = (props) => {
         props.updateUserDetails(updatedUserDetails);
         console.log(updatedUserDetails.playlists);
         toast.success(`Playlist ${playlistName} created successfully`);
-        navigate('/playlists');
+        // navigate('/playlists');
+        props.playlistModal(false)
       }
     } catch (error) {
       console.error('Can\'t create playlist', error);
     }
   };
+
+  const closeModal=()=>{
+    props.playlistModal(false);
+  }
   
 
   return (
-    <div className='popup-container'>
-      <div className='popup-content'>
-        <span className='close-btn'>
-          &times;
-        </span>
-        <h2>Create playlist</h2>
-        <input type="text"
-        placeholder='Enter playlist name'
-        value={playlistName}
-        required
-        onChange={(e)=>setPlaylistName(e.target.value)}
-        />
-        <button onClick={handleCreate}>Create</button>
+    <>
+      <div className='modal-wrapper'></div>
+      <div className='modal-container px-2' onClick={closeModal}>
+        {/* <div style={{color: "white", padding: "0"}}>
+          <i
+            className="fa-solid fa-xmark curpoint"
+            style={{ paddingRight: ".2rem" }}
+          ></i>
+        </div> */}
+        <div className='modal-content'>
+          <div>
+            <h2>Create playlist</h2>
+          </div>
+          <div className='d-flex flex-column align-items-center'>
+            <div>
+              <input type="text"
+              placeholder='Enter playlist name'
+              value={playlistName}
+              required
+              onChange={(e)=>setPlaylistName(e.target.value)}
+              style={{height: "2rem"}}
+              />
+            </div>
+            <div className='pt-2 d-flex justify-content-between'>
+              <button className='mx-2' onClick={handleCreate}>Create</button>
+              <button onClick={closeModal}>Cancel</button>
+            </div>
+          </div>
+        </div>
       </div>
-    </div>
+    </>
   )
 }
 

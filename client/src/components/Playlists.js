@@ -1,20 +1,19 @@
 import React, { useState, useEffect } from "react";
 import { ColorExtractor } from "react-color-extractor";
-import { useNavigate } from "react-router-dom";
+// import { useNavigate } from "react-router-dom";
+import CreatePlaylist from "./CreatePlaylist";
 
 const Playlist = (props) => {
-  const navigate = useNavigate();
+  // const navigate = useNavigate();
 
   const [loading, setLoading] = useState(false);
   const [displaySongs, setDisplaySongs] = useState(false);
   const [likedSongsIDArray, setLikedSongsIDArray] = useState([]);
   const [likedSongsData, setLikedSongsData] = useState([]);
-  // const [selectedPlaylistSongsIDArray, setSelectedPlaylistSongsIDArray] =
-    useState([]);
+  // const [selectedPlaylistSongsIDArray, setSelectedPlaylistSongsIDArray] = useState([]);
   const [selectedPlaylistSongsData, setSelectedPlaylistSongsData] = useState([]);
-  const [userPlaylists, setUserPlaylists] = useState(
-    props.userDetails.playlists || []
-  );
+  const [userPlaylists, setUserPlaylists] = useState(props.userDetails.playlists || []);
+  const [playlistModal,setPlaylistModal]= useState(false);
   const [selectedPlaylistName, setSelectedPlaylistName] = useState(null);
   // const [selectedPlaylistData, setSelectedPlaylistData] = useState([]);
 
@@ -121,9 +120,9 @@ const Playlist = (props) => {
     }
   };
 
-  const navigateToCreatePlaylist = () => {
-    navigate("/createplaylist");
-  };
+  // const navigateToCreatePlaylist = () => {
+  //   navigate("/createplaylist");
+  // };
 
   return (
     <div className="home">
@@ -203,7 +202,7 @@ const Playlist = (props) => {
                 <div className="d-flex flex-column justify-content-center align-items-center card-body mt-1">
                   <i
                     className="fa-solid fa-circle-plus fa-5x"
-                    onClick={navigateToCreatePlaylist}
+                    onClick={()=>{setPlaylistModal(true)}}
                   ></i>
                   <h4 style={{ textAlign: "center" }}>Create playlist</h4>
                 </div>
@@ -366,6 +365,11 @@ const Playlist = (props) => {
         </div>
         <div id="gg">{displaySongs}</div>
       </div>
+      {playlistModal && <CreatePlaylist 
+        userDetails={props.userDetails}
+        updateUserDetails={props.updateUserDetails}
+        playlistModal={setPlaylistModal}
+      />}
     </div>
   );
 };

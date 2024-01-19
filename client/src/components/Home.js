@@ -7,6 +7,7 @@ import Skeleton from 'react-loading-skeleton'
 // import 'react-loading-skeleton/dist/skeleton.css'
 import TopPL from './TopPL'
 import {Popover} from "@headlessui/react";
+import CreatePlaylist from './CreatePlaylist';
 
 const Home = (props) => {
   const navigate = useNavigate();
@@ -21,6 +22,8 @@ const Home = (props) => {
   const [selectedPlaylistName, setSelectedPlaylistName] = useState(null);
   const [playlistTracks, setPlaylistTracks] = useState([]);
   const [recentSearches, setRecentSearches] = useState([]);
+  const [playlistModal,setPlaylistModal]= useState(false);
+
 
   const sitemsPerPage = 10;
   const [scurrentPage, setScurrentPage] = useState(1);
@@ -591,7 +594,9 @@ const handleLikeSong = async (e, trackId) => {
                                         {/* <hr /> */}
                                       </>
                                     ))}
-                                    <button>Create</button>
+                                    <button
+                                      onClick={()=>{setPlaylistModal(true)}}
+                                    >Create</button>
                                   </div>
                                 </Popover.Panel>
                               </>
@@ -826,7 +831,9 @@ const handleLikeSong = async (e, trackId) => {
                                                   {/* <hr /> */}
                                                 </>
                                               ))}
-                                              <button>Create</button>
+                                              <button
+                                                onClick={()=>{setPlaylistModal(true)}}
+                                              >Create</button>
                                             </div>
                                           </Popover.Panel>
                                         </>
@@ -875,9 +882,18 @@ const handleLikeSong = async (e, trackId) => {
             handleDownload={handleDownload}
             handleLikeSong={handleLikeSong}
             isSongLiked={isSongLiked}
+            addToPlaylist={addToPlaylist}
+            playlists={playlists}
+            setPlaylistModal={setPlaylistModal}
+            login={props.login}
           />
         </div>
       </div>
+      {playlistModal && <CreatePlaylist 
+        userDetails={props.userDetails}
+        updateUserDetails={props.updateUserDetails}
+        playlistModal={setPlaylistModal}
+      />}
     </div>
   );
 };
