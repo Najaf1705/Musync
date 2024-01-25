@@ -585,14 +585,14 @@ const handleLikeSong = async (e, trackId) => {
                                 <Popover.Panel className="poppanel">
                                   <div>
                                     {playlists.map((plist, index) => (
-                                      <>
+                                      <React.Fragment key={index}>
                                         <li className="curpoint"
                                         onClick={(e) =>addToPlaylist(e,plist.playlistName,item.id)}
                                         >
                                           {plist.playlistName}
                                         </li>
                                         {/* <hr /> */}
-                                      </>
+                                      </React.Fragment>
                                     ))}
                                     <button
                                       onClick={()=>{setPlaylistModal(true)}}
@@ -822,14 +822,14 @@ const handleLikeSong = async (e, trackId) => {
                                           <Popover.Panel className="poppanel">
                                             <div>
                                               {playlists.map((plist, index) => (
-                                                <>
+                                                <React.Fragment key={index}>
                                                   <li className="curpoint"
                                                   onClick={(e) =>addToPlaylist(e,plist.playlistName,item.track.id)}
                                                   >
                                                     {plist.playlistName}
                                                   </li>
                                                   {/* <hr /> */}
-                                                </>
+                                                </React.Fragment>
                                               ))}
                                               <button
                                                 onClick={()=>{setPlaylistModal(true)}}

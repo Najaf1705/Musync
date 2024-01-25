@@ -1,4 +1,4 @@
-import React, {useState} from 'react'
+import React, {useEffect, useState} from 'react'
 import { toast } from 'react-toastify';
 // import { useNavigate } from 'react-router-dom';
 
@@ -40,19 +40,18 @@ const CreatePlaylist = (props) => {
   const closeModal=()=>{
     props.playlistModal(false);
   }
+
+  useEffect(()=>{
+    document.body.style.overflowY="hidden";
+    return ()=>{document.body.style.overflowY="scroll";};
+  },[])
   
 
   return (
     <>
       <div className='modal-wrapper'></div>
       <div className='modal-container px-2' onClick={closeModal}>
-        {/* <div style={{color: "white", padding: "0"}}>
-          <i
-            className="fa-solid fa-xmark curpoint"
-            style={{ paddingRight: ".2rem" }}
-          ></i>
-        </div> */}
-        <div className='modal-content'>
+        <div className='modal-content' onClick={(e) => e.stopPropagation()}>
           <div>
             <h2>Create playlist</h2>
           </div>

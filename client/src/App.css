@@ -401,7 +401,7 @@ nav ul li .a:hover::after{
   background: rgb(88, 88, 88);
   padding: 20px;
   border-radius: 8px;
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+  box-shadow: 8px 11px 20px 8px rgb(0 0 0);
   width: 30rem;
   height: 10rem;
   display: flex;
@@ -416,7 +416,9 @@ nav ul li .a:hover::after{
 
 .home .poppanel div{
   /* width: 100%; */
-  /* height: 10rem; */
+  /* max-height: 11rem; */
+  /* overflow-y: auto; */
+  backdrop-filter: blur(10px);
   border-radius: .4rem;
   padding: .5rem;
   position: absolute;
@@ -424,11 +426,11 @@ nav ul li .a:hover::after{
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  color: black;
+  color: rgb(255, 255, 255);
   font-size: 1rem;
-  top: 1rem;
-  left: 6rem;
-  background: rgb(165, 165, 165);
+  top: -3rem;
+  left: 2rem;
+  background: rgba(0, 0, 0, 0.575);
   z-index: 100;
 }
 

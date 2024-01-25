@@ -262,14 +262,14 @@ const TopPL = (props) => {
                             <Popover.Panel className="poppanel">
                               <div>
                                 {props.playlists.map((plist, index) => (
-                                  <>
+                                  <React.Fragment key={index}>
                                     <li className="curpoint"
                                     onClick={(e) =>props.addToPlaylist(e,plist.playlistName,item.track.id)}
                                     >
                                       {plist.playlistName}
                                     </li>
                                     {/* <hr /> */}
-                                  </>
+                                  </React.Fragment>
                                 ))}
                                 <button
                                   onClick={()=>{props.setPlaylistModal(true)}}
