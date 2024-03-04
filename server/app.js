@@ -8,6 +8,7 @@ const cookieParser = require('cookie-parser');
 
 require('./db/conn');
 // const User=require('./models/userSchema');
+// const Odata=require('./models/dataSchema');
 app.use(cookieParser());
 app.use(cors());
 app.use(express.json());

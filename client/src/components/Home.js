@@ -49,14 +49,14 @@ const Home = (props) => {
     (playlistData && playlistData.playlists && playlistData.playlists.items ? playlistData.playlists.items.length : 0) / pitemsPerPage
   );
 
+  const [topSongs,setTopSongs]=useState(null);
+
 
 // immediatly update likedSongs
   useEffect(() => {
     setLikedSongs(props.userDetails.likedSongs || []);
     setPlaylists(props.userDetails.playlists);
 }, [props.userDetails.likedSongs,props.userDetails.playlists,props.updateUserDetails]);
-
-
 
   const [cardColors, setCardColors] = useState([]);
   const [cardTextColors, setCardTextColors] = useState([]);
@@ -112,11 +112,7 @@ const Home = (props) => {
     setSelectedPlaylistName(null);
   };
 
-  const [playlists,setPlaylists]=useState(props.userDetails.playlists);
-  // const [listOpen,setListOpen]=useState(false);
-  // const [menuPosition, setMenuPosition] = useState({ top: 0, left: 0 });
-  
-
+  const [playlists,setPlaylists]=useState(props.userDetails.playlists); 
 
 
   const searchSong = useCallback(async () => {
@@ -171,6 +167,37 @@ const Home = (props) => {
     localStorage.setItem('recentSearches', JSON.stringify(searches));
   };
 
+  // Get top songs
+  
+  useEffect(() => {
+    const fetchTopSongs = async () => {
+      try {
+        setLoading(true);
+
+        // Replace 'your-backend-url' with the actual URL of your backend
+        const response = await fetch('/api/topSongs', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        });
+
+        if (!response.ok) {
+          throw new Error('Failed to fetch top songs');
+        }
+
+        const data = await response.json();
+        setTopSongs(data.data);
+      } catch (error) {
+        console.error('Error fetching top songs:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchTopSongs();
+  }, []);
+
 
   const handleSubmit = async (e) => {
     e.preventDefault(); 
@@ -194,25 +221,6 @@ const Home = (props) => {
     navigate('/download');
   };
 
-// const getUserInfo = async () => {
-//   try {
-//     const response = await fetch('/serverprofile', {
-//       method: 'GET',
-//       headers: {
-//         Accept: 'application/json',
-//         'Content-Type': 'application/json',
-//       },
-//       credentials: 'include',
-//     });
-//     // console.log(response);
-//     return response; 
-
-//   } catch (error) {
-//     console.error("Error:", error);
-//     throw error;
-//   }
-// };
-
  // update likedSongs in the parent (App.js) component
  const handleUpdateLikedSongs = (newLikedSongs) => {
   const newUserDetails = {
@@ -226,11 +234,15 @@ const Home = (props) => {
 // Like Song
 const sendLikeSong = async (userId, trackId) => {
   try {
-    const response = await fetch(`/api/like-song/${userId}/${trackId}`, {
+    const response = await fetch(`/api/like-song`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
+      body: JSON.stringify({
+        userId: userId,
+        trackId: trackId,
+      }),
     });
 
     if (response.status === 200) {
@@ -278,40 +290,6 @@ const sendUnlikeSong = async (userId, trackId) => {
   }
 };
 
-// const handleLikeSong = async (e, trackId) => {
-//   e.preventDefault();
-
-//   try {
-//     const res = await getUserInfo();
-
-//     if (res.status === 200) {
-//       const userdata = await res.json();
-//       // console.log('User Data:', userdata);
-//       const userId=await userdata._id;
-//       // console.log(userId);
-
-//       if (likedSongsState.includes(trackId)) {
-//         const updatedLikedSongs = likedSongsState.filter((id) => id !== trackId);
-//         setLikedSongsState(updatedLikedSongs);
-//         // Unlike it
-//         await sendUnlikeSong(userId, trackId);
-//       } else {
-//         const updatedLikedSongs = [...likedSongsState, trackId];
-//         setLikedSongsState(updatedLikedSongs);
-//         // Like it
-//         await sendLikeSong(userId, trackId);
-//       }
-//     } else if (res.status === 401) {
-//       toast.warning("You need to login to like a song");
-//     } else {
-//       throw new Error('Request failed with status ' + res.status);
-//     }
-//   } catch (error) {
-//     console.error(error);
-//     navigate('/login');
-//   }
-// };
-
 const handleLikeSong = async (e, trackId) => {
   e.preventDefault();
     if (props.login) {
@@ -337,43 +315,13 @@ const handleLikeSong = async (e, trackId) => {
         </span>
       );
     }
-};
-
-
-  // const likedSongsArray = async () => {
-  //   try {
-  //     const res = await getUserInfo();
-  
-  //     if (res.status === 200) {
-  //       const userdata = await res.json();
-  //       // console.log(userdata._id);
-  //       const userId = userdata._id;
-  //       // console.log(userdata)
-  
-  //       const likedSongsResponse = await fetch(`/api/liked-songs/${userId}`);
-  //       // console.log(likedSongsResponse);
-        
-  //       if (likedSongsResponse.status === 200) {
-  //         const likedSongs = await likedSongsResponse.json();
-  //         // console.log("Liked Songs:", likedSongs);
-  //         setLikedSongs(likedSongs);
-  //       } else {
-  //         console.error("Error fetching liked songs. Status:", likedSongsResponse.status);
-  //       }
-  //     } else {
-  //       console.log("User not authenticated.");
-  //     }
-  //   } catch (error) {
-  //     console.error("LikedSongsArray error:", error);
-  //   }
-  // };
+  };
 
   const isSongLiked = (trackId) => likedSongs.includes(trackId);
 
   useEffect(() => {
     searchSong();
   }, [songName, searchSong]);
-  
 
 
   const addToPlaylist = async (e, playlistName, songId) => {
@@ -405,8 +353,6 @@ const handleLikeSong = async (e, trackId) => {
     }
   };
   
-
-
 
   return (
     <div className="home  pb-3">
@@ -481,6 +427,64 @@ const handleLikeSong = async (e, trackId) => {
           ) : (
             ""
           )}
+          
+          {/* <div>heheh</div> */}
+          <h3 className="mt-2">Top Songs</h3>
+          <div className="row card-deck d-flex justify-content-center mx-">
+            <>
+              {
+              topSongs && topSongs.length > 0 ? (
+                topSongs.map((item, index) =>
+                  item.id &&
+                  item.album?.images[0]?.url &&
+                  item.name &&
+                  item.artists ? (
+                    <div
+                      className="card col-5 col-md-4 col-lg-3 mb-3 mx-2"
+                      key={item.id}
+                      style={{
+                        backgroundColor: cardColors[index] || "",
+                        color: cardTextColors[index] || "",
+                      }}
+                    >
+                      <div style={{ minHeight: "6rem", minWidth: "100%" }}>
+                        <ColorExtractor
+                          getColors={(colors) =>
+                            handleColors(colors, index)
+                          }
+                        >
+                          <img
+                            src={item.album.images[0].url}
+                            className="card-img-top pt-2"
+                            alt={item.name}
+                          />
+                          {/* <div>img</div> */}
+                        </ColorExtractor>
+                      </div>
+
+                      <div className="card-body">
+                        <p className="card-text">
+                          {item.name.slice(0, 30)} -{" "}
+                          {item.artists
+                            .map((artist) => artist.name)
+                            .join(", ")
+                            .slice(0, 30)}
+                        </p>
+                      </div>
+                    </div>
+                  ) : null
+                )
+               ) : (
+                 <h3
+                   className="d-flex justify-content-center"
+                   style={{ paddingBottom: "3rem" }}
+                 >
+                   You have not liked any songs yet
+                 </h3>
+               )
+              }
+            </>
+          </div>
 
           {songData && songData.tracks && songData.tracks.items.length > 0 && (
             <div>

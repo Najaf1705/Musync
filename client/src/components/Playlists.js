@@ -53,10 +53,6 @@ const Playlist = (props) => {
     }
   };
 
-
-  
-
-
   useEffect(() => {
     // setLikedSongsIDArray([...props.userDetails.likedSongs].reverse());
     setLikedSongsIDArray(props.userDetails.likedSongs);
