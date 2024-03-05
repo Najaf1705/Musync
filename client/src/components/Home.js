@@ -427,64 +427,6 @@ const handleLikeSong = async (e, trackId) => {
           ) : (
             ""
           )}
-          
-          {/* <div>heheh</div> */}
-          <h3 className="mt-2">Top Songs</h3>
-          <div className="row card-deck d-flex justify-content-center mx-">
-            <>
-              {
-              topSongs && topSongs.length > 0 ? (
-                topSongs.map((item, index) =>
-                  item.id &&
-                  item.album?.images[0]?.url &&
-                  item.name &&
-                  item.artists ? (
-                    <div
-                      className="card col-5 col-md-4 col-lg-3 mb-3 mx-2"
-                      key={item.id}
-                      style={{
-                        backgroundColor: cardColors[index] || "",
-                        color: cardTextColors[index] || "",
-                      }}
-                    >
-                      <div style={{ minHeight: "6rem", minWidth: "100%" }}>
-                        <ColorExtractor
-                          getColors={(colors) =>
-                            handleColors(colors, index)
-                          }
-                        >
-                          <img
-                            src={item.album.images[0].url}
-                            className="card-img-top pt-2"
-                            alt={item.name}
-                          />
-                          {/* <div>img</div> */}
-                        </ColorExtractor>
-                      </div>
-
-                      <div className="card-body">
-                        <p className="card-text">
-                          {item.name.slice(0, 30)} -{" "}
-                          {item.artists
-                            .map((artist) => artist.name)
-                            .join(", ")
-                            .slice(0, 30)}
-                        </p>
-                      </div>
-                    </div>
-                  ) : null
-                )
-               ) : (
-                 <h3
-                   className="d-flex justify-content-center"
-                   style={{ paddingBottom: "3rem" }}
-                 >
-                   You have not liked any songs yet
-                 </h3>
-               )
-              }
-            </>
-          </div>
 
           {songData && songData.tracks && songData.tracks.items.length > 0 && (
             <div>
@@ -510,107 +452,119 @@ const handleLikeSong = async (e, trackId) => {
                 </div>
                 <h3>Songs</h3>
 
-                {scurrentItems.map((item, index) =>
-                  // <ColorExtractor getColors={handleColors}>
-                  item.id &&
-                  item.album?.images[0]?.url &&
-                  item.name &&
-                  item.artists ? (
-                    <div
-                      className="card col-5 col-md-4 col-lg-3 mb-3 mx-2"
-                      key={item.id}
-                      style={{
-                        backgroundColor: cardColors[index] || "",
-                        color: cardTextColors[index] || "",
-                      }}
-                    >
-                      <div style={{ minHeight: "8rem", minWidth: "100%" }}>
-                        <ColorExtractor
-                          getColors={(colors) => handleColors(colors, index)}
-                        >
-                          <img
-                            loading="lazy"
-                            src={item.album?.images[0]?.url}
-                            className="card-img-top pt-2"
-                            alt={item.name}
-                          />
-                        </ColorExtractor>
-                      </div>
-                      <div className="card-body">
-                        <p className="card-text">
-                          {item.name.slice(0, 30) || <Skeleton />} -{" "}
-                          {item.artists
-                            .map((artist) => artist.name)
-                            .join(", ")
-                            .slice(0, 30)}
-                        </p>
-                        <Popover>
-                          <div className="cardbuts absolute">
-                            <i
-                              className="fa-solid fa-download fa-xl mr-2"
-                              style={{ marginRight: "1rem" }}
-                              onClick={() =>
-                                handleDownload(
-                                  item.name + " " + item.artists[0].name
-                                )
-                              }
-                            ></i>
-                            {isSongLiked(item.id) ? (
+                {scurrentItems.map(
+                  (item, index) =>
+                    // <ColorExtractor getColors={handleColors}>
+                    item.id &&
+                    item.album?.images[0]?.url &&
+                    item.name &&
+                    item.artists ? (
+                      <div
+                        className="card col-5 col-md-4 col-lg-3 mb-3 mx-2"
+                        key={item.id}
+                        style={{
+                          backgroundColor: cardColors[index] || "",
+                          color: cardTextColors[index] || "",
+                        }}
+                      >
+                        <div style={{ minHeight: "8rem", minWidth: "100%" }}>
+                          <ColorExtractor
+                            getColors={(colors) => handleColors(colors, index)}
+                          >
+                            <img
+                              loading="lazy"
+                              src={item.album?.images[0]?.url}
+                              className="card-img-top pt-2"
+                              alt={item.name}
+                            />
+                          </ColorExtractor>
+                        </div>
+                        <div className="card-body">
+                          <p className="card-text">
+                            {item.name.slice(0, 30) || <Skeleton />} -{" "}
+                            {item.artists
+                              .map((artist) => artist.name)
+                              .join(", ")
+                              .slice(0, 30)}
+                          </p>
+                          <Popover>
+                            <div className="cardbuts absolute">
                               <i
-                                className="fa-solid fa-heart fa-xl"
-                                // style={{ color: "#ff3838" }}
-                                onClick={(e) => handleLikeSong(e, item.id)}
+                                className="fa-solid fa-download fa-xl mr-2"
+                                style={{ marginRight: "1rem" }}
+                                onClick={() =>
+                                  handleDownload(
+                                    item.name + " " + item.artists[0].name
+                                  )
+                                }
                               ></i>
-                            ) : (
-                              <i
-                                className="fa-regular fa-heart fa-xl"
-                                onClick={(e) => handleLikeSong(e, item.id)}
-                              ></i>
-                            )}
-                            {/* <Popover> */}
-                            {props.login ? (
-                              <>
-                                <Popover.Button
-                                  className="fa-solid fa-plus fa-xl"
-                                  style={{
-                                    width: "0",
-                                    padding: "0",
-                                    margin: "0",
-                                    background: "rgba(33, 33, 33)",
-                                    marginLeft: "1rem",
-                                    color: cardTextColors[index],
-                                  }}
-                                >
-                                  {/* <i className="fa-solid fa-plus fa-xl"
+                              {isSongLiked(item.id) ? (
+                                <i
+                                  className="fa-solid fa-heart fa-xl"
+                                  // style={{ color: "#ff3838" }}
+                                  onClick={(e) => handleLikeSong(e, item.id)}
+                                ></i>
+                              ) : (
+                                <i
+                                  className="fa-regular fa-heart fa-xl"
+                                  onClick={(e) => handleLikeSong(e, item.id)}
+                                ></i>
+                              )}
+                              {/* <Popover> */}
+                              {props.login ? (
+                                <>
+                                  <Popover.Button
+                                    className="fa-solid fa-plus fa-xl"
+                                    style={{
+                                      width: "0",
+                                      padding: "0",
+                                      margin: "0",
+                                      background: "rgba(33, 33, 33)",
+                                      marginLeft: "1rem",
+                                      color: cardTextColors[index],
+                                    }}
+                                  >
+                                    {/* <i className="fa-solid fa-plus fa-xl"
                                     style={{ marginLeft: "1rem" }}
                                   >
                                   </i> */}
-                                </Popover.Button>
-                                <Popover.Panel className="poppanel">
-                                  <div>
-                                    {playlists.map((plist, index) => (
-                                      <React.Fragment key={index}>
-                                        <li className="curpoint"
-                                        onClick={(e) =>addToPlaylist(e,plist.playlistName,item.id)}
-                                        >
-                                          {plist.playlistName}
-                                        </li>
-                                        {/* <hr /> */}
-                                      </React.Fragment>
-                                    ))}
-                                    <button
-                                      onClick={()=>{setPlaylistModal(true)}}
-                                    >Create</button>
-                                  </div>
-                                </Popover.Panel>
-                              </>
-                            ) : null}
-                            {/* </Popover> */}
-                          </div>
-                        </Popover>
+                                  </Popover.Button>
+                                  <Popover.Panel className="poppanel">
+                                    <div>
+                                      {playlists.map((plist, index) => (
+                                        <React.Fragment key={index}>
+                                          <li
+                                            className="curpoint"
+                                            onClick={(e) =>
+                                              addToPlaylist(
+                                                e,
+                                                plist.playlistName,
+                                                item.id
+                                              )
+                                            }
+                                          >
+                                            {plist.playlistName}
+                                          </li>
+                                          {/* <hr /> */}
+                                        </React.Fragment>
+                                      ))}
+                                      <button
+                                        onClick={() => {
+                                          setPlaylistModal(true);
+                                        }}
+                                      >
+                                        Create
+                                      </button>
+                                    </div>
+                                  </Popover.Panel>
+                                </>
+                              ) : null}
+                              {/* </Popover> */}
+                            </div>
+                          </Popover>
+                        </div>
                       </div>
-                    </div>
-                  ) : null
+                    ) : null
                   // </ColorExtractor>
                 )}
                 <div className="pagination justify-content-center mt-3">
@@ -827,8 +781,15 @@ const handleLikeSong = async (e, trackId) => {
                                             <div>
                                               {playlists.map((plist, index) => (
                                                 <React.Fragment key={index}>
-                                                  <li className="curpoint"
-                                                  onClick={(e) =>addToPlaylist(e,plist.playlistName,item.track.id)}
+                                                  <li
+                                                    className="curpoint"
+                                                    onClick={(e) =>
+                                                      addToPlaylist(
+                                                        e,
+                                                        plist.playlistName,
+                                                        item.track.id
+                                                      )
+                                                    }
                                                   >
                                                     {plist.playlistName}
                                                   </li>
@@ -836,8 +797,12 @@ const handleLikeSong = async (e, trackId) => {
                                                 </React.Fragment>
                                               ))}
                                               <button
-                                                onClick={()=>{setPlaylistModal(true)}}
-                                              >Create</button>
+                                                onClick={() => {
+                                                  setPlaylistModal(true);
+                                                }}
+                                              >
+                                                Create
+                                              </button>
                                             </div>
                                           </Popover.Panel>
                                         </>
@@ -881,6 +846,61 @@ const handleLikeSong = async (e, trackId) => {
                 )}
             </div>
           )}
+          <>
+            {/* <div>heheh</div> */}
+            <h3 className="mt-2">Top Songs</h3>
+            <div className="row card-deck d-flex justify-content-center mx-">
+              <>
+                {topSongs && topSongs.length > 0 ? (
+                  topSongs.map((item, index) =>
+                    item.id &&
+                    item.album?.images[0]?.url &&
+                    item.name &&
+                    item.artists ? (
+                      <div
+                        className="card col-5 col-md-4 col-lg-3 mb-3 mx-2"
+                        key={item.id}
+                        style={{
+                          backgroundColor: cardColors[index] || "",
+                          color: cardTextColors[index] || "",
+                        }}
+                      >
+                        <div style={{ minHeight: "6rem", minWidth: "100%" }}>
+                          <ColorExtractor
+                            getColors={(colors) => handleColors(colors, index)}
+                          >
+                            <img
+                              src={item.album.images[0].url}
+                              className="card-img-top pt-2"
+                              alt={item.name}
+                            />
+                            {/* <div>img</div> */}
+                          </ColorExtractor>
+                        </div>
+
+                        <div className="card-body">
+                          <p className="card-text">
+                            {item.name.slice(0, 30)} -{" "}
+                            {item.artists
+                              .map((artist) => artist.name)
+                              .join(", ")
+                              .slice(0, 30)}
+                          </p>
+                        </div>
+                      </div>
+                    ) : null
+                  )
+                ) : (
+                  <h3
+                    className="d-flex justify-content-center"
+                    style={{ paddingBottom: "3rem" }}
+                  >
+                    Top Songs will appear here
+                  </h3>
+                )}
+              </>
+            </div>
+          </>
           <Outlet />
           <TopPL
             handleDownload={handleDownload}
@@ -893,11 +913,13 @@ const handleLikeSong = async (e, trackId) => {
           />
         </div>
       </div>
-      {playlistModal && <CreatePlaylist 
-        userDetails={props.userDetails}
-        updateUserDetails={props.updateUserDetails}
-        playlistModal={setPlaylistModal}
-      />}
+      {playlistModal && (
+        <CreatePlaylist
+          userDetails={props.userDetails}
+          updateUserDetails={props.updateUserDetails}
+          playlistModal={setPlaylistModal}
+        />
+      )}
     </div>
   );
 };
