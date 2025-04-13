@@ -1,11 +1,18 @@
-import React, {useState} from 'react'
-import { NavLink, useNavigate} from 'react-router-dom';
-import {GoogleOAuthProvider,GoogleLogin} from '@react-oauth/google';
+import React, { useState } from 'react'
+import { NavLink, useNavigate } from 'react-router-dom';
+import { GoogleOAuthProvider, GoogleLogin } from '@react-oauth/google';
 import { jwtDecode } from "jwt-decode";
 import { toast } from 'react-toastify';
+import { useDispatch } from 'react-redux';
+import { setUserDetails } from '../redux/features/userSlice';
 
-const Login = (props) => {
-  function hide(){
+const Login = () => {
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+
+  const hide = () => {
     if(document.getElementById("password").type==='password'){
       document.getElementById("password").type="text";
       document.getElementById("hideeye1").style.display="block";
@@ -14,99 +21,74 @@ const Login = (props) => {
       document.getElementById("password").type="password";
       document.getElementById("hideeye1").style.display="none";
       document.getElementById("hideeye2").style.display="block";
-
     }
   }
 
-  // const [userDetails,setUserDetails]=useState(null);
-
-  const navigate=useNavigate();
-  const [email, setEmail] = useState("");
-  // const [gemail, setGemail] = useState("");
-  const [password, setPassword] = useState("");
-  // const [userData, setUserData] = useState({});
-
-  const getUserInfo = async () => {
-  try {
-    const response = await fetch('/serverprofile', {
-      method: 'GET',
-      headers: {
-        Accept: 'application/json',
-        'Content-Type': 'application/json',
-      },
-      credentials: 'include',
-    });
-    // console.log(response);
-    return response; 
-
-  } catch (error) {
-    console.error("Error:", error);
-    throw error;
-  }
-};
-
-  const loginUser=async (e)=>{
+  const loginUser = async (e) => {
     e.preventDefault();
-    const res=await fetch('/serverlogin',{
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({
-        email,
-        password
-      })
-    })
+    try {
+      const res = await fetch(`${process.env.REACT_APP_BACKEND_URL}/serverlogin`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          email,
+          password
+        })
+      });
 
-    const serRes=await res.json();
-    if(res.status===401||!serRes){
+      const serRes = await res.json();
       
-      document.getElementById("wrongpassword").innerHTML="Invalid credentials"
-      setTimeout(() => {
-        document.getElementById("wrongpassword").innerHTML=""
-      }, 3000); 
-      return;
-    }else{
+      if (res.status === 401 || !serRes) {
+        document.getElementById("wrongpassword").innerHTML = "Invalid credentials"
+        setTimeout(() => {
+          document.getElementById("wrongpassword").innerHTML = ""
+        }, 3000);
+        return;
+      }
+      
+      // Fetch user details after successful login
+      const userResponse = await fetch(`${process.env.REACT_APP_BACKEND_URL}/serverprofile`, {
+        credentials: 'include'
+      });
+      const userData = await userResponse.json();
+      
+      dispatch(setUserDetails(userData));
       toast.success("Logged in Successfully");
-      const res = await getUserInfo();
-      const user = await res.json();
-      // setUserData(res.json());
-      await props.onLogStateChange(false,user);
-      // console.log(user.name);
-      localStorage.setItem('isLoggedIn', 'true');
       navigate("/");
+    } catch (error) {
+      console.error("Error:", error);
     }
   }
 
   const sendGoogleLogInInfo = async (email) => {
     try {
-      const response = await fetch('/googleserverlogin', {
+      const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/googleserverlogin`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({email})
+        body: JSON.stringify({ email })
       });
-      // console.log("Response: ", response);
 
       const data = await response.json();
-      console.log("Data: ", data);
       
-      if(response.status===401||!data){
-        toast.error("User dosen't exists!! Try registering");
+      if (response.status === 401 || !data) {
+        toast.error("User doesn't exist!! Try registering");
         navigate("/signup");
         return;
       }
-      else {
-        toast.success("Logged in Successfully");
-        const res = await getUserInfo();
-        const user = await res.json();
-        // setUserData(res.json());
-        await props.onLogStateChange(false,user);
-        console.log(user);
-        localStorage.setItem('isLoggedIn', 'true');
-        navigate("/");
-      }
+
+      // Fetch user details after successful Google login
+      const userResponse = await fetch(`${process.env.REACT_APP_BACKEND_URL}/serverprofile`, {
+        credentials: 'include'
+      });
+      const userData = await userResponse.json();
+      
+      dispatch(setUserDetails(userData));
+      toast.success("Logged in Successfully");
+      navigate("/");
     } catch (error) {
       console.error("Error:", error);
     }

@@ -125,6 +125,10 @@ body{
   cursor: pointer;
 }
 
+.profilecard{
+  padding-top: 8rem;
+}
+
 
 
 nav{

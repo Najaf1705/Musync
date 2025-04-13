@@ -1,69 +1,65 @@
-import React from 'react';
-import { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { ToastContainer } from 'react-toastify';
-import {Route,Routes} from "react-router-dom";
+import { Route, Routes } from "react-router-dom";
+import { useDispatch, useSelector } from 'react-redux';
+import { fetchUserDetails } from './redux/features/userSlice';
 import 'react-toastify/dist/ReactToastify.css';
 import "./App.css";
 import "./main.js";
 import Navbar from './components/Navbar';
-import Home from './components/Home';
+import Home from './components/home/Home.js';
 import Discover from './components/Discover';
-import Download from './components/Download';
+import Download from './components/download/Download';
 import Profile from './components/Profile';
 import Login from './components/Login';
 import Signup from './components/Signup';
 import Errorpage from './components/Errorpage';
 import Playlists from './components/Playlists';
-// import CreatePlaylist from './components/CreatePlaylist';
-// const dotenv = require("dotenv");
-// dotenv.config({path:'../clientconfig.env'});
 
 const App = () => {
   const [selectedSong, setSelectedSong] = useState('');
-  // const [userName, setUserName] = useState('');
-  const [userDetails, setUserDetails] = useState({});
-  const [login, setLogin] = useState(localStorage.getItem('isLoggedIn'));
+  const dispatch = useDispatch();
+  const isLoggedIn = useSelector((state) => state.user.isLoggedIn);
+  const userDetails = useSelector((state) => state.user.userDetails);
+
+  useEffect(() => {
+    dispatch(fetchUserDetails())
+      .unwrap()
+      .then((data) => {
+        console.log('User details fetched successfully:', data);
+      })
+      .catch((error) => {
+        console.error('Error fetching user details:', error);
+      });
+  }, [dispatch]);
+
   const handleSelectedSongChange = (songDetails) => {
     setSelectedSong(songDetails);
-  };
-  const logChange = (logstate,userDets) => {
-    if(logstate){
-      setLogin(false);
-      setUserDetails({});
-      // console.log(userDetails);
-    }
-    else{
-      setLogin(true);
-      setUserDetails(userDets);
-      // console.log(userDetails);
-    }
-  };
-
-  const updateUserDetails = (newUserDetails) => {
-    setUserDetails(newUserDetails);
   };
 
   return (
     <>
-      <Navbar login={login} onLogStateChange={logChange} userDetails={userDetails} />
-        <Routes>
-          <Route path="" element={<Home login={login} selectedSong={selectedSong} 
-          updateUserDetails={updateUserDetails} onSelectedSongChange={handleSelectedSongChange}
-          userDetails={userDetails} />}>
-            
-          </Route>
-          <Route path="/discover" element={<Discover selectedSong={selectedSong} 
-          onSelectedSongChange={handleSelectedSongChange}/>} />
-          <Route path="/download" element={<Download selectedSong={selectedSong}/>} />
-          <Route path="/profile" element={<Profile />} />
-          <Route path="/login" element={<Login  onLogStateChange={logChange} />} />
-          <Route path="/signup" element={<Signup />} />
-          <Route path="/playlists" element={<Playlists userDetails={userDetails} 
-          updateUserDetails={updateUserDetails}/>} />
-          {/* <Route path="/createplaylist" element={<CreatePlaylist userDetails={userDetails}  */}
-          {/* updateUserDetails={updateUserDetails} />} /> */}
-          <Route path="*" element={<Errorpage />} />
-        </Routes>
+      <Navbar />
+      <Routes>
+        <Route path="" element={
+          <Home 
+            selectedSong={selectedSong}
+            onSelectedSongChange={handleSelectedSongChange}
+          />
+        } />
+        <Route path="/discover" element={
+          <Discover 
+            selectedSong={selectedSong}
+            onSelectedSongChange={handleSelectedSongChange}
+          />
+        } />
+        <Route path="/download" element={<Download selectedSong={selectedSong} />} />
+        <Route path="/profile" element={<Profile />} />
+        <Route path="/login" element={<Login />} />
+        <Route path="/signup" element={<Signup />} />
+        <Route path="/playlists" element={<Playlists />} />
+        <Route path="*" element={<Errorpage />} />
+      </Routes>
       <ToastContainer position="bottom-right" />
     </>
   )

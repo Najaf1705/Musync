@@ -52,7 +52,7 @@ const Signup = () => {
     }
     setPasswordMismatch(false);
 
-    const res=await fetch("/serverregister",{
+    const res=await fetch(`${process.env.REACT_APP_BACKEND_URL}/serverregister`,{
       method: "POST",
       headers: {
         "Content-Type" : "application/json"
@@ -77,7 +77,7 @@ const Signup = () => {
 
   const sendGoogleSignUpInfo = async (email,name,image) => {
     try {
-      const response = await fetch("/googleserverregister", {
+      const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/googleserverregister`,{
         method: "POST",
         headers: {
           "Content-Type": "application/json",

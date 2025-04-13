@@ -1,17 +1,15 @@
-const express = require('express');
-const router = express.Router();
-const fs = require('fs'); // Import the 'fs' module
+const fs = require('fs');
 const path = require('path');
 
 // Build the path to the JSON data file
-const dataPath = path.join(__dirname, 'songsmodel.json');
+const dataPath = path.join(__dirname, '../routes/songsmodel.json');
 
 // Load the JSON data
 const rawData = fs.readFileSync(dataPath);
 const songsData = JSON.parse(rawData);
 
-// Define the route for song recommendations
-router.get('/api/recommendations', (req, res) => {
+// Get song recommendations
+const getRecommendations = (req, res) => {
   const { songName } = req.query;
 
   if (!songName) {
@@ -28,6 +26,8 @@ router.get('/api/recommendations', (req, res) => {
   }
 
   res.json(song.recommend);
-});
+};
 
-module.exports = router;
+module.exports = {
+  getRecommendations,
+};

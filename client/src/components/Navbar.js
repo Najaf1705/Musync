@@ -1,269 +1,130 @@
-import React from 'react';
-// import {  } from 'react';
-import { useState, useEffect, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
-import 'bootstrap/dist/css/bootstrap.css';
+import { useDispatch, useSelector } from 'react-redux';
+import { clearUserDetails } from '../redux/features/userSlice';
 import { toast } from 'react-toastify';
-const profilePicture = process.env.PUBLIC_URL + '/images/doodle.jpg';
+import 'bootstrap/dist/css/bootstrap.css';
 
-const Navbar = (props) => {
+const defaultProfilePicture = process.env.PUBLIC_URL + '/images/doodle.jpg';
 
-  const navigate = useNavigate();  
-  const [profilePictureURL, setProfilePictureURL] = useState(props.userDetails.image || profilePicture);
-  const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
+const Navbar = () => {
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
+  const userDetails = useSelector((state) => state.user.userDetails);
+  const isLoggedIn = useSelector((state) => state.user.isLoggedIn);
+  
+  const [profilePictureURL, setProfilePictureURL] = useState(defaultProfilePicture);
   const [isNavbarOpen, setIsNavbarOpen] = useState(false);
-
   const navbarRef = useRef(null);
 
-  const handleNavbarToggle = () => {
-    setIsNavbarOpen(!isNavbarOpen);
-  };
-
-  const closeNavbar = () => {
-    setIsNavbarOpen(false);
-  };
-
-  const handleDocumentClick = (event) => {
-    if (navbarRef.current && !navbarRef.current.contains(event.target)) {
-      closeNavbar();
-    }
-  };
-
+  // Update profile picture when user details change
   useEffect(() => {
-    document.addEventListener('click', handleDocumentClick);
-
-    return () => {
-      document.removeEventListener('click', handleDocumentClick);
-    };
-  }, []);
-
-  // to check if user has logged in in this device
-  const getUserInfo = async () => {
-  try {
-    const response = await fetch('/serverprofile', {
-      method: 'GET',
-      headers: {
-        Accept: 'application/json',
-        'Content-Type': 'application/json',
-      },
-      credentials: 'include',
-    });
-        // Check if the response status is OK (status code 200)
-        if (response.ok) {
-          // Parse JSON data if the server returns JSON
-          const data = await response.json();
-          // Do something with the parsed data
-          console.log('User info:', data);
-          return data; // Return the parsed data
-        } else {
-          // If the server returns an error status, throw an error
-          throw new Error(`Server returned ${response.status} ${response.statusText}`);
-        }
-  } catch (error) {
-      console.error("Error:", error);
-      throw error;
+    if (userDetails?.image) {
+      setProfilePictureURL(userDetails.image);
     }
-  };
+  }, [userDetails]);
 
-  // const { login } =props;
+  // Handle navbar click outside
   useEffect(() => {
-    const fetchData = async () => {
-      if (isLoggedIn) {
-        try {
-          const user = await getUserInfo();
-          // const user = await res.json();
-          props.onLogStateChange(false, user);
-          console.log("gg");
-          fetchProfilePicture();  
-        } catch (error) {
-          console.error("Error fetching user data:", error);
-        }
-      } else {
-        props.onLogStateChange(true,null);
+    const handleDocumentClick = (event) => {
+      if (navbarRef.current && !navbarRef.current.contains(event.target)) {
+        setIsNavbarOpen(false);
       }
     };
-    fetchData();
+
+    document.addEventListener('click', handleDocumentClick);
+    return () => document.removeEventListener('click', handleDocumentClick);
   }, []);
 
   const handleLogout = async () => {
     try {
-      localStorage.setItem('isLoggedIn', 'false');
-      localStorage.removeItem('cookieExpiration');
-      const response = await fetch('/logout', {
+      const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/logout`, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include'
       });
-  
-      if (response.status === 200) {
-        props.onLogStateChange(true,null);
-        console.log("ggout");
-        navigate('/');
-        toast.success("Logged out Successfully");
-      } else {
-        console.error('Logout failed with status: ' + response.status);
+
+      if (!response.ok) {
+        throw new Error('Logout failed');
       }
+
+      dispatch(clearUserDetails());
+      navigate('/');
+      toast.success("Logged out Successfully");
     } catch (error) {
-      console.error('Error during logout:', error);
+      console.error('Logout error:', error);
+      toast.error("Logout failed. Please try again.");
     }
   };
 
-  // const fetchProfilePicture = async () => {
-  //   try {
-  //     const response = await fetch('/serverprofile'); // Replace with your server route
-  //     if (response.status === 200) {
-  //       const data = await response.json();
-  //       if (data.image) {
-  //         setProfilePictureURL(data.image); 
-  //       } else {
-  //         setProfilePictureURL(profilePicture); 
-  //       }
-  //     } else {
-    //       console.error('Failed to fetch profile picture:', response.status);
-    //     }
-    //   } catch (error) {
-      //     console.error('Error while fetching profile picture:', error);
-      //   }
-      // };
-      
-    const fetchProfilePicture=async()=>{
-      if(props.userDetails.image){
-        setProfilePictureURL(props.userDetails.image);
-      }else{
-        setProfilePictureURL(profilePicture); 
-    }
-  }
-  
+  const navItems = [
+    { path: "", label: "Home" },
+    { path: "/discover", label: "Discover" },
+    { path: "/download", label: "Download" },
+    ...(isLoggedIn ? [{ path: "/playlists", label: "Playlists" }] : [])
+  ];
 
   return (
-    <div>
-      <nav className="navbar navbar-expand-lg navbar-lg fixed-top">
-        <div className="container-fluid" ref={navbarRef}>
-          <div style={{display: "flex", alignItems: "center"}}>
-            {isLoggedIn ? (
-              <>
-                <NavLink to="/profile">
-                  <img
-                    className="hover-container"
-                    src={profilePictureURL}
-                    alt=""
-                    style={{
-                      width: "2rem",
-                      height: "2rem",
-                      borderRadius: "50%",
-                      marginRight: "1rem",
-                    }}
-                  />
-                </NavLink>
-              </>
-            ) : ("")}
-            <NavLink
-              className="navbar-brand mr-1"
-              to="/"
-              style={{ color: "white" }}
-            >
-              <i className="fa-solid fa-backward-step "></i> Musync{" "}
-              <i className="fa-solid fa-forward-step"></i>
+    <nav className="navbar navbar-expand-lg navbar-lg fixed-top">
+      <div className="container-fluid" ref={navbarRef}>
+        {/* Logo and Profile Section */}
+        <div className="d-flex align-items-center">
+          {isLoggedIn && (
+            <NavLink to="/profile">
+              <img
+                className="hover-container rounded-circle"
+                src={profilePictureURL}
+                onError={() => setProfilePictureURL(defaultProfilePicture)}
+                alt="Profile"
+                style={{ width: "2rem", height: "2rem", marginRight: "1rem" }}
+              />
             </NavLink>
-          </div>
-          <button
-            className="navbar-toggler"
-            type="button"
-            style={{ backgroundColor: "grey" }}
-            data-bs-toggle="collapse"
-            data-bs-target="#navbarSupportedContent"
-            aria-controls="navbarSupportedContent"
-            aria-expanded="false"
-            aria-label="Toggle navigation"
-            onClick={handleNavbarToggle}
-          >
-          <span className="navbar-toggler-icon"></span>
-          </button>
-          <div className={`collapse navbar-collapse ${isNavbarOpen ? 'show' : ''}`} id="navbarSupportedContent">
-            <ul className="navbar-nav ml-0">
-              <li className="nav-item px-2">
-                <NavLink className="a active" aria-current="page" to="">
-                  Home
-                </NavLink>
-              </li>
-              <li className="nav-item px-2">
-                <NavLink
-                  className="a active"
-                  aria-current="page"
-                  to="/discover"
-                >
-                  Discover
-                </NavLink>
-              </li>
-              {props.login ? (
-                <li className="nav-item px-2">
-                  <NavLink
-                    className="a active"
-                    aria-current="page"
-                    to="/playlists"
-                  >
-                    Playlists
-                  </NavLink>
-                </li>
-                ) : (
-                  ""
-              )}
-              <li className="nav-item px-2">
-                <NavLink
-                  className="a active"
-                  aria-current="page"
-                  to="/download"
-                >
-                  Download
-                </NavLink>
-              </li>
-              {/* <li className="nav-item px-2">
-                {props.login?(
-                  <NavLink className="a active" aria-current="page" to="/profile">
-                    Profile
-                  </NavLink>
-                ):("")}
-              </li> */}
-              <li className="sinlog nav-item px-3">
-                {props.login ? (
-                  // Render "Logout" when user is authenticated
-                  <>
-                    <NavLink
-                      className="a active"
-                      onClick={handleLogout}
-                      style={{ cursor: "pointer" }}
-                    >
-                      Logout
-                    </NavLink>
-                  </>
-                ) : (
-                  // Render "Login" and "Signup" when user is not authenticated
-                  <>
-                    <NavLink
-                      className="a active"
-                      aria-current="page"
-                      to="/login"
-                    >
-                      Login
-                    </NavLink>
-                    <span className="a">/</span>
-                    <NavLink
-                      className="a active"
-                      aria-current="page"
-                      to="/signup"
-                    >
-                      Signup
-                    </NavLink>
-                  </>
-                )}
-              </li>
-            </ul>
-          </div>
+          )}
+          <NavLink className="navbar-brand mr-1" to="/" style={{ color: "white" }}>
+            <i className="fa-solid fa-backward-step"></i> Musync{" "}
+            <i className="fa-solid fa-forward-step"></i>
+          </NavLink>
         </div>
-      </nav>
-    </div>
-  );
-}
 
-export default Navbar
+        {/* Navbar Toggle Button */}
+        <button
+          className="navbar-toggler"
+          type="button"
+          onClick={() => setIsNavbarOpen(!isNavbarOpen)}
+          style={{ backgroundColor: "grey" }}
+          aria-label="Toggle navigation"
+        >
+          <span className="navbar-toggler-icon"></span>
+        </button>
+
+        {/* Navigation Items */}
+        <div className={`collapse navbar-collapse ${isNavbarOpen ? 'show' : ''}`}>
+          <ul className="navbar-nav ml-0">
+            {navItems.map(({ path, label }) => (
+              <li key={path} className="nav-item px-2">
+                <NavLink className="a active" to={path}>
+                  {label}
+                </NavLink>
+              </li>
+            ))}
+            <li className="sinlog nav-item px-3">
+              {isLoggedIn ? (
+                <NavLink className="a active" onClick={handleLogout} style={{ cursor: "pointer" }}>
+                  Logout
+                </NavLink>
+              ) : (
+                <>
+                  <NavLink className="a active" to="/login">Login</NavLink>
+                  <span className="a">/</span>
+                  <NavLink className="a active" to="/signup">Signup</NavLink>
+                </>
+              )}
+            </li>
+          </ul>
+        </div>
+      </div>
+    </nav>
+  );
+};
+
+export default Navbar;

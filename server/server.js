@@ -7,16 +7,21 @@ const app=express();
 const cookieParser = require('cookie-parser');
 
 require('./db/conn');
-// const User=require('./models/userSchema');
-// const Odata=require('./models/dataSchema');
+
+
 app.use(cookieParser());
-app.use(cors());
+app.use(cors(
+  {
+    origin: "http://localhost:3000",
+    credentials: true,
+  }
+));
 app.use(express.json());
-app.use(require('./router/auth'));
-app.use(require('./router/spotapi'));
-app.use(require('./router/likedsongs'));
-app.use(require('./router/createplaylist'));
-app.use(require('./router/recommend'));
+app.use(require('./routes/authRoute'));
+app.use(require('./routes/spotifyRoute'));
+app.use(require('./routes/likedsongsRoute'));
+app.use(require('./routes/playlistRoute'));
+app.use(require('./routes/recommendRoute'));
 
 app.get("/", (req,res)=>{
   res.send("hello")

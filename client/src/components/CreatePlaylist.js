@@ -1,15 +1,16 @@
 import React, {useEffect, useState} from 'react'
 import { toast } from 'react-toastify';
-// import { useNavigate } from 'react-router-dom';
+import { useSelector, useDispatch } from 'react-redux';
+import { setUserDetails } from '../redux/features/userSlice';
 
-const CreatePlaylist = (props) => {
-
-  // const navigate = useNavigate();
-  const [playlistName,setPlaylistName]=useState('');
+const CreatePlaylist = ({ playlistModal }) => {
+  const dispatch = useDispatch();
+  const userDetails = useSelector((state) => state.user.userDetails);
+  const [playlistName, setPlaylistName] = useState('');
 
   const handleCreate = async () => {
     try {
-      const response = await fetch(`/api/create-playlist/${playlistName.trim()}/${props.userDetails._id}`, {
+      const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/create-playlist/${playlistName.trim()}/${userDetails._id}`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -22,15 +23,14 @@ const CreatePlaylist = (props) => {
         const newPlaylist = await response.json();
   
         const updatedUserDetails = {
-          ...props.userDetails,
-          playlists: [...props.userDetails.playlists, newPlaylist], // Append the new playlist
+          ...userDetails,
+          playlists: [...userDetails.playlists, newPlaylist],
         };
   
-        props.updateUserDetails(updatedUserDetails);
+        dispatch(setUserDetails(updatedUserDetails));
         console.log(updatedUserDetails.playlists);
         toast.success(`Playlist ${playlistName} created successfully`);
-        // navigate('/playlists');
-        props.playlistModal(false)
+        playlistModal(false);
       }
     } catch (error) {
       console.error('Can\'t create playlist', error);
@@ -38,7 +38,7 @@ const CreatePlaylist = (props) => {
   };
 
   const closeModal=()=>{
-    props.playlistModal(false);
+    playlistModal(false);
   }
 
   useEffect(()=>{

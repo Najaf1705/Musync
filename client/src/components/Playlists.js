@@ -1,79 +1,43 @@
 import React, { useState, useEffect } from "react";
-import { ColorExtractor } from "react-color-extractor";
-// import { useNavigate } from "react-router-dom";
+import { useSelector, useDispatch } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
 import CreatePlaylist from "./CreatePlaylist";
 
-const Playlist = (props) => {
-  // const navigate = useNavigate();
+const Playlist = () => {
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
+  const userDetails = useSelector((state) => state.user.userDetails);
+  const isLoggedIn = useSelector((state) => state.user.isLoggedIn);
 
   const [loading, setLoading] = useState(false);
   const [displaySongs, setDisplaySongs] = useState(false);
-  const [likedSongsIDArray, setLikedSongsIDArray] = useState([]);
   const [likedSongsData, setLikedSongsData] = useState([]);
-  // const [selectedPlaylistSongsIDArray, setSelectedPlaylistSongsIDArray] = useState([]);
   const [selectedPlaylistSongsData, setSelectedPlaylistSongsData] = useState([]);
-  const [userPlaylists, setUserPlaylists] = useState(props.userDetails.playlists || []);
-  const [playlistModal,setPlaylistModal]= useState(false);
+  const [playlistModal, setPlaylistModal] = useState(false);
   const [selectedPlaylistName, setSelectedPlaylistName] = useState(null);
-  // const [selectedPlaylistData, setSelectedPlaylistData] = useState([]);
 
-  const [cardColors, setCardColors] = useState([]);
-  const [cardTextColors, setCardTextColors] = useState([]);
-
-  const handleColors = (colors, cardIndex) => {
-    if (colors && colors.length > 0) {
-      const dominantColor = colors[0];
-      const hexColor = dominantColor.replace(/^#/, "");
-
-      // Convert to RGB
-      let bigint = parseInt(hexColor, 16);
-      let r = (bigint >> 16) & 255;
-      let g = (bigint >> 8) & 255;
-      let b = bigint & 255;
-
-      // Calculate perceived brightness using YIQ formula
-      const brightness = (r * 299 + g * 587 + b * 114) / 1000;
-
-      // Choose a text color based on perceived brightness
-      const textColor = brightness > 128 ? "#000000" : "#FFFFFF";
-      // const textColor = colors[36];
-
-      // Use the cardIndex to update the specific card's colors in the arrays
-      setCardColors((prevColors) => {
-        const updatedColors = [...prevColors];
-        updatedColors[cardIndex] = dominantColor;
-        return updatedColors;
-      });
-
-      setCardTextColors((prevTextColors) => {
-        const updatedTextColors = [...prevTextColors];
-        updatedTextColors[cardIndex] = textColor;
-        return updatedTextColors;
-      });
-    }
-  };
-
+  // Redirect if not logged in
   useEffect(() => {
-    // setLikedSongsIDArray([...props.userDetails.likedSongs].reverse());
-    setLikedSongsIDArray(props.userDetails.likedSongs);
-    setUserPlaylists(props.userDetails.playlists || []);
-    console.log("heheheh");
-  }, [props.userDetails]);
+    if (!isLoggedIn) {
+      navigate('/login');
+    }
+  }, [isLoggedIn, navigate]);
 
+  // Fetch liked songs details
   useEffect(() => {
     const fetchSongDetails = async () => {
+      if (!userDetails?.likedSongs?.length) return;
+
       try {
         setLoading(true);
-        const promises = (likedSongsIDArray ?? []).map(async (song) => {
-          const response = await fetch(`/api/${song}`);
+        const promises = userDetails.likedSongs.map(async (song) => {
+          const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/${song}`);
           if (!response.ok) {
             throw new Error(`Failed to fetch song details for ID: ${song}`);
           }
-          const songDetails = await response.json();
-          return songDetails;
+          return await response.json();
         });
 
-        // Wait for all promises to resolve before updating the state
         const allSongDetails = await Promise.all(promises);
         setLikedSongsData(allSongDetails);
       } catch (error) {
@@ -84,29 +48,25 @@ const Playlist = (props) => {
     };
 
     fetchSongDetails();
-  }, [likedSongsIDArray]);
+  }, [userDetails?.likedSongs]);
 
   const handleSelectedPlaylistSongs = async (pname) => {
-    const selectedPlaylist = await props.userDetails.playlists.find(
+    const selectedPlaylist = userDetails.playlists.find(
       (playlist) => playlist.playlistName === pname
     );
-    const songIds = await selectedPlaylist.songs;
-    // setSelectedPlaylistSongsIDArray(songIds);
+
+    if (!selectedPlaylist?.songs?.length) return;
 
     try {
       setLoading(true);
-      const promises = (songIds ?? []).map(
-        async (song) => {
-          const response = await fetch(`/api/${song}`);
-          if (!response.ok) {
-            throw new Error(`Failed to fetch song details for ID: ${song}`);
-          }
-          const songDetails = await response.json();
-          return songDetails;
+      const promises = selectedPlaylist.songs.map(async (song) => {
+        const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/${song}`);
+        if (!response.ok) {
+          throw new Error(`Failed to fetch song details for ID: ${song}`);
         }
-      );
+        return await response.json();
+      });
 
-      // Wait for all promises to resolve before updating the state
       const allSongDetails = await Promise.all(promises);
       setSelectedPlaylistSongsData(allSongDetails);
     } catch (error) {
@@ -116,9 +76,9 @@ const Playlist = (props) => {
     }
   };
 
-  // const navigateToCreatePlaylist = () => {
-  //   navigate("/createplaylist");
-  // };
+  if (!userDetails) {
+    return <div>Loading...</div>;
+  }
 
   return (
     <div className="home">
@@ -156,16 +116,14 @@ const Playlist = (props) => {
                 </div>
                 <div className="card-body mt-1">
                   <h6 className="card-title mb-0">💗Liked Songs</h6>
-                  {/* <p className="card-text">By You</p> */}
                 </div>
               </div>
-              {userPlaylists.map((items, index) => (
+              {userDetails.playlists.map((items, index) => (
                 <div
                   className="col-4 col-md-4 col-lg-3 mb-3 curpoint"
                   onClick={() => {
                     setDisplaySongs(true);
                     setSelectedPlaylistName(items.playlistName);
-                    console.log(items.playlistName);
                     handleSelectedPlaylistSongs(items.playlistName);
                   }}
                   key={index}
@@ -190,7 +148,6 @@ const Playlist = (props) => {
                   </div>
                   <div className="card-body mt-1">
                     <h6 className="card-title mb-0">{items.playlistName}</h6>
-                    {/* <p className="card-text">By You</p> */}
                   </div>
                 </div>
               ))}
@@ -198,7 +155,9 @@ const Playlist = (props) => {
                 <div className="d-flex flex-column justify-content-center align-items-center card-body mt-1">
                   <i
                     className="fa-solid fa-circle-plus fa-5x"
-                    onClick={()=>{setPlaylistModal(true)}}
+                    onClick={() => {
+                      setPlaylistModal(true);
+                    }}
                   ></i>
                   <h4 style={{ textAlign: "center" }}>Create playlist</h4>
                 </div>
@@ -213,16 +172,13 @@ const Playlist = (props) => {
                   marginBottom: "2rem",
                 }}
                 onClick={() => {
-                setDisplaySongs(false);
-                // setSelectedPlaylistName(null);
-                // setSelectedPlaylistSongsData([]);
+                  setDisplaySongs(false);
                 }}
               ></i>
               <div>
                 {loading && (
                   <div className="text-center mb-4">
                     <i className="fa-solid fa-rotate fa-spin fa-2xl"></i>
-                    {/* <h4>Loading...</h4> */}
                   </div>
                 )}
               </div>
@@ -237,26 +193,14 @@ const Playlist = (props) => {
                         <div
                           className="card col-5 col-md-4 col-lg-3 mb-3 mx-2"
                           key={item.id}
-                          style={{
-                            backgroundColor: cardColors[index] || "",
-                            color: cardTextColors[index] || "",
-                          }}
                         >
                           <div style={{ minHeight: "6rem", minWidth: "100%" }}>
-                            <ColorExtractor
-                              getColors={(colors) =>
-                                handleColors(colors, index)
-                              }
-                            >
-                              <img
-                                src={item.album.images[0].url}
-                                className="card-img-top pt-2"
-                                alt={item.name}
-                              />
-                              {/* <div>img</div> */}
-                            </ColorExtractor>
+                            <img
+                              src={item.album.images[0].url}
+                              className="card-img-top pt-2"
+                              alt={item.name}
+                            />
                           </div>
-
                           <div className="card-body">
                             <p className="card-text">
                               {item.name.slice(0, 30)} -{" "}
@@ -265,30 +209,6 @@ const Playlist = (props) => {
                                 .join(", ")
                                 .slice(0, 30)}
                             </p>
-                            {/* <div>body</div> */}
-                            {/* <div className="cardbuts">
-                              <i
-                                className="fa-solid fa-download fa-xl mr-2"
-                                style={{ marginRight: "1rem" }}
-                                onClick={() =>
-                                  props.handleDownload(
-                                    item.track.name + " " + item.track.artists[0].name
-                                  )
-                                }
-                              ></i>
-                              {props.isSongLiked(item.track.id) ? (
-                                <i
-                                  className="fa-solid fa-heart fa-xl"
-                                  // style={{ color: "#ff3838" }}
-                                  onClick={(e) => props.handleLikeSong(e, item.track.id)}
-                                ></i>
-                              ) : (
-                                <i
-                                  className="fa-regular fa-heart fa-xl"
-                                  onClick={(e) => props.handleLikeSong(e, item.track.id)}
-                                ></i>
-                              )}
-                            </div> */}
                           </div>
                         </div>
                       ) : null
@@ -313,26 +233,14 @@ const Playlist = (props) => {
                         <div
                           className="card col-5 col-md-4 col-lg-3 mb-3 mx-2"
                           key={item.id}
-                          style={{
-                            backgroundColor: cardColors[index] || "",
-                            color: cardTextColors[index] || "",
-                          }}
                         >
                           <div style={{ minHeight: "6rem", minWidth: "100%" }}>
-                            <ColorExtractor
-                              getColors={(colors) =>
-                                handleColors(colors, index)
-                              }
-                            >
-                              <img
-                                src={item.album.images[0].url}
-                                className="card-img-top pt-2"
-                                alt={item.name}
-                              />
-                              {/* <div>img</div> */}
-                            </ColorExtractor>
+                            <img
+                              src={item.album.images[0].url}
+                              className="card-img-top pt-2"
+                              alt={item.name}
+                            />
                           </div>
-
                           <div className="card-body">
                             <p className="card-text">
                               {item.name.slice(0, 30)} -{" "}
@@ -355,17 +263,16 @@ const Playlist = (props) => {
                   )}
                 </>
               )}
-              {/* get items using track id and display */}
             </>
           )}
         </div>
         <div id="gg">{displaySongs}</div>
       </div>
-      {playlistModal && <CreatePlaylist 
-        userDetails={props.userDetails}
-        updateUserDetails={props.updateUserDetails}
-        playlistModal={setPlaylistModal}
-      />}
+      {playlistModal && (
+        <CreatePlaylist
+          playlistModal={setPlaylistModal}
+        />
+      )}
     </div>
   );
 };

@@ -15,10 +15,6 @@ const userSchema = new mongoose.Schema({
     type: String,
     // required: true,
   },
-  cpassword: {
-    type: String,
-    // required: true,
-  },
   image: {
     type: String,
     // required: true,
@@ -47,7 +43,6 @@ const userSchema = new mongoose.Schema({
 userSchema.pre('save',async function(next){
   if(this.isModified('password')){
     this.password=await bcrypt.hash(this.password,12);
-    this.cpassword=await bcrypt.hash(this.cpassword,12);
   }
   next();
 });
@@ -60,6 +55,7 @@ userSchema.methods.generateAuthToken=async function(){
      if (!Array.isArray(this.tokens)) {
       this.tokens = [];
     }
+    console.log("token", token);
 
     this.tokens=this.tokens.concat({token:token});
     await this.save();

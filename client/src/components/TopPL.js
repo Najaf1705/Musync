@@ -1,6 +1,5 @@
 import { Popover } from '@headlessui/react';
 import React, { useState, useEffect } from 'react';
-import {ColorExtractor} from 'react-color-extractor';
 
 const TopPL = (props) => {
   
@@ -70,7 +69,7 @@ const TopPL = (props) => {
       const fetchPlaylists = async () => {
         try {
           setLoading(true);
-          const response = await fetch(`/api/top?country=${selectedCountry}`);
+          const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/top?country=${selectedCountry}`);
           const data = await response.json();
           setPlaylists(data.playlists.items);
         } catch (error) {
@@ -108,7 +107,7 @@ const TopPL = (props) => {
           setLoading(true);
           const response = await fetch(`/api/playlist-tracks/${selectedPlaylist}`);
           const data = await response.json();
-          console.log(data);
+          // console.log(data);
           setPlaylistTracks(data.items);
         } catch (error) {
           console.error(error);
@@ -190,26 +189,26 @@ const TopPL = (props) => {
                 </div>
               )}
             </div>
-            {currentItems.map((item,index) => (
-              item.track?.id && item.track?.album?.images[0]?.url && item.track?.name && item.track?.artists ? (
+            {currentItems.map((item, index) =>
+              item.track?.id &&
+              item.track?.album?.images[0]?.url &&
+              item.track?.name &&
+              item.track?.artists ? (
                 <div
                   className="card col-5 col-md-4 col-lg-3 mb-3 mx-2"
                   key={item.track.id}
                   style={{
                     backgroundColor: cardColors[index] || "",
-                    color: cardTextColors[index] || ""
+                    color: cardTextColors[index] || "",
                   }}
                 >
-                  <div style={{minHeight: "8rem", minWidth: "100%"}}>
-                    <ColorExtractor getColors={(colors) => handleColors(colors, index)}>
-                      <img
-                        src={item.track.album.images[0].url}
-                        className="card-img-top pt-2"
-                        alt={item.name}
-                      />
-                    </ColorExtractor>
+                  <div style={{ minHeight: "8rem", minWidth: "100%" }}>
+                    <img
+                      src={item.track.album.images[0].url}
+                      className="card-img-top pt-2"
+                      alt={item.name}
+                    />
                   </div>
-
                   <div className="card-body">
                     <p className="card-text">
                       {item.track.name.slice(0, 30)} -{" "}
@@ -218,72 +217,10 @@ const TopPL = (props) => {
                         .join(", ")
                         .slice(0, 30)}
                     </p>
-                    <Popover>
-                      <div className="cardbuts">
-                        <i
-                          className="fa-solid fa-download fa-xl mr-2"
-                          style={{ marginRight: "1rem" }}
-                          onClick={() =>
-                            props.handleDownload(
-                              item.track.name + " " + item.track.artists[0].name
-                            )
-                          }
-                        ></i>
-                        {props.isSongLiked(item.track.id) ? (
-                          <i
-                            className="fa-solid fa-heart fa-xl"
-                            // style={{ color: "#ff3838" }}
-                            onClick={(e) => props.handleLikeSong(e, item.track.id)}
-                          ></i>
-                        ) : (
-                          <i
-                            className="fa-regular fa-heart fa-xl"
-                            onClick={(e) => props.handleLikeSong(e, item.track.id)}
-                          ></i>
-                        )}
-                        {props.login ? (
-                          <>
-                            <Popover.Button
-                              className="fa-solid fa-plus fa-xl"
-                              style={{
-                                width: "0",
-                                padding: "0",
-                                margin: "0",
-                                background: "rgba(33, 33, 33)",
-                                marginLeft: "1rem",
-                                color: cardTextColors[index],
-                              }}
-                            >
-                              {/* <i className="fa-solid fa-plus fa-xl"
-                                style={{ marginLeft: "1rem" }}
-                              >
-                              </i> */}
-                            </Popover.Button>
-                            <Popover.Panel className="poppanel">
-                              <div>
-                                {props.playlists.map((plist, index) => (
-                                  <React.Fragment key={index}>
-                                    <li className="curpoint"
-                                    onClick={(e) =>props.addToPlaylist(e,plist.playlistName,item.track.id)}
-                                    >
-                                      {plist.playlistName}
-                                    </li>
-                                    {/* <hr /> */}
-                                  </React.Fragment>
-                                ))}
-                                <button
-                                  onClick={()=>{props.setPlaylistModal(true)}}
-                                >Create</button>
-                              </div>
-                            </Popover.Panel>
-                          </>
-                        ) : null}
-                      </div>
-                    </Popover>
                   </div>
                 </div>
-              ):null
-            ))}
+              ) : null
+            )}
             <div className="pagination justify-content-center mt-3">
               <div aria-label="Page navigation example">
                 <ul className="pagination">

@@ -12,7 +12,7 @@ const Discover = (props) => {
 
   const fetchRecommendations = async () => {
     try {
-      const response = await fetch(`/api/recommendations?songName=${songName}`);
+      const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/recommendations?songName=${songName}`);
       if (response.status === 200) {
         const data = await response.json();
         setRecommendations(data);
@@ -21,7 +21,7 @@ const Discover = (props) => {
 
         // Fetch details for each recommendation
         const detailsPromises = data.map(async (recommendation) => {
-          const response = await fetch(`/api/search?name=${recommendation}`);
+          const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/search?name=${recommendation}`);
           if (response.ok) {
             // document.getElementById('card-deck').innerHTML = "";
             const data = await response.json();
