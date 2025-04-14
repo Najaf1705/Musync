@@ -48,7 +48,7 @@ export const searchSongsAndPlaylists = createAsyncThunk(
         throw new Error('Invalid response format from server');
       }
 
-      console.log('Search results:', data);
+      // console.log('Search results:', data);
 
       // Transform data if needed and return
       return {

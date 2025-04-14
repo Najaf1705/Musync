@@ -7,8 +7,8 @@ const SearchResults = () => {
   const { searchResults, playlistData, loading } = useSelector(state => state.songs);
 
   // Add debug logging
-  console.log('Search Results:', searchResults);
-  console.log('Playlist Data:', playlistData);
+  // console.log('Search Results:', searchResults);
+  // console.log('Playlist Data:', playlistData);
 
   if (loading) {
     return <div className="text-center"><i className="fa-solid fa-spinner fa-spin"></i></div>;
