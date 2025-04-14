@@ -5,7 +5,9 @@
   "main": "app.js",
   "scripts": {
     "start": "node server",
-    "dev": "nodemon server"
+    "dev": "nodemon server",
+    "build": "npm install",
+    "start:prod": "NODE_ENV=production node server"
   },
   "keywords": [],
   "author": "",
