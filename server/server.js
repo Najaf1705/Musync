@@ -7,24 +7,30 @@ const app=express();
 const cookieParser = require('cookie-parser');
 
 require('./db/conn');
-
-
 app.use(cookieParser());
+
+
+// Allow specific origins
 const allowedOrigins = [
-  "http://localhost:3000",
-  "https://musync-enzoe.vercel.app"
+  'http://localhost:3000', // For local development
+  'https://musync-enzoe.vercel.app' // For production
 ];
 
-app.use(cors({
-  origin: function (origin, callback) {
-    if (!origin || allowedOrigins.includes(origin)) {
-      callback(null, true);
-    } else {
-      callback(new Error('Not allowed by CORS'));
-    }
-  },
-  credentials: true,
-}));
+app.use(
+  cors({
+    origin: (origin, callback) => {
+      // Allow requests with no origin (e.g., mobile apps or curl)
+      if (!origin) return callback(null, true);
+      if (allowedOrigins.includes(origin)) {
+        callback(null, true);
+      } else {
+        callback(new Error('Not allowed by CORS'));
+      }
+    },
+    credentials: true // If you need cookies or auth headers
+  })
+);
+
 app.use(express.json());
 app.use(require('./routes/authRoute'));
 app.use(require('./routes/spotifyRoute'));
