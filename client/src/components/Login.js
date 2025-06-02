@@ -161,6 +161,7 @@ const Login = () => {
                   onFailure={(error) => {
                     console.error(error);
                   }}
+                  redirect_uri={process.env.REACT_APP_REDIRECT_URI}
                 >
                   <span>Log in with Google</span>
                 </GoogleLogin>
