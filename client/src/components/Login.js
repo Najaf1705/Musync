@@ -4,7 +4,8 @@ import { GoogleOAuthProvider, GoogleLogin } from '@react-oauth/google';
 import { jwtDecode } from "jwt-decode";
 import { toast } from 'react-toastify';
 import { useDispatch } from 'react-redux';
-import { setUserDetails } from '../redux/features/userSlice';
+import { setUser } from '../redux/features/userSlice';
+import { setLikedSongs, setLikedSongsIds } from "../redux/features/likeSlice"; // adjust path as needed
 
 const Login = () => {
   const dispatch = useDispatch();
@@ -29,17 +30,13 @@ const Login = () => {
     try {
       const res = await fetch(`${process.env.REACT_APP_BACKEND_URL}/serverlogin`, {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        credentials: 'include',
-        body: JSON.stringify({
-          email,
-          password
-        })
+        headers: { "Content-Type": "application/json" },
+        credentials: "include", // important!
+        body: JSON.stringify({ email, password }),
       });
 
       const serRes = await res.json();
+      console.log("serRes", serRes);
       
       if (res.status === 401 || !serRes) {
         document.getElementById("wrongpassword").innerHTML = "Invalid credentials"
@@ -55,7 +52,9 @@ const Login = () => {
       });
       const userData = await userResponse.json();
       
-      dispatch(setUserDetails(userData));
+      dispatch(setUser(userData));
+      dispatch(setLikedSongsIds(userData.likedSongs));
+
       toast.success("Logged in Successfully");
       navigate("/");
     } catch (error) {
@@ -81,14 +80,11 @@ const Login = () => {
         navigate("/signup");
         return;
       }
-
-      // Fetch user details after successful Google login
-      const userResponse = await fetch(`${process.env.REACT_APP_BACKEND_URL}/serverprofile`, {
-        credentials: 'include'
-      });
-      const userData = await userResponse.json();
       
-      dispatch(setUserDetails(userData));
+      console.log("google login data", data);
+      dispatch(setUser(data.user));
+      dispatch(setLikedSongsIds(data.user.likedSongs));
+
       toast.success("Logged in Successfully");
       navigate("/");
     } catch (error) {

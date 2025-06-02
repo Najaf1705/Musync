@@ -1,7 +1,7 @@
 import React, {useEffect, useState} from 'react'
 import { toast } from 'react-toastify';
 import { useSelector, useDispatch } from 'react-redux';
-import { setUserDetails } from '../redux/features/userSlice';
+import { setUser } from '../../redux/features/userSlice';
 
 const CreatePlaylist = ({ playlistModal }) => {
   const dispatch = useDispatch();
@@ -27,7 +27,7 @@ const CreatePlaylist = ({ playlistModal }) => {
           playlists: [...userDetails.playlists, newPlaylist],
         };
   
-        dispatch(setUserDetails(updatedUserDetails));
+        dispatch(setUser(updatedUserDetails));
         console.log(updatedUserDetails.playlists);
         toast.success(`Playlist ${playlistName} created successfully`);
         playlistModal(false);

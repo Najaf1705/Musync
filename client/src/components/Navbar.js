@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
-import { clearUserDetails } from '../redux/features/userSlice';
+import { clearUser } from '../redux/features/userSlice';
 import { toast } from 'react-toastify';
 import 'bootstrap/dist/css/bootstrap.css';
 
@@ -48,7 +48,7 @@ const Navbar = () => {
         throw new Error('Logout failed');
       }
 
-      dispatch(clearUserDetails());
+      dispatch(clearUser());
       navigate('/');
       toast.success("Logged out Successfully");
     } catch (error) {

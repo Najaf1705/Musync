@@ -1,7 +1,7 @@
 import React from "react";
 import { useSelector } from 'react-redux';
-import SongCard from "./songCard";
-import PlaylistCard from "./playlistCard";
+import SongCard from "../songCard";
+import PlaylistCard from "../playlist/playlistCard";
 
 const SearchResults = () => {
   const { searchResults, playlistData, loading } = useSelector(state => state.songs);

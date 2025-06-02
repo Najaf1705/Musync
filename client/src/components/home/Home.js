@@ -6,19 +6,20 @@ import SearchBar from "./searchBar";
 import RecentSearches from "./recentSearches";
 import SearchResults from "./searchResults";
 import TopSongs from "./topSongs";
-import CreatePlaylist from "../CreatePlaylist";
+import CreatePlaylist from "../playlist/CreatePlaylist";
 import { fetchTopSongs, fetchPlaylistTracks, searchSongsAndPlaylists } from "../utils/api";
 
 const Home = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  const userDetails = useSelector((state) => state.user.userDetails);
+  const userDetails = useSelector((state) => state.user.user);
+  const likedSongsIds = useSelector((state) => state.likes.likedSongsIds);
   const isLoggedIn = useSelector((state) => state.user.isLoggedIn);
 
   const [songName, setSongName] = useState("");
   const [songData, setSongData] = useState(null);
   const [playlistData, setPlaylistData] = useState(null);
-  const [likedSongs, setLikedSongs] = useState(userDetails?.likedSongs || []);
+  // const [likedSongs, setLikedSongs] = useState([]);
   const [loading, setLoading] = useState(false);
   const [selectedPlaylist, setSelectedPlaylist] = useState(null);
   const [selectedPlaylistName, setSelectedPlaylistName] = useState(null);
@@ -29,6 +30,7 @@ const Home = () => {
   const [cardColors, setCardColors] = useState([]);
   const [cardTextColors, setCardTextColors] = useState([]);
 
+  // console.log("Liked Songs Ids:", likedSongsIds);
   // Fetch top songs
   useEffect(() => {
     const fetchSongs = async () => {
@@ -36,6 +38,7 @@ const Home = () => {
       const data = await fetchTopSongs();
       setTopSongs(data);
       setLoading(false);
+      // useSelector((state) => state.likes.likedSongs);
     };
     fetchSongs();
   }, []);
@@ -115,8 +118,8 @@ const Home = () => {
           setSelectedPlaylistName={setSelectedPlaylistName}
           playlistTracks={playlistTracks}
           // handleDownload={onSelectedSongChange}
-          likedSongs={likedSongs}
-          setLikedSongs={setLikedSongs}
+          // likedSongs={likedSongs}
+          // setLikedSongs={setLikedSongs}
           cardColors={cardColors}
           cardTextColors={cardTextColors}
           setCardColors={setCardColors}

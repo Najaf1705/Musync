@@ -2,10 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { ToastContainer } from 'react-toastify';
 import { Route, Routes } from "react-router-dom";
 import { useDispatch, useSelector } from 'react-redux';
-import { fetchUserDetails } from './redux/features/userSlice';
 import 'react-toastify/dist/ReactToastify.css';
 import "./App.css";
-import "./main.js";
 import Navbar from './components/Navbar';
 import Home from './components/home/Home.js';
 import Discover from './components/Discover';
@@ -14,41 +12,59 @@ import Profile from './components/Profile';
 import Login from './components/Login';
 import Signup from './components/Signup';
 import Errorpage from './components/Errorpage';
-import Playlists from './components/Playlists';
+import Playlists from './components/playlist/Playlists';
+import { fetchLikedSongs, setLikedSongsIds } from './redux/features/likeSlice'; // adjust path as needed
+import { setUser, clearUser } from './redux/features/userSlice'; // adjust path as needed
 
 const App = () => {
   const [selectedSong, setSelectedSong] = useState('');
   const dispatch = useDispatch();
   const isLoggedIn = useSelector((state) => state.user.isLoggedIn);
-  const userDetails = useSelector((state) => state.user.userDetails);
+  const userDetails = useSelector((state) => state.user.user);
+  const likedSongsId = useSelector((state) => state.likes.likedSongsId);
+  // dispatch(fetchLikedSongs(userDetails._id));
 
   useEffect(() => {
-    dispatch(fetchUserDetails())
-      .unwrap()
-      .then((data) => {
-        console.log('User details fetched successfully:', data);
-      })
-      .catch((error) => {
-        console.error('Error fetching user details:', error);
-      });
-  }, [dispatch]);
+    console.log("User Details:", userDetails);
+    console.log("Liked sonsgs:", likedSongsId);
+  }, [userDetails]);
+
 
   const handleSelectedSongChange = (songDetails) => {
     setSelectedSong(songDetails);
   };
+
+  useEffect(() => {
+    const verify = async () => {
+      const res = await fetch(`${process.env.REACT_APP_BACKEND_URL}/serverprofile`, {
+        credentials: "include",
+      });
+
+      if (res.ok) {
+        const user = await res.json();
+        dispatch(setUser(user)); // refresh with real data
+        dispatch(setLikedSongsIds(user.likedSongs)); // fetch liked songs for the user
+      } else {
+        dispatch(clearUser());   // localStorage token was outdated
+      }
+    };
+
+    verify();
+  }, []);
+
 
   return (
     <>
       <Navbar />
       <Routes>
         <Route path="" element={
-          <Home 
+          <Home
             selectedSong={selectedSong}
             onSelectedSongChange={handleSelectedSongChange}
           />
         } />
         <Route path="/discover" element={
-          <Discover 
+          <Discover
             selectedSong={selectedSong}
             onSelectedSongChange={handleSelectedSongChange}
           />

@@ -1,71 +1,32 @@
-import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-
-// Async thunk to fetch user details from the database
-export const fetchUserDetails = createAsyncThunk(
-  'user/fetchUserDetails',
-  async (_, { rejectWithValue }) => {
-    try {
-      const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/serverprofile`, {
-        method: 'GET',
-        credentials: 'include', // Include cookies in the request
-      });
-
-      if (!response.ok) {
-        if (response.status === 401) {
-          throw new Error('Unauthorized: Invalid or missing authentication cookie');
-        }
-        if (response.status === 400) {
-          throw new Error('Invalid request: Check token or user ID');
-        }
-        throw new Error('Failed to fetch user details');
-      }
-
-      const data = await response.json();
-      return data;
-    } catch (error) {
-      return rejectWithValue(error.message);
-    }
-  }
-);
+// src/redux/userSlice.js
+import { createSlice } from '@reduxjs/toolkit';
 
 const initialState = {
-  userDetails: null, // Stores user details if logged in
-  isLoggedIn: false, // Tracks login status
-  loading: false, // Tracks loading state
-  error: null, // Stores error messages
+  user: null,             // Holds user object
+  isLoggedIn: false,      // Tracks login status
 };
 
 const userSlice = createSlice({
   name: 'user',
   initialState,
   reducers: {
-    setUserDetails(state, action) {
-      state.userDetails = action.payload;
-      state.isLoggedIn = true; // Set login status to true when user details are set
+    setUser: (state, action) => {
+      state.user = action.payload;
+      state.isLoggedIn = true; // ✅ Automatically mark as logged in
     },
-    clearUserDetails(state) {
-      state.userDetails = null;
-      state.isLoggedIn = false; // Set login status to false when user details are cleared
+    clearUser: (state) => {
+      state.user = null;
+      state.isLoggedIn = false; // ✅ Mark as logged out
     },
-  },
-  extraReducers: (builder) => {
-    builder
-      .addCase(fetchUserDetails.pending, (state) => {
-        state.loading = true;
-        state.error = null;
-      })
-      .addCase(fetchUserDetails.fulfilled, (state, action) => {
-        state.loading = false;
-        state.userDetails = action.payload;
-        state.isLoggedIn = true; // Set login status to true when fetch is successful
-      })
-      .addCase(fetchUserDetails.rejected, (state, action) => {
-        state.loading = false;
-        state.error = action.payload;
-        state.isLoggedIn = false; // Set login status to false if fetch fails
-      });
+    // Optional separate login/logout toggles
+    setLoggedIn: (state) => {
+      state.isLoggedIn = true;
+    },
+    setLoggedOut: (state) => {
+      state.isLoggedIn = false;
+    },
   },
 });
 
-export const { setUserDetails, clearUserDetails } = userSlice.actions;
+export const { setUser, clearUser, setLoggedIn, setLoggedOut } = userSlice.actions;
 export default userSlice.reducer;

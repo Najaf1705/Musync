@@ -2,11 +2,13 @@ import React, { useState, useEffect } from "react";
 import { useSelector, useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import CreatePlaylist from "./CreatePlaylist";
+import SongCard from "../songCard";
 
 const Playlist = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  const userDetails = useSelector((state) => state.user.userDetails);
+  const userDetails = useSelector((state) => state.user.user);
+  const likedSongsId = useSelector((state) => state.likes.likedSongsId);
   const isLoggedIn = useSelector((state) => state.user.isLoggedIn);
 
   const [loading, setLoading] = useState(false);
@@ -26,11 +28,11 @@ const Playlist = () => {
   // Fetch liked songs details
   useEffect(() => {
     const fetchSongDetails = async () => {
-      if (!userDetails?.likedSongs?.length) return;
+      if (!likedSongsId?.length) return;
 
       try {
         setLoading(true);
-        const promises = userDetails.likedSongs.map(async (song) => {
+        const promises = likedSongsId.map(async (song) => {
           const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/${song}`);
           if (!response.ok) {
             throw new Error(`Failed to fetch song details for ID: ${song}`);
@@ -48,7 +50,7 @@ const Playlist = () => {
     };
 
     fetchSongDetails();
-  }, [userDetails?.likedSongs]);
+  }, [likedSongsId]);
 
   const handleSelectedPlaylistSongs = async (pname) => {
     const selectedPlaylist = userDetails.playlists.find(
@@ -190,27 +192,7 @@ const Playlist = () => {
                       item.album?.images[0]?.url &&
                       item.name &&
                       item.artists ? (
-                        <div
-                          className="card col-5 col-md-4 col-lg-3 mb-3 mx-2"
-                          key={item.id}
-                        >
-                          <div style={{ minHeight: "6rem", minWidth: "100%" }}>
-                            <img
-                              src={item.album.images[0].url}
-                              className="card-img-top pt-2"
-                              alt={item.name}
-                            />
-                          </div>
-                          <div className="card-body">
-                            <p className="card-text">
-                              {item.name.slice(0, 30)} -{" "}
-                              {item.artists
-                                .map((artist) => artist.name)
-                                .join(", ")
-                                .slice(0, 30)}
-                            </p>
-                          </div>
-                        </div>
+                        <SongCard item={item} index={index} key={item.id} />
                       ) : null
                     )
                   ) : (
@@ -230,27 +212,7 @@ const Playlist = () => {
                       item.album?.images[0]?.url &&
                       item.name &&
                       item.artists ? (
-                        <div
-                          className="card col-5 col-md-4 col-lg-3 mb-3 mx-2"
-                          key={item.id}
-                        >
-                          <div style={{ minHeight: "6rem", minWidth: "100%" }}>
-                            <img
-                              src={item.album.images[0].url}
-                              className="card-img-top pt-2"
-                              alt={item.name}
-                            />
-                          </div>
-                          <div className="card-body">
-                            <p className="card-text">
-                              {item.name.slice(0, 30)} -{" "}
-                              {item.artists
-                                .map((artist) => artist.name)
-                                .join(", ")
-                                .slice(0, 30)}
-                            </p>
-                          </div>
-                        </div>
+                        <SongCard item={item} index={index} key={item.id} />
                       ) : null
                     )
                   ) : (

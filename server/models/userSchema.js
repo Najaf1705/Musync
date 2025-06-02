@@ -40,31 +40,46 @@ const userSchema = new mongoose.Schema({
 });
 
 // hashing password
-userSchema.pre('save',async function(next){
-  if(this.isModified('password')){
-    this.password=await bcrypt.hash(this.password,12);
+userSchema.pre('save', async function (next) {
+  if (this.isModified('password')) {
+    this.password = await bcrypt.hash(this.password, 12);
   }
   next();
 });
 
-userSchema.methods.generateAuthToken=async function(){
+userSchema.methods.generateAuthToken = async function () {
   try {
-    let token = jwt.sign({_id:this._id}, process.env.SECRET_KEY)
+    // Generate JWT token with 1 days expiry
+    const token = jwt.sign(
+      { _id: this._id.toString() },
+      process.env.SECRET_KEY,
+      { expiresIn: "1d" }
+    );
 
-     // Ensure `tokens` is an array before pushing the token
-     if (!Array.isArray(this.tokens)) {
+    // Initialize tokens array if undefined or not array
+    if (!Array.isArray(this.tokens)) {
       this.tokens = [];
     }
-    console.log("token", token);
 
-    this.tokens=this.tokens.concat({token:token});
+    // Optional: Keep only last 4 tokens to limit storage (max 5 tokens)
+    if (this.tokens.length >= 5) {
+      this.tokens.shift(); // remove oldest token
+    }
+
+    // Add the new token
+    this.tokens = this.tokens.concat({ token });
+
+    // Save the user document
     await this.save();
+
     return token;
   } catch (error) {
-    console.log(error);
+    console.error("Error generating auth token:", error);
+    throw error; // Let caller handle it
   }
-}
+};
 
 
-const User = mongoose.model('REGISTERATION',userSchema);
-module.exports=User;
+
+const User = mongoose.model('REGISTERATION', userSchema);
+module.exports = User;

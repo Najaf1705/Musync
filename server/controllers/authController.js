@@ -66,9 +66,19 @@ const serverLogin = async (req, res) => {
       res.cookie("jtoken", token, {
         httpOnly: true,
         secure: process.env.NODE_ENV === 'production', // Use secure cookies in production
+        maxAge: 1000*60*60*24,         // 1 week expiration
       });
 
-      return res.status(200).json({ message: "Logged in successfully" });
+      return res.status(200).json({
+        message: "Logged in successfully",
+        user: {
+          id: userExists._id,
+          name: userExists.name,
+          email: userExists.email,
+          likedSongs: userExists.likedSongs, // only safe fields
+          playlists: userExists.playlists,
+        },
+      });
     } else {
       return res.status(401).json({ error: "Invalid credentials" });
     }
@@ -91,13 +101,20 @@ const googleServerLogin = async (req, res) => {
       res.cookie("jtoken", token, {
         httpOnly: true,
         secure: process.env.NODE_ENV === 'production', // Use secure cookies in production
+        maxAge: 1000*60*60*24,         // 1 week expiration
       });
 
-      // In your login/token generation code
-      // console.log('User ID before token generation:', userExists._id.toString());
-      // console.log('Generated token payload:', { _id: userExists._id.toString() });
+      return res.status(200).json({
+        message: "Logged in successfully",
+        user: {
+          id: userExists._id,
+          name: userExists.name,
+          email: userExists.email,
+          likedSongs: userExists.likedSongs, // only safe fields
+          playlists: userExists.playlists,
+        },
+      });
 
-      return res.status(200).json({ message: "Logged in successfully" });
     } else {
       return res.status(401).json({ error: "User doesn't exist! Try registering" });
     }

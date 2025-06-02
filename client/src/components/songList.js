@@ -1,5 +1,11 @@
-import React from 'react';
 import SongCard from './songCard';
+import { useSelector, useDispatch } from 'react-redux';
+
+import { fetchLikedSongs } from '../redux/features/likeSlice';
+
+const songData=useSelector((state) => state.songs);
+console.log(songData);
+
 
 const SongList = ({
   songs,
@@ -14,6 +20,7 @@ const SongList = ({
   setPlaylistModal,
   login,
 }) => {
+  const dispatch = useDispatch();
   return (
     <div className="card-deck row d-flex justify-content-center pb-3 mx-1">
       {songs.map((item, index) => (

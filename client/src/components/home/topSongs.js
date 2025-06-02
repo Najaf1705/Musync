@@ -1,5 +1,5 @@
 import React from "react";
-import SongCard from "./songCard";
+import SongCard from "../songCard";
 
 const TopSongs = ({ topSongs, cardColors, cardTextColors, setCardColors, setCardTextColors }) => {
   return (

@@ -1,16 +1,18 @@
 import React from "react";
 import { useDispatch, useSelector } from 'react-redux';
 import { toast } from "react-toastify";
-import { toggleLikeSong } from '../../redux/features/songSlice';
-import { setCardColors, setCardTextColors } from '../../redux/features/songSlice';
+import { toggleLikeSong } from '../redux/features/likeSlice';
+import { setCardColors, setCardTextColors } from '../redux/features/songSlice';
 
 const SongCard = ({ item, index }) => {
+  // console.log("SongCard item:", item.id);
   const dispatch = useDispatch();
   const isLoggedIn = useSelector(state => state.user.isLoggedIn);
-  const userDetails = useSelector(state => state.user.userDetails);
+  const userDetails = useSelector(state => state.user.user);
   const cardColors = useSelector(state => state.songs.cardColors);
   const cardTextColors = useSelector(state => state.songs.cardTextColors);
-  const isLiked = userDetails?.likedSongs?.includes(item.id);
+  // const isLiked = userDetails?.likedSongs?.includes(item.id);
+  const [isLiked, setIsLiked] = React.useState(userDetails?.likedSongs?.includes(item.id));
 
   if (!item || !item.name || !item.artists) {
     return null; // Or return a placeholder/loading state
@@ -22,12 +24,27 @@ const SongCard = ({ item, index }) => {
       return;
     }
 
+    setIsLiked(!isLiked); // Optimistically update the like state
+
     try {
-      await dispatch(toggleLikeSong(item.id)).unwrap();
-      toast.success(isLiked ? "Removed from Liked Songs" : "Added to Liked Songs");
-    } catch (error) {
-      toast.error("Failed to update like status");
+    const res = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/toggle-like/${item.id}`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      credentials: "include",
+      body: JSON.stringify({ id: item.id }),
+    });
+
+    const data = await res.json();
+    console.log("Like toggle response:", data);
+
+    if (res.ok) {
+      // Optional: refetch liked song details if needed
+      dispatch(toggleLikeSong(item.id));
+      toast.success("Like toggle success:");
     }
+  } catch (err) {
+    console.error("Like toggle failed:", err);
+  }
   };
 
   const handleColors = (colors) => {
@@ -37,8 +54,8 @@ const SongCard = ({ item, index }) => {
       // const brightness = calculateBrightness(dominantColor);
       const textColor = brightness > 128 ? "#000000" : "#FFFFFF";
 
-      dispatch(setCardColors({ index, color: dominantColor }));
-      dispatch(setCardTextColors({ index, color: textColor }));
+      // dispatch(setCardColors({ index, color: dominantColor }));
+      // dispatch(setCardTextColors({ index, color: textColor }));
     }
   };
 
@@ -59,8 +76,10 @@ const SongCard = ({ item, index }) => {
         />
       </div>
       <div className="card-body">
+        <div className="song-title-marquee">
+          <span>{(item.name || 'Unknown')}</span>
+        </div>
         <p className="card-text">
-          {(item.name || 'Unknown').slice(0, 30)} -{" "}
           {item.artists
             ? item.artists.map((artist) => artist.name || 'Unknown Artist').join(", ").slice(0, 30)
             : 'Unknown Artist'}
