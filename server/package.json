@@ -7,7 +7,7 @@
     "start": "node server",
     "dev": "nodemon server",
     "build": "npm install",
-    "start:prod": "NODE_ENV=production node server"
+    "start:prod": "cross-env NODE_ENV=production node server"
   },
   "keywords": [],
   "author": "",
@@ -27,6 +27,7 @@
     "python-shell": "^5.0.0"
   },
   "devDependencies": {
+    "cross-env": "^7.0.3",
     "nodemon": "^3.0.1"
   }
 }

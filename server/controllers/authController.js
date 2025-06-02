@@ -66,6 +66,7 @@ const serverLogin = async (req, res) => {
       res.cookie("jtoken", token, {
         httpOnly: true,
         secure: process.env.NODE_ENV === 'production', // Use secure cookies in production
+        sameSite: 'none', // Required for cross-site requests
         maxAge: 1000*60*60*24,         // 1 week expiration
       });
 
@@ -101,6 +102,7 @@ const googleServerLogin = async (req, res) => {
       res.cookie("jtoken", token, {
         httpOnly: true,
         secure: process.env.NODE_ENV === 'production', // Use secure cookies in production
+        sameSite: 'none', // Required for cross-site requests
         maxAge: 1000*60*60*24,         // 1 week expiration
       });
 
