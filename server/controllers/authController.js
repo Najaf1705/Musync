@@ -6,13 +6,13 @@ const User = require('../models/userSchema');
 const serverRegister = async (req, res) => {
   const { name, email, password, cpassword } = req.body;
   if (!name || !email || !password || !cpassword) {
-    return res.status(422).json({ error: "Please fill all fields" });
+    return res.status(400).json({ error: "Please provide all details" });
   }
 
   try {
     const userExist = await User.findOne({ email: email });
     if (userExist) {
-      return res.status(422).json({ error: "User already exists" });
+      return res.status(409).json({ error: "User already exists" });
     }
 
     const user = new User({ name, email, password, cpassword });
@@ -31,7 +31,7 @@ const googleServerRegister = async (req, res) => {
     const existingUser = await User.findOne({ email: email });
 
     if (existingUser) {
-      return res.status(422).json({ error: 'User already registered with Google' });
+      return res.status(409).json({ error: 'User already registered with Google' });
     }
 
     const newUser = new User({ email, name, image });
@@ -65,7 +65,7 @@ const serverLogin = async (req, res) => {
 
       res.cookie("jtoken", token, {
         httpOnly: true,
-        secure: process.env.NODE_ENV === 'production', // Use secure cookies in production
+        secure: true,
         sameSite: 'none', // Required for cross-site requests
         maxAge: 1000*60*60*24,         // 1 week expiration
       });
@@ -101,7 +101,7 @@ const googleServerLogin = async (req, res) => {
 
       res.cookie("jtoken", token, {
         httpOnly: true,
-        secure: process.env.NODE_ENV === 'production', // Use secure cookies in production
+        secure: true, // Use secure cookies in production
         sameSite: 'none', // Required for cross-site requests
         maxAge: 1000*60*60*24,         // 1 week expiration
       });
@@ -118,7 +118,7 @@ const googleServerLogin = async (req, res) => {
       });
 
     } else {
-      return res.status(401).json({ error: "User doesn't exist! Try registering" });
+      return res.status(409).json({ message: "User doesn't exist! Try registering" });
     }
   } catch (error) {
     console.log(error);

@@ -12,6 +12,7 @@ const authenticate = async (req, res, next) => {
 
     // Verify and decode the JWT
     const decoded = jwt.verify(token, process.env.SECRET_KEY);
+    console.log('Decoded token:', decoded);
     
     // Add debug logging
     console.log('Decoded token _id:', decoded._id);

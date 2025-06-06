@@ -1,18 +1,20 @@
-const jwt=require("jsonwebtoken");
+const jwt = require("jsonwebtoken");
 const User = require('../models/userSchema');
 
-const authenticate=async (req, res, next)=>{
+const authenticate = async (req, res, next) => {
   try {
-    const token=req.cookies.jtoken;
-    const tverify=jwt.verify(token, process.env.SECRET_KEY);
-    const rootuser= await User.findOne({_id:tverify._id, "tokens.token":token});
+    const token = req.cookies.jtoken;
+    console.log("Token from cookie:", token);
+    const tverify = jwt.verify(token, process.env.SECRET_KEY);
+    console.log("Token verified user:", tverify);
+    const rootuser = await User.findOne({ _id: tverify._id, "tokens.token": token });
 
-    if(!rootuser){
+    if (!rootuser) {
       throw new Error("User not found");
     }
-    req.token=token;
-    req.rootuser=rootuser;
-    req.userID=rootuser._id;
+    req.token = token;
+    req.rootuser = rootuser;
+    req.userID = rootuser._id;
     // req.userName = rootuser.name;
     next();
 
@@ -22,4 +24,4 @@ const authenticate=async (req, res, next)=>{
   }
 }
 
-module.exports=authenticate;
+module.exports = authenticate;

@@ -1,61 +1,77 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from 'react-redux';
 import { toast } from "react-toastify";
 import { toggleLikeSong } from '../redux/features/likeSlice';
-import { setCardColors, setCardTextColors } from '../redux/features/songSlice';
+import { Vibrant } from "node-vibrant/browser";
 
 const SongCard = ({ item, index }) => {
-  // console.log("SongCard item:", item.id);
   const dispatch = useDispatch();
   const isLoggedIn = useSelector(state => state.user.isLoggedIn);
+  const likedSongs = useSelector(state => state.likes.likedSongs);
   const userDetails = useSelector(state => state.user.user);
-  const cardColors = useSelector(state => state.songs.cardColors);
-  const cardTextColors = useSelector(state => state.songs.cardTextColors);
-  // const isLiked = userDetails?.likedSongs?.includes(item.id);
-  const [isLiked, setIsLiked] = React.useState(userDetails?.likedSongs?.includes(item.id));
+  const [isLiked, setIsLiked] = useState(likedSongs?.includes(item.id));
+  const [likeLoading, setLikeLoading] = useState(false);
+
+
+
+  // Local state for colors
+  const [bgColor, setBgColor] = useState("#fff");
+  const [textColor, setTextColor] = useState("#000");
+
+  // Extract colors using Vibrant when the image changes
+  useEffect(() => {
+    if (item.album?.images[0]?.url) {
+      Vibrant.from(item.album.images[0].url)
+        .getPalette()
+        .then((palette) => {
+          const dominantColor = palette.Vibrant?.hex || "#fff";
+          setBgColor(dominantColor);
+          const rgb = palette.Vibrant?.rgb || [255, 255, 255];
+          const brightness = (rgb[0] * 299 + rgb[1] * 587 + rgb[2] * 114) / 1000;
+          setTextColor(brightness > 128 ? "#000" : "#fff");
+        })
+        .catch(() => {
+          setBgColor("#fff");
+          setTextColor("#000");
+        });
+    }
+  }, [item.album]);
+
+
 
   if (!item || !item.name || !item.artists) {
-    return null; // Or return a placeholder/loading state
+    return null;
   }
 
   const handleLike = async () => {
     if (!isLoggedIn) {
-      toast.error("Please login first!");
+      toast.error("Please log in to like songs.");
       return;
     }
-
-    setIsLiked(!isLiked); // Optimistically update the like state
+    if (likeLoading) return;
+    setLikeLoading(true);
 
     try {
-    const res = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/toggle-like/${item.id}`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      credentials: "include",
-      body: JSON.stringify({ id: item.id }),
-    });
-
-    const data = await res.json();
-    console.log("Like toggle response:", data);
-
-    if (res.ok) {
-      // Optional: refetch liked song details if needed
-      dispatch(toggleLikeSong(item.id));
-      toast.success("Like toggle success:");
-    }
-  } catch (err) {
-    console.error("Like toggle failed:", err);
-  }
-  };
-
-  const handleColors = (colors) => {
-    if (colors?.[0]) {
-      const dominantColor = colors[0];
-      const brightness = 128; // Placeholder for brightness calculation
-      // const brightness = calculateBrightness(dominantColor);
-      const textColor = brightness > 128 ? "#000000" : "#FFFFFF";
-
-      // dispatch(setCardColors({ index, color: dominantColor }));
-      // dispatch(setCardTextColors({ index, color: textColor }));
+      const res = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/toggle-like/${item.id}`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({ id: item.id }),
+      });
+      const data = await res.json();
+      setIsLiked(data.isLiked);
+      if (res.ok) {
+        dispatch(toggleLikeSong(item.id));
+        if (data.isLiked) {
+          toast.success("Liked the song!");
+        } else {
+          toast.info("Unliked the song.");
+        }
+      }
+    } catch (err) {
+      console.error("Like toggle failed:", err);
+    } finally {
+      setLikeLoading(false);
     }
   };
 
@@ -63,8 +79,9 @@ const SongCard = ({ item, index }) => {
     <div
       className="card col-5 col-md-4 col-lg-3 mb-3 mx-2"
       style={{
-        backgroundColor: cardColors[index] || "",
-        color: cardTextColors[index] || "",
+        backgroundColor: bgColor,
+        color: textColor,
+        transition: "background 0.3s, color 0.3s"
       }}
     >
       <div style={{ minHeight: "8rem", minWidth: "100%" }}>
@@ -87,17 +104,15 @@ const SongCard = ({ item, index }) => {
         <div className="d-flex justify-content-around mt-2">
           <i
             className={`fa-${isLiked ? 'solid' : 'regular'} fa-heart curpoint`}
-            onClick={handleLike}
-            style={{ color: isLiked ? 'red' : cardTextColors[index] || '' }}
+            onClick={likeLoading ? undefined : handleLike}
+            style={{ pointerEvents: likeLoading ? 'none' : 'auto', opacity: likeLoading ? 0.5 : 1 }}
           ></i>
           <i
             className="fa-solid fa-plus curpoint"
-            // onClick={() => isLoggedIn ? setPlaylistModal(true) : toast.error("Please login first!")}
             title="Add to playlist"
           ></i>
           <i
             className="fa-solid fa-download curpoint"
-            // onClick={() => handleDownload(item)}
             title="Download"
           ></i>
         </div>

@@ -38,7 +38,6 @@ const Home = () => {
       const data = await fetchTopSongs();
       setTopSongs(data);
       setLoading(false);
-      // useSelector((state) => state.likes.likedSongs);
     };
     fetchSongs();
   }, []);

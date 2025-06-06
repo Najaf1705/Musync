@@ -9,7 +9,7 @@ router.get('/', (req, res) => {
 });
 
 // Email Registration
-router.post('/serverregister', authenticate, authController.serverRegister);
+router.post('/serverregister', authController.serverRegister);
 
 // Google Registration
 router.post('/googleserverregister', authController.googleServerRegister);

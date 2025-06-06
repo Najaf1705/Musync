@@ -5,7 +5,7 @@ import 'bootstrap/dist/css/bootstrap.css';
 
 const Profile = () => {
   const navigate = useNavigate();
-  const userDetails = useSelector((state) => state.user.userDetails);
+  const userDetails = useSelector((state) => state.user.user);
   const isLoggedIn = useSelector((state) => state.user.isLoggedIn);
 
   // Redirect to login if not authenticated

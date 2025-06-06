@@ -2,6 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { clearUser } from '../redux/features/userSlice';
+import { clearLikeData } from '../redux/features/likeSlice';
 import { toast } from 'react-toastify';
 import 'bootstrap/dist/css/bootstrap.css';
 
@@ -10,19 +11,22 @@ const defaultProfilePicture = process.env.PUBLIC_URL + '/images/doodle.jpg';
 const Navbar = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  const userDetails = useSelector((state) => state.user.userDetails);
+  const userDetails = useSelector((state) => state.user.user);
   const isLoggedIn = useSelector((state) => state.user.isLoggedIn);
-  
-  const [profilePictureURL, setProfilePictureURL] = useState(defaultProfilePicture);
-  const [isNavbarOpen, setIsNavbarOpen] = useState(false);
-  const navbarRef = useRef(null);
 
-  // Update profile picture when user details change
+  const [profilePictureURL, setProfilePictureURL] = useState(userDetails?.image || defaultProfilePicture);
+
+  // Update profile picture when userDetails changes
   useEffect(() => {
-    if (userDetails?.image) {
+    if (userDetails && userDetails.image) {
       setProfilePictureURL(userDetails.image);
+    } else {
+      setProfilePictureURL(defaultProfilePicture);
     }
   }, [userDetails]);
+
+  const [isNavbarOpen, setIsNavbarOpen] = useState(false);
+  const navbarRef = useRef(null);
 
   // Handle navbar click outside
   useEffect(() => {
@@ -49,6 +53,7 @@ const Navbar = () => {
       }
 
       dispatch(clearUser());
+      dispatch(clearLikeData());
       navigate('/');
       toast.success("Logged out Successfully");
     } catch (error) {

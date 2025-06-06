@@ -12,10 +12,6 @@ const TopSongs = ({ topSongs, cardColors, cardTextColors, setCardColors, setCard
               key={item.id}
               item={item}
               index={index}
-              cardColors={cardColors}
-              cardTextColors={cardTextColors}
-              setCardColors={setCardColors}
-              setCardTextColors={setCardTextColors}
             />
           ))
         ) : (

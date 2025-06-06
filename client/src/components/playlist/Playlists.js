@@ -8,7 +8,7 @@ const Playlist = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const userDetails = useSelector((state) => state.user.user);
-  const likedSongsId = useSelector((state) => state.likes.likedSongsId);
+  const likedSongs = useSelector((state) => state.likes.likedSongs);
   const isLoggedIn = useSelector((state) => state.user.isLoggedIn);
 
   const [loading, setLoading] = useState(false);
@@ -18,21 +18,13 @@ const Playlist = () => {
   const [playlistModal, setPlaylistModal] = useState(false);
   const [selectedPlaylistName, setSelectedPlaylistName] = useState(null);
 
-  // Redirect if not logged in
-  useEffect(() => {
-    if (!isLoggedIn) {
-      navigate('/login');
-    }
-  }, [isLoggedIn, navigate]);
-
-  // Fetch liked songs details
   useEffect(() => {
     const fetchSongDetails = async () => {
-      if (!likedSongsId?.length) return;
+      if (!likedSongs?.length) return;
 
       try {
         setLoading(true);
-        const promises = likedSongsId.map(async (song) => {
+        const promises = likedSongs.map(async (song) => {
           const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/${song}`);
           if (!response.ok) {
             throw new Error(`Failed to fetch song details for ID: ${song}`);
@@ -50,7 +42,7 @@ const Playlist = () => {
     };
 
     fetchSongDetails();
-  }, [likedSongsId]);
+  }, [likedSongs, dispatch]);
 
   const handleSelectedPlaylistSongs = async (pname) => {
     const selectedPlaylist = userDetails.playlists.find(

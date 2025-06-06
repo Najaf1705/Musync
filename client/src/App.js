@@ -9,11 +9,11 @@ import Home from './components/home/Home.js';
 import Discover from './components/Discover';
 import Download from './components/download/Download';
 import Profile from './components/Profile';
-import Login from './components/Login';
-import Signup from './components/Signup';
+import Login from './components/auth/Login.js';
+import Signup from './components/auth/Signup.js';
 import Errorpage from './components/Errorpage';
 import Playlists from './components/playlist/Playlists';
-import { fetchLikedSongs, setLikedSongsIds } from './redux/features/likeSlice'; // adjust path as needed
+import { fetchLikedSongs, setLikedSongs, clearLikeData } from './redux/features/likeSlice'; // adjust path as needed
 import { setUser, clearUser } from './redux/features/userSlice'; // adjust path as needed
 
 const App = () => {
@@ -21,7 +21,7 @@ const App = () => {
   const dispatch = useDispatch();
   const isLoggedIn = useSelector((state) => state.user.isLoggedIn);
   const userDetails = useSelector((state) => state.user.user);
-  const likedSongsId = useSelector((state) => state.likes.likedSongsId);
+  const likedSongsId = useSelector((state) => state.likes.likedSongs);
   // dispatch(fetchLikedSongs(userDetails._id));
 
   useEffect(() => {
@@ -37,15 +37,18 @@ const App = () => {
   useEffect(() => {
     const verify = async () => {
       const res = await fetch(`${process.env.REACT_APP_BACKEND_URL}/serverprofile`, {
+        method: "GET",
         credentials: "include",
       });
 
       if (res.ok) {
         const user = await res.json();
         dispatch(setUser(user)); // refresh with real data
-        dispatch(setLikedSongsIds(user.likedSongs)); // fetch liked songs for the user
+        dispatch(setLikedSongs(user.likedSongs));
+        console.log("likedSongs:", user.likedSongs);
       } else {
         dispatch(clearUser());   // localStorage token was outdated
+        dispatch(clearLikeData());
       }
     };
 
