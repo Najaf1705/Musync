@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { setUser } from "../../redux/features/userSlice"; // adjust path as needed
 import { setLikedSongs } from "../../redux/features/likeSlice"; // adjust path as needed
@@ -11,6 +11,8 @@ export const useAuthUtils = () => {
     const [invalidCredentialsErr, setInvalidCredentialsErr] = useState("");
     const navigate = useNavigate();
     const dispatch = useDispatch();
+
+    const isLoggedIn = useSelector((state) => state.user.isLoggedIn);
 
     // Function to handle user login
     const loginUser = async (userData) => {
@@ -155,5 +157,5 @@ export const useAuthUtils = () => {
         }
     };
 
-    return { loginUser, invalidCredentialsErr, googleLoginUser, signupUser, googleSignupUser };
+    return { loginUser, invalidCredentialsErr, googleLoginUser, signupUser, googleSignupUser, isLoggedIn };
 };

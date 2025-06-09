@@ -27,7 +27,8 @@ const SearchResults = () => {
           </div>
         </div>
       ) : (
-        <h5>No songs found</h5>
+        // <h5>No songs found</h5>
+        <></>
       )}
 
       {/* Playlists */}
@@ -43,7 +44,8 @@ const SearchResults = () => {
           </div>
         </div>
       ) : (
-        <h5>No playlists found</h5>
+        // <h5>No playlists found</h5>
+        <></>
       )}
     </div>
   );

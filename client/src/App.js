@@ -13,6 +13,7 @@ import Login from './components/auth/Login.js';
 import Signup from './components/auth/Signup.js';
 import Errorpage from './components/Errorpage';
 import Playlists from './components/playlist/Playlists';
+import { fetchTopSongs } from './redux/features/songSlice'; // adjust path as needed
 import { fetchLikedSongs, setLikedSongs, clearLikeData } from './redux/features/likeSlice'; // adjust path as needed
 import { setUser, clearUser } from './redux/features/userSlice'; // adjust path as needed
 
@@ -27,7 +28,12 @@ const App = () => {
   useEffect(() => {
     console.log("User Details:", userDetails);
     console.log("Liked sonsgs:", likedSongsId);
+    dispatch(fetchTopSongs());
   }, [userDetails]);
+
+  useEffect(() => {
+    dispatch(fetchTopSongs());
+  }, [dispatch]);
 
 
   const handleSelectedSongChange = (songDetails) => {
@@ -35,6 +41,7 @@ const App = () => {
   };
 
   useEffect(() => {
+    console.log(process.env.REACT_APP_BACKEND_URL);
     const verify = async () => {
       const res = await fetch(`${process.env.REACT_APP_BACKEND_URL}/serverprofile`, {
         method: "GET",
@@ -45,7 +52,7 @@ const App = () => {
         const user = await res.json();
         dispatch(setUser(user)); // refresh with real data
         dispatch(setLikedSongs(user.likedSongs));
-        console.log("likedSongs:", user.likedSongs);
+        // console.log("likedSongs:", user.likedSongs);
       } else {
         dispatch(clearUser());   // localStorage token was outdated
         dispatch(clearLikeData());

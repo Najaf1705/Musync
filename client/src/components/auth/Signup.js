@@ -1,12 +1,20 @@
 import React from 'react'
 import { GoogleOAuthProvider, GoogleLogin } from '@react-oauth/google';
 import { jwtDecode } from "jwt-decode";
-import { useState } from 'react';
-import { NavLink } from 'react-router-dom';
+import { useState, useEffect } from 'react';
+import { NavLink, useNavigate } from 'react-router-dom';
 import { useAuthUtils } from './authUtils';
 
 const Signup = () => {
-  const { signupUser, googleSignupUser } = useAuthUtils(); 
+  const { signupUser, googleSignupUser, isLoggedIn } = useAuthUtils();
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (isLoggedIn) {
+      navigate('/'); // Redirect to home or dashboard
+    }
+  }, [isLoggedIn, navigate]);
+
   function hide() {
     if (document.getElementById("confirmPassword").type === 'password') {
       document.getElementById("confirmPassword").type = "text";
@@ -43,7 +51,7 @@ const Signup = () => {
       <div className="msignup">
         <div className="container mt-3 d-flex flex-column align-items-center">
           {/* <h2>Registration Form</h2> */}
-          <form onSubmit={(e)=>{
+          <form onSubmit={(e) => {
             e.preventDefault();
             signupUser(userData)
           }} className="signup col-md-8">
@@ -151,7 +159,7 @@ const Signup = () => {
                     const name = decoded.name;
                     const image = decoded.picture;
 
-                    googleSignupUser({email: googleEmail, name, image});
+                    googleSignupUser({ email: googleEmail, name, image });
                     console.log("decoded signup", decoded);
                   }}
                   onFailure={(error) => {

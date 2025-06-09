@@ -1,4 +1,34 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
+import { fetchTrackDetails } from '../../components/utils/api'
+
+export const fetchTopSongs = createAsyncThunk(
+  'songs/fetchTopSongs',
+  async()=>{
+    try {
+      console.log("Fetching top songs...");
+      const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/topSongs`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        credentials: 'include'
+      });
+  
+      if (!response.ok) throw new Error("Failed to fetch top songs");
+      const { data: trackIds } = await response.json();
+  
+      // Then fetch details for each track
+      const trackDetailsPromises = trackIds.map(trackId => fetchTrackDetails(trackId));
+      const trackDetails = await Promise.all(trackDetailsPromises);
+  
+      // Filter out any failed fetches (null values)
+      return trackDetails.filter(track => track !== null);
+    } catch (error) {
+      console.error("Error fetching top songs:", error);
+      return [];
+    }
+  }
+);
 
 export const toggleLikeSong = createAsyncThunk(
   'songs/toggleLike',
@@ -82,6 +112,9 @@ const songSlice = createSlice({
     cardTextColors: [],
   },
   reducers: {
+    setTopSongs: (state, action) => {
+      state.topSongs = action.payload;
+    },
     setSearchResults: (state, action) => {
       state.searchResults = action.payload;
     },
@@ -144,11 +177,15 @@ const songSlice = createSlice({
       .addCase(searchSongsAndPlaylists.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
-      });
-  },
+      })
+      .addCase(fetchTopSongs.fulfilled, (state, action) => {
+        state.topSongs = action.payload; // Set resolved data
+      })
+    }
 });
 
 export const {
+  setTopSongs,
   setSearchResults,
   setPlaylistData,
   setSelectedPlaylist,

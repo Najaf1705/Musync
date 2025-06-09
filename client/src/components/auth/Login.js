@@ -1,14 +1,26 @@
-import React, { useState } from 'react'
-import { NavLink } from 'react-router-dom';
+import React, { useState, useEffect } from 'react'
+import { NavLink, useNavigate } from 'react-router-dom';
 import { GoogleOAuthProvider, GoogleLogin } from '@react-oauth/google';
 import { jwtDecode } from "jwt-decode";
 import { useAuthUtils } from './authUtils'; // adjust path as needed
 
 const Login = () => {
-  const { loginUser, invalidCredentialsErr, googleLoginUser } = useAuthUtils(); // Import the loginUser function from authUtils
+  const { loginUser, invalidCredentialsErr, googleLoginUser, isLoggedIn } = useAuthUtils();
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (isLoggedIn) {
+      navigate('/'); // Redirect to home or dashboard
+    }
+  }, [isLoggedIn, navigate]);
+
+  
   const [userData, setUserData] = useState({
-    name: "", email: ""
+    name: "", email: "", password: ""
   });
+
+
+
 
   const hide = () => {
     if (document.getElementById("password").type === 'password') {

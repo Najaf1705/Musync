@@ -13,34 +13,22 @@ const Home = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const userDetails = useSelector((state) => state.user.user);
-  const likedSongsIds = useSelector((state) => state.likes.likedSongsIds);
+  const likedSongs = useSelector((state) => state.likes.likedSongs);
   const isLoggedIn = useSelector((state) => state.user.isLoggedIn);
+  const topSongs = useSelector((state) => state.songs.topSongs);
 
   const [songName, setSongName] = useState("");
   const [songData, setSongData] = useState(null);
   const [playlistData, setPlaylistData] = useState(null);
-  // const [likedSongs, setLikedSongs] = useState([]);
   const [loading, setLoading] = useState(false);
   const [selectedPlaylist, setSelectedPlaylist] = useState(null);
   const [selectedPlaylistName, setSelectedPlaylistName] = useState(null);
   const [playlistTracks, setPlaylistTracks] = useState([]);
   const [recentSearches, setRecentSearches] = useState([]);
   const [playlistModal, setPlaylistModal] = useState(false);
-  const [topSongs, setTopSongs] = useState(null);
   const [cardColors, setCardColors] = useState([]);
   const [cardTextColors, setCardTextColors] = useState([]);
 
-  // console.log("Liked Songs Ids:", likedSongsIds);
-  // Fetch top songs
-  useEffect(() => {
-    const fetchSongs = async () => {
-      setLoading(true);
-      const data = await fetchTopSongs();
-      setTopSongs(data);
-      setLoading(false);
-    };
-    fetchSongs();
-  }, []);
 
   // Fetch playlist tracks
   useEffect(() => {

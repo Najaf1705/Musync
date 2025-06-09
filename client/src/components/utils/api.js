@@ -18,7 +18,7 @@ export const fetchTrackDetails = async (trackId) => {
 
 export const fetchTopSongs = async () => {
   try {
-    // First fetch top song IDs
+    console.log("Fetching top songs...");
     const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/topSongs`, {
       method: "POST",
       headers: {
