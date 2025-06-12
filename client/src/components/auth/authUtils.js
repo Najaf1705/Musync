@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { setUser } from "../../redux/features/userSlice"; // adjust path as needed
-import { setLikedSongs } from "../../redux/features/likeSlice"; // adjust path as needed
+import { setLikedSongs } from "../../redux/features/songSlice"; // adjust path as needed
 import { toast } from "react-toastify";
 
 

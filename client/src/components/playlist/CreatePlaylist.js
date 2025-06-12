@@ -49,25 +49,35 @@ const CreatePlaylist = ({ playlistModal }) => {
 
   return (
     <>
-      <div className='modal-wrapper'></div>
-      <div className='modal-container px-2' onClick={closeModal}>
-        <div className='modal-content' onClick={(e) => e.stopPropagation()}>
+      <div className="fixed inset-0 bg-black bg-opacity-40 z-40"></div>
+      <div className="fixed inset-0 flex items-center justify-center z-50 px-2" onClick={closeModal}>
+        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 w-full max-w-md" onClick={(e) => e.stopPropagation()}>
           <div>
-            <h2>Create playlist</h2>
+            <h2 className="text-xl font-bold mb-4 text-center text-gray-800 dark:text-gray-100">Create playlist</h2>
           </div>
-          <div className='d-flex flex-column align-items-center'>
-            <div>
-              <input type="text"
-              placeholder='Enter playlist name'
+          <div className="flex flex-col items-center">
+            <input
+              type="text"
+              placeholder="Enter playlist name"
               value={playlistName}
               required
               onChange={(e)=>setPlaylistName(e.target.value)}
+              className="border border-gray-300 rounded-md px-3 py-2 w-full focus:outline-none focus:ring-2 focus:ring-blue-400"
               style={{height: "2rem"}}
-              />
-            </div>
-            <div className='pt-2 d-flex justify-content-between'>
-              <button className='mx-2' onClick={handleCreate}>Create</button>
-              <button onClick={closeModal}>Cancel</button>
+            />
+            <div className="pt-4 flex justify-between w-full">
+              <button
+                className="mx-2 bg-blue-500 hover:bg-blue-600 text-white font-semibold px-4 py-2 rounded transition"
+                onClick={handleCreate}
+              >
+                Create
+              </button>
+              <button
+                className="mx-2 bg-gray-300 hover:bg-gray-400 text-gray-800 font-semibold px-4 py-2 rounded transition"
+                onClick={closeModal}
+              >
+                Cancel
+              </button>
             </div>
           </div>
         </div>

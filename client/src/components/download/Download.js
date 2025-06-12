@@ -64,17 +64,17 @@ const Download = ({ selectedSong }) => {
   };
 
   return (
-    <div className="home pb-3">
-      <div className="container d-flex flex-column my-2">
+    <div className="home pb-6">
+      <div className="flex flex-col my-2 mx-auto max-w-3xl">
         <div className="back-blur">
-          <h3 className="text-center">Download Song</h3>
+          <h3 className="text-center text-2xl font-semibold py-2">Download Song</h3>
         </div>
         <SearchForm
           searchQuery={searchQuery}
           setSearchQuery={setSearchQuery}
           onSearch={handleSearch}
         />
-        <div className="container">
+        <div>
           <VideoList
             videos={searchResults}
             selectedVideo={selectedVideo}

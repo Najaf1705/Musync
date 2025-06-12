@@ -1,9 +1,18 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import { fetchTrackDetails } from '../../components/utils/api'
+import axios from 'axios';
+
+export const fetchLikedSongs = createAsyncThunk(
+  "likes/fetchLikedSongs",
+  async (userId) => {
+    const response = await axios.get(`${process.env.REACT_APP_BACKEND_URL}/api/liked-songs/${userId}`);
+    return response.data.likedSongs;
+  }
+);
 
 export const fetchTopSongs = createAsyncThunk(
   'songs/fetchTopSongs',
-  async()=>{
+  async () => {
     try {
       console.log("Fetching top songs...");
       const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/topSongs`, {
@@ -13,14 +22,14 @@ export const fetchTopSongs = createAsyncThunk(
         },
         credentials: 'include'
       });
-  
+
       if (!response.ok) throw new Error("Failed to fetch top songs");
       const { data: trackIds } = await response.json();
-  
+
       // Then fetch details for each track
       const trackDetailsPromises = trackIds.map(trackId => fetchTrackDetails(trackId));
       const trackDetails = await Promise.all(trackDetailsPromises);
-  
+
       // Filter out any failed fetches (null values)
       return trackDetails.filter(track => track !== null);
     } catch (error) {
@@ -39,7 +48,8 @@ export const toggleLikeSong = createAsyncThunk(
         credentials: 'include',
         headers: {
           'Content-Type': 'application/json'
-        }
+        },
+        body: JSON.stringify({ id: songId }),
       });
 
       if (!response.ok) {
@@ -57,6 +67,7 @@ export const toggleLikeSong = createAsyncThunk(
 export const searchSongsAndPlaylists = createAsyncThunk(
   'songs/search',
   async (query, { rejectWithValue }) => {
+    console.log("Searching dongs and playlists");
     try {
       const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/search?q=${encodeURIComponent(query)}`, {
         method: 'GET',
@@ -78,10 +89,9 @@ export const searchSongsAndPlaylists = createAsyncThunk(
         throw new Error('Invalid response format from server');
       }
 
-      // console.log('Search results:', data);
+      console.log('Search results:', data);
 
-      // Transform data if needed and return
-      return {
+      const returnData = {
         tracks: {
           ...data.tracks,
           items: data.tracks.items.map(track => ({
@@ -91,6 +101,11 @@ export const searchSongsAndPlaylists = createAsyncThunk(
         },
         playlists: data.playlists
       };
+
+      console.log('Transformed search results:', returnData);
+
+      // Transform data if needed and return
+      return returnData;
     } catch (error) {
       console.error('Search error:', error);
       return rejectWithValue(error.message);
@@ -101,6 +116,8 @@ export const searchSongsAndPlaylists = createAsyncThunk(
 const songSlice = createSlice({
   name: 'songs',
   initialState: {
+    likedSongs: [],
+    userPlaylists: null,
     topSongs: [],
     searchResults: null,
     playlistData: null,
@@ -108,10 +125,20 @@ const songSlice = createSlice({
     playlistTracks: [],
     loading: false,
     error: null,
-    cardColors: [],
-    cardTextColors: [],
   },
   reducers: {
+    setUserSongs: (state, action) => {
+      const { likedSongs, userPlaylists } = action.payload;
+      state.likedSongs = likedSongs || [];
+      state.userPlaylists = [
+        {
+          playlistName: "Liked Songs",
+          songs: state.likedSongs,
+          _id: "likedSongs",
+        },
+        ...(userPlaylists || [])
+      ];
+    },
     setTopSongs: (state, action) => {
       state.topSongs = action.payload;
     },
@@ -127,71 +154,138 @@ const songSlice = createSlice({
     setPlaylistTracks: (state, action) => {
       state.playlistTracks = action.payload;
     },
-    setCardColors: (state, action) => {
-      state.cardColors[action.payload.index] = action.payload.color;
+    setLikedSongs: (state, action) => {
+      state.likedSongs = action.payload;
+      state.userPlaylists.filter((playlist)=>{
+        if(playlist.playlistName === "Liked Songs"){
+          playlist.songs = action.payload;
+        }
+      })
     },
-    setCardTextColors: (state, action) => {
-      state.cardTextColors[action.payload.index] = action.payload.color;
+
+    toggleLikeSongReducer: (state, action) => {
+      const song = action.payload;
+      const exists = state.likedSongs.find(s => s === song);
+
+      if (exists) {
+        state.likedSongs = state.likedSongs.filter(s => s !== song);
+      } else {
+        state.likedSongs.push(song);
+      }
+      setLikedSongs(state, { payload: state.likedSongs }); // Update likedSongs in the state
+    },
+    clearSongSlice: (state) => {
+      state.likedSongs= [];
+      state.userPlaylists= null;
+      state.topSongs= [];
+      state.searchResults= null;
+      state.playlistData= null;
+      state.selectedPlaylist= null;
+      state.playlistTracks= [];
+      state.loading= false;
+      state.error= null;
     },
   },
+
   extraReducers: (builder) => {
     builder
+
+      // toggle like cases 
       .addCase(toggleLikeSong.pending, (state) => {
-        state.loading = true;
+        state.loading = false;
         state.error = null;
       })
       .addCase(toggleLikeSong.fulfilled, (state, action) => {
         state.loading = false;
+        const { songId, isLiked } = action.payload;
+
         // Update liked status in search results if present
         if (state.searchResults?.tracks?.items) {
           const song = state.searchResults.tracks.items.find(
-            item => item.id === action.payload.songId
+            item => item.id === songId
           );
           if (song) {
-            song.isLiked = action.payload.isLiked;
+            song.isLiked = isLiked;
           }
         }
         // Update liked status in playlist tracks if present
         if (state.playlistTracks.length > 0) {
           const song = state.playlistTracks.find(
-            item => item.id === action.payload.songId
+            item => item.id === songId
           );
           if (song) {
-            song.isLiked = action.payload.isLiked;
+            song.isLiked = isLiked;
           }
+        }
+
+        // Update likedSongs array in userPlaylists
+        if (isLiked) {
+          // Add to likedSongs if not already present
+          if (!state.userPlaylists
+            .find(playlist=>playlist.playlistName === "Liked Songs")
+            .songs.includes(songId)) {
+            state.userPlaylists
+              .find(playlist => playlist.playlistName === "Liked Songs")
+              .songs.push(songId);
+          }
+        } else {
+          // Remove from likedSongs if present
+          state.userPlaylists
+            .find(playlist => playlist.playlistName === "Liked Songs")
+            .songs = state.userPlaylists
+              .find(playlist => playlist.playlistName === "Liked Songs")
+              .songs.filter(song => song !== songId);
         }
       })
       .addCase(toggleLikeSong.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
       })
+
+      // search cases
       .addCase(searchSongsAndPlaylists.pending, (state) => {
+        console.log("searchSongsAndPlaylists.pending");
         state.loading = true;
         state.error = null;
       })
       .addCase(searchSongsAndPlaylists.fulfilled, (state, action) => {
+        console.log("searchSongsAndPlaylists.fulfilled");
         state.loading = false;
         state.searchResults = action.payload.tracks;
         state.playlistData = action.payload.playlists;
       })
       .addCase(searchSongsAndPlaylists.rejected, (state, action) => {
+        console.log("searchSongsAndPlaylists.rejected");
         state.loading = false;
         state.error = action.payload;
+      })
+
+      // top songs cases
+      .addCase(fetchTopSongs.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(fetchTopSongs.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.error.message; // Set error message
       })
       .addCase(fetchTopSongs.fulfilled, (state, action) => {
         state.topSongs = action.payload; // Set resolved data
       })
-    }
+  }
 });
 
 export const {
+  setUserSongs,
+  setLikedSongs,
+  setUserPlaylists,
+  toggleLikeSongReducer,
+  clearSongSlice,
   setTopSongs,
   setSearchResults,
   setPlaylistData,
   setSelectedPlaylist,
   setPlaylistTracks,
-  setCardColors,
-  setCardTextColors,
 } = songSlice.actions;
 
 export default songSlice.reducer;

@@ -2,12 +2,10 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 
-
 const Discover = (props) => {
   const navigate = useNavigate();
   const [songName, setSongName] = useState("");
   const [recommendations, setRecommendations] = useState([]);
-  // const [nosong, setNosong] = useState("");
   const [songDetails, setSongDetails] = useState([]);
 
   const fetchRecommendations = async () => {
@@ -17,13 +15,11 @@ const Discover = (props) => {
         const data = await response.json();
         setRecommendations(data);
         setSongDetails([]);
-        // setNosong("");
 
         // Fetch details for each recommendation
         const detailsPromises = data.map(async (recommendation) => {
           const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/search?name=${recommendation}`);
           if (response.ok) {
-            // document.getElementById('card-deck').innerHTML = "";
             const data = await response.json();
             return data.tracks.items[0];
           } else {
@@ -35,7 +31,6 @@ const Discover = (props) => {
         setSongDetails(details);
       } else {
         toast.error(`Can't find "${songName}" in dataset`);
-        // setNosong("Can't find the song in the dataset");
         setRecommendations([]);
         setSongDetails([]);
         return;
@@ -45,71 +40,70 @@ const Discover = (props) => {
     }
   };
 
-  
   const handleFetchRecommendations = async (e) => {
     e.preventDefault(); 
     await fetchRecommendations();
   };
 
-  
   const handleDownload = (songDetails) => {
     props.onSelectedSongChange(songDetails);
     navigate('/download');
   };
 
   return (
-    <div className='home pb-3'>
-      <div className='container'>
-        <div className=' container d-flex flex-column my-2'>
+    <div className='home pb-6'>
+      <div className='mx-auto max-w-4xl'>
+        <div className='flex flex-col my-2'>
           <div className="back-blur">
-            <h3 className='text-center'>Get Song Recommendations</h3>
+            <h3 className='text-center text-2xl font-semibold py-2'>Get Song Recommendations</h3>
           </div>
-          <form className='input-group d-flex justify-content-center mt-2'>
+          <form className='flex justify-center items-center gap-2 mt-2' onSubmit={handleFetchRecommendations}>
             <input
               type="text"
-              className="form-control-md"
+              className="border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400 w-64"
               placeholder="Enter Song Name"
               value={songName}
               onChange={(e) => setSongName(e.target.value.toLowerCase())}
             />
-            <div className='input-group-append mx-2 '>
             <button
-              className=" "
+              className="bg-blue-500 hover:bg-blue-600 text-white font-semibold px-4 py-2 rounded-md transition"
               type="submit"
-              onClick={handleFetchRecommendations}
             >
               Search
             </button>
-            </div>
           </form>
 
-          {recommendations.length>0&&(
-          <div
-            id="card-deck"
-            className="my-4 card-deck row d-flex justify-content-center pb-3">
+          {recommendations.length > 0 && (
+            <div
+              id="card-deck"
+              className="my-4 flex flex-wrap justify-center pb-3"
+            >
               {songDetails.map((song, index) => (
-                <div key={index} className="card col-md-3 col-sm-3 mb-3 mx-4">
+                <div key={index} className="flex flex-col items-center bg-white dark:bg-gray-800 rounded-lg shadow-md m-2 p-3 w-64">
                   <img
                     src={
                       song ? song.album.images[0].url : "placeholder-image-url"
                     }
                     alt="Song Cover"
-                    className="card-img-top pt-2"
+                    className="rounded-lg object-cover w-full h-40 pt-2"
                   />
-                  <div className="card-body">
-                    <h5 className="card-title">
+                  <div className="mt-2 text-center">
+                    <h5 className="font-semibold text-base mb-0">
                       {song ? song.name : "Song not found"}
                     </h5>
-                    <p className="card-text">
+                    <p className="text-gray-600 dark:text-gray-300 text-sm">
                       {song ? `${song.artists[0].name}` : ""}
                     </p>
-                    <button className="  w-50 downbt" onClick={() => handleDownload(song.name+' '+song.artists[0].name)}>
+                    <button
+                      className="w-1/2 bg-blue-500 hover:bg-blue-600 text-white font-semibold px-4 py-2 rounded transition mt-2"
+                      onClick={() => handleDownload(song.name + ' ' + song.artists[0].name)}
+                    >
                       Download
                     </button>
                   </div>
                 </div>
               ))}
-          </div>
+            </div>
           )}
         </div>
       </div>

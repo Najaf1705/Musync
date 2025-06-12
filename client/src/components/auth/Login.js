@@ -35,85 +35,94 @@ const Login = () => {
   }
 
   return (
-    <>
-      <div className="mlogin">
-        <div className="container mt-3 d-flex flex-column align-items-center">
-          <form onSubmit={(e) => {
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-neutral-900 to-neutral-800">
+      <div className="w-full max-w-md bg-neutral-900 rounded-xl shadow-lg p-8">
+        <form
+          onSubmit={(e) => {
             e.preventDefault();
             loginUser(userData);
-          }} className='login col-md-5'>
-            <div className="form-group mb-3">
-              <h2>Login</h2>
-              <label htmlFor="email"><i className="fa-solid fa-envelope"></i> Email</label>
+          }}
+          className="space-y-6"
+        >
+          <div className="text-center mb-6">
+            <h2 className="text-3xl font-bold text-white mb-2">Login</h2>
+          </div>
+          <div>
+            <label htmlFor="email" className="block text-neutral-300 mb-1">
+              <i className="fa-solid fa-envelope mr-2"></i>Email
+            </label>
+            <input
+              type="email"
+              className="w-full px-4 py-2 rounded-lg bg-neutral-800 text-white border border-neutral-700 focus:outline-none focus:ring-2 focus:ring-green-400"
+              id="email"
+              placeholder="Email"
+              autoComplete="off"
+              value={userData.email}
+              name="email"
+              onChange={(e) => setUserData({ ...userData, email: e.target.value })}
+              required
+            />
+          </div>
+          <div>
+            <label htmlFor="password" className="block text-neutral-300 mb-1">
+              <i className="fa-solid fa-lock mr-2"></i>Password
+            </label>
+            <div className="relative">
               <input
-                type="email"
-                className="form-control"
-                id="email"
-                placeholder="Email"
+                type="password"
+                className="w-full px-4 py-2 rounded-lg bg-neutral-800 text-white border border-neutral-700 focus:outline-none focus:ring-2 focus:ring-green-400"
+                id="password"
+                placeholder="Password"
                 autoComplete="off"
-                value={userData.email}
-                name="email"
-                onChange={(e) => setUserData({...userData, email:e.target.value})}
+                value={userData.password}
+                name="password"
+                onChange={(e) => setUserData({ ...userData, password: e.target.value })}
                 required
               />
+              <span className="absolute right-3 top-1/2 -translate-y-1/2 cursor-pointer text-neutral-400" onClick={hide}>
+                <i id="hideeye1" className="fa-regular fa-eye"></i>
+                <i id="hideeye2" className="fa-regular fa-eye-slash"></i>
+              </span>
             </div>
-
-            <div className="form-group  mb-3">
-              <label htmlFor="password"><i className="fa-solid fa-lock"></i> Password</label>
-              <div className="input-box">
-                <input
-                  type="password"
-                  className="form-control"
-                  id="password"
-                  placeholder="Password"
-                  autoComplete="off"
-                  value={userData.password}
-                  name="password"
-                  onChange={(e) => setUserData({ ...userData, password: e.target.value })}
-                  required
-                />
-                <span className="eye" onClick={hide}>
-                  <i id="hideeye1" className="fa-regular fa-eye"></i>
-                  <i id="hideeye2" className="fa-regular fa-eye-slash"></i>
-                </span>
-              </div>
-            </div>
-            <div id="wrongpassword" style={{ color: "black", paddingBottom: ".7rem" }}>
-              {invalidCredentialsErr}
-            </div>
-            <div className='d-flex justify-content-between'>
-              <button type="submit" className="signbtn">
-                Login
-              </button>
-              <NavLink to="/signup" className="already"> Need an account?</NavLink>
-            </div>
-            <div className="line-container">
-              <span className="text-between">or</span>
-            </div>
-            <div className="sociallog">
-              <GoogleOAuthProvider clientId={process.env.REACT_APP_GOOGLE_CLIENT_ID}
-                className="col-md-6">
-                <GoogleLogin className="btn bg-dark"
-                  onSuccess={(credentialResponse) => {
-                    const decoded = jwtDecode(credentialResponse.credential);
-                    console.log("Decoded Google login:", decoded);
-
-                    googleLoginUser({email: decoded.email, name: decoded.name, image: decoded.picture});
-                  }}
-                  style={{ backgroundColor: "green", width: "5rem" }}
-                  onFailure={(error) => {
-                    console.error(error);
-                  }}
-                  redirect_uri={process.env.REACT_APP_REDIRECT_URI}
-                >
-                  <span>Log in with Google</span>
-                </GoogleLogin>
-              </GoogleOAuthProvider>
-            </div>
-          </form>
-        </div>
+          </div>
+          <div className="text-red-400 text-sm min-h-[1.5rem]">{invalidCredentialsErr}</div>
+          <div className="flex items-center justify-between">
+            <button
+              type="submit"
+              className="bg-green-500 hover:bg-green-600 text-white font-semibold py-2 px-6 rounded-lg transition"
+            >
+              Login
+            </button>
+            <NavLink to="/signup" className="text-green-400 hover:underline text-sm">
+              Need an account?
+            </NavLink>
+          </div>
+          <div className="flex items-center my-4">
+            <div className="flex-grow border-t border-neutral-700"></div>
+            <span className="mx-3 text-neutral-400">or</span>
+            <div className="flex-grow border-t border-neutral-700"></div>
+          </div>
+          <div className="flex justify-center">
+            <GoogleOAuthProvider clientId={process.env.REACT_APP_GOOGLE_CLIENT_ID}>
+              <GoogleLogin
+                onSuccess={(credentialResponse) => {
+                  const decoded = jwtDecode(credentialResponse.credential);
+                  googleLoginUser({ email: decoded.email, name: decoded.name, image: decoded.picture });
+                }}
+                onFailure={(error) => {
+                  console.error(error);
+                }}
+                redirect_uri={process.env.REACT_APP_REDIRECT_URI}
+                width="100%"
+                theme="filled_black"
+                text="continue_with"
+                shape="pill"
+              />
+            </GoogleOAuthProvider>
+          </div>
+        </form>
       </div>
-    </>
+    </div>
   );
 }
 

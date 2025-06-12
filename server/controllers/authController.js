@@ -53,7 +53,8 @@ const serverLogin = async (req, res) => {
 
     const userExists = await User.findOne({ email: email });
 
-    if (userExists) {
+
+    if (userExists && userExists.password) {
       const passmatch = await bcrypt.compare(password, userExists.password);
 
       if (!passmatch) {
@@ -134,6 +135,7 @@ const logout = (req, res) => {
 
 // Profile Endpoint
 const serverProfile = (req, res) => {
+  console.log("Fetching user profile");
   res.status(200).json(req.rootuser);
 };
 

@@ -2,11 +2,10 @@ import React, { useState, useRef, useEffect } from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { clearUser } from '../redux/features/userSlice';
-import { clearLikeData } from '../redux/features/likeSlice';
+import { clearSongSlice } from '../redux/features/songSlice';
 import { toast } from 'react-toastify';
-import 'bootstrap/dist/css/bootstrap.css';
 
-const defaultProfilePicture = process.env.PUBLIC_URL + '/images/doodle.jpg';
+const defaultProfilePicture = process.env.PUBLIC_URL + '/images/pp.png';
 
 const Navbar = () => {
   const navigate = useNavigate();
@@ -16,7 +15,6 @@ const Navbar = () => {
 
   const [profilePictureURL, setProfilePictureURL] = useState(userDetails?.image || defaultProfilePicture);
 
-  // Update profile picture when userDetails changes
   useEffect(() => {
     if (userDetails && userDetails.image) {
       setProfilePictureURL(userDetails.image);
@@ -28,7 +26,6 @@ const Navbar = () => {
   const [isNavbarOpen, setIsNavbarOpen] = useState(false);
   const navbarRef = useRef(null);
 
-  // Handle navbar click outside
   useEffect(() => {
     const handleDocumentClick = (event) => {
       if (navbarRef.current && !navbarRef.current.contains(event.target)) {
@@ -53,7 +50,7 @@ const Navbar = () => {
       }
 
       dispatch(clearUser());
-      dispatch(clearLikeData());
+      dispatch(clearSongSlice());
       navigate('/');
       toast.success("Logged out Successfully");
     } catch (error) {
@@ -70,58 +67,75 @@ const Navbar = () => {
   ];
 
   return (
-    <nav className="navbar navbar-expand-lg navbar-lg fixed-top">
-      <div className="container-fluid" ref={navbarRef}>
+    <nav className="fixed top-0 left-0 w-full z-50 shadow-lg border-white/10 backdrop-filter backdrop-blur-lg bg-opacity-10">
+      <div className="container mx-auto flex items-center justify-between py-2 px-4" ref={navbarRef}>
         {/* Logo and Profile Section */}
-        <div className="d-flex align-items-center">
+        <div className="flex items-center">
           {isLoggedIn && (
             <NavLink to="/profile">
               <img
-                className="hover-container rounded-circle"
+                className="rounded-full w-8 h-8 mr-4 border-2 border-gray-700 object-cover hover:ring-2 hover:ring-blue-400 transition"
                 src={profilePictureURL}
                 onError={() => setProfilePictureURL(defaultProfilePicture)}
                 alt="Profile"
-                style={{ width: "2rem", height: "2rem", marginRight: "1rem" }}
               />
             </NavLink>
           )}
-          <NavLink className="navbar-brand mr-1" to="/" style={{ color: "white" }}>
-            <i className="fa-solid fa-backward-step"></i> Musync{" "}
-            <i className="fa-solid fa-forward-step"></i>
+          <NavLink className="text-white text-xl font-bold flex items-center gap-2" to="/">
+            <i className="fa-solid fa-backward-step"></i> Musync <i className="fa-solid fa-forward-step"></i>
           </NavLink>
         </div>
 
         {/* Navbar Toggle Button */}
         <button
-          className="navbar-toggler"
+          className="lg:hidden p-2 rounded bg-gray-700 text-white focus:outline-none"
           type="button"
           onClick={() => setIsNavbarOpen(!isNavbarOpen)}
-          style={{ backgroundColor: "grey" }}
           aria-label="Toggle navigation"
         >
-          <span className="navbar-toggler-icon"></span>
+          <span>
+            <svg className="w-6 h-6" fill="none" stroke="currentColor" strokeWidth="2"
+              viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round"
+                d={isNavbarOpen
+                  ? "M6 18L18 6M6 6l12 12"
+                  : "M4 6h16M4 12h16M4 18h16"}
+              />
+            </svg>
+          </span>
         </button>
 
         {/* Navigation Items */}
-        <div className={`collapse navbar-collapse ${isNavbarOpen ? 'show' : ''}`}>
-          <ul className="navbar-nav ml-0">
+        <div className={`flex-col lg:flex-row lg:flex items-center gap-2 lg:gap-4 absolute lg:static top-full left-0 w-full lg:w-auto bg-black backdrop-filter backdrop-blur-lg  lg:bg-transparent transition-all duration-200 ease-in-out ${isNavbarOpen ? 'flex' : 'hidden'}`}>
+          <ul className="flex flex-col lg:flex-row items-center w-full lg:w-auto">
             {navItems.map(({ path, label }) => (
-              <li key={path} className="nav-item px-2">
-                <NavLink className="a active" to={path}>
+              <li key={path} className="px-2 py-2 lg:py-0">
+                <NavLink
+                  className={({ isActive }) =>
+                    `text-white hover:text-blue-400 px-2 py-1 rounded transition ${isActive ? 'font-semibold underline' : ''}`
+                  }
+                  to={path}
+                  end={path === ""}
+                  onClick={() => setIsNavbarOpen(false)}
+                >
                   {label}
                 </NavLink>
               </li>
             ))}
-            <li className="sinlog nav-item px-3">
+            <li className="px-2 py-2 lg:py-0 flex items-center">
               {isLoggedIn ? (
-                <NavLink className="a active" onClick={handleLogout} style={{ cursor: "pointer" }}>
+                <button
+                  className="text-white hover:text-red-400 px-2 py-1 rounded transition"
+                  onClick={handleLogout}
+                  style={{ cursor: "pointer" }}
+                >
                   Logout
-                </NavLink>
+                </button>
               ) : (
                 <>
-                  <NavLink className="a active" to="/login">Login</NavLink>
-                  <span className="a">/</span>
-                  <NavLink className="a active" to="/signup">Signup</NavLink>
+                  <NavLink className="text-white hover:text-blue-400 px-2 py-1 rounded transition" to="/login" onClick={() => setIsNavbarOpen(false)}>Login</NavLink>
+                  <span className="text-white px-1">/</span>
+                  <NavLink className="text-white hover:text-blue-400 px-2 py-1 rounded transition" to="/signup" onClick={() => setIsNavbarOpen(false)}>Signup</NavLink>
                 </>
               )}
             </li>

@@ -171,21 +171,16 @@ const TopPL = (props) => {
         </div>
       ) : (
         <div>
-          <h4 className="mt-2">{selectedPlaylistName} Tracks</h4>
-          <div className="card-deck row d-flex justify-content-center my-3 pb-3 mx-1">
+          <h4 className="mt-2 text-lg font-semibold">{selectedPlaylistName} Tracks</h4>
+          <div className="flex flex-wrap justify-center my-3 pb-3 mx-1">
             <div>
               <i
-                className="fa-solid fa-xmark fa-xl curpoint"
-                style={{
-                  marginLeft: "1rem",
-                  marginBottom: "2rem"
-                }}
+                className="fa-solid fa-xmark fa-xl cursor-pointer text-gray-500 hover:text-red-500 ml-4 mb-8"
                 onClick={clearSelectedPlaylist}
               ></i>
               {loading && (
                 <div className="text-center my-5">
                   <i className="fa-solid fa-rotate fa-spin fa-2xl"></i>
-                  {/* <h4>Loading...</h4> */}
                 </div>
               )}
             </div>
@@ -195,22 +190,22 @@ const TopPL = (props) => {
               item.track?.name &&
               item.track?.artists ? (
                 <div
-                  className="card col-5 col-md-4 col-lg-3 mb-3 mx-2"
+                  className="bg-white dark:bg-gray-800 rounded-lg shadow-md flex flex-col items-center justify-between m-2 p-3 w-64"
                   key={item.track.id}
                   style={{
                     backgroundColor: cardColors[index] || "",
                     color: cardTextColors[index] || "",
                   }}
                 >
-                  <div style={{ minHeight: "8rem", minWidth: "100%" }}>
+                  <div className="w-full flex justify-center" style={{ minHeight: "8rem" }}>
                     <img
                       src={item.track.album.images[0].url}
-                      className="card-img-top pt-2"
+                      className="rounded-lg object-cover h-32 w-32"
                       alt={item.name}
                     />
                   </div>
-                  <div className="card-body">
-                    <p className="card-text">
+                  <div className="mt-2 text-center">
+                    <p className="font-medium truncate">
                       {item.track.name.slice(0, 30)} -{" "}
                       {item.track.artists
                         .map((artist) => artist.name)
@@ -221,31 +216,23 @@ const TopPL = (props) => {
                 </div>
               ) : null
             )}
-            <div className="pagination justify-content-center mt-3">
-              <div aria-label="Page navigation example">
-                <ul className="pagination">
-                  <li
-                    className={`page-item ${
-                      currentPage === 1 ? "disabled" : ""
-                    } page-link`}
-                  >
-                    <i
-                      className="fa-solid fa-backward fa-xl curpoint"
-                      onClick={() => paginate(currentPage - 1)}
-                    ></i>
-                  </li>
-                  <li
-                    className={`page-item ${
-                      currentPage === totalPages ? "disabled" : ""
-                    } page-link`}
-                  >
-                    <i
-                      className="fa-solid fa-forward fa-xl curpoint"
-                      onClick={() => paginate(currentPage + 1)}
-                    ></i>
-                  </li>
-                </ul>
-              </div>
+            <div className="flex justify-center w-full mt-3">
+              <button
+                className={`mx-2 px-4 py-2 rounded-full bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-200 hover:bg-gray-300 dark:hover:bg-gray-600 transition ${currentPage === 1 ? "opacity-50 cursor-not-allowed" : ""}`}
+                onClick={() => paginate(currentPage - 1)}
+                disabled={currentPage === 1}
+                aria-label="Previous page"
+              >
+                <i className="fa-solid fa-backward fa-xl"></i>
+              </button>
+              <button
+                className={`mx-2 px-4 py-2 rounded-full bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-200 hover:bg-gray-300 dark:hover:bg-gray-600 transition ${currentPage === totalPages ? "opacity-50 cursor-not-allowed" : ""}`}
+                onClick={() => paginate(currentPage + 1)}
+                disabled={currentPage === totalPages}
+                aria-label="Next page"
+              >
+                <i className="fa-solid fa-forward fa-xl"></i>
+              </button>
             </div>
           </div>
         </div>

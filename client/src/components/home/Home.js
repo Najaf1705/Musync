@@ -13,7 +13,7 @@ const Home = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const userDetails = useSelector((state) => state.user.user);
-  const likedSongs = useSelector((state) => state.likes.likedSongs);
+  const likedSongs = useSelector((state) => state.songs.likedSongs);
   const isLoggedIn = useSelector((state) => state.user.isLoggedIn);
   const topSongs = useSelector((state) => state.songs.topSongs);
 
@@ -34,10 +34,10 @@ const Home = () => {
   useEffect(() => {
     if (selectedPlaylist) {
       const fetchTracks = async () => {
-        setLoading(true);
+        // setLoading(true);
         const data = await fetchPlaylistTracks(selectedPlaylist);
         setPlaylistTracks(data.items);
-        setLoading(false);
+        // setLoading(false);
       };
       fetchTracks();
     } else {
@@ -47,11 +47,11 @@ const Home = () => {
 
   // Search songs and playlists
   const searchSong = useCallback(async () => {
-    setLoading(true);
+    // setLoading(true);
     const { songs, playlists } = await searchSongsAndPlaylists(songName);
     setSongData(songs);
     setPlaylistData(playlists);
-    setLoading(false);
+    // setLoading(false);
   }, [songName]);
 
   useEffect(() => {
@@ -84,9 +84,11 @@ const Home = () => {
   };
 
   return (
-    <div className="home pb-3">
-      <div className="mx-2">
-        <h3>Ohiyooo {userDetails?.name?.split(" ")[0] || "Luffy"}</h3>
+    <div className="home pb-6">
+      <div className="mx-4">
+        <h3 className="text-2xl font-semibold mb-4">
+          Ohiyooo {userDetails?.name?.split(" ")[0] || "Luffy"}
+        </h3>
         <SearchBar
           songName={songName}
           setSongName={setSongName}

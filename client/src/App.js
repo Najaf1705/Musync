@@ -3,7 +3,7 @@ import { ToastContainer } from 'react-toastify';
 import { Route, Routes } from "react-router-dom";
 import { useDispatch, useSelector } from 'react-redux';
 import 'react-toastify/dist/ReactToastify.css';
-import "./App.css";
+import "./index.css";
 import Navbar from './components/Navbar';
 import Home from './components/home/Home.js';
 import Discover from './components/Discover';
@@ -13,8 +13,8 @@ import Login from './components/auth/Login.js';
 import Signup from './components/auth/Signup.js';
 import Errorpage from './components/Errorpage';
 import Playlists from './components/playlist/Playlists';
-import { fetchTopSongs } from './redux/features/songSlice'; // adjust path as needed
-import { fetchLikedSongs, setLikedSongs, clearLikeData } from './redux/features/likeSlice'; // adjust path as needed
+import { fetchTopSongs, setUserPlaylists, setUserSongs } from './redux/features/songSlice'; // adjust path as needed
+import { fetchLikedSongs, setLikedSongs, clearSongSlice } from './redux/features/songSlice'; // adjust path as needed
 import { setUser, clearUser } from './redux/features/userSlice'; // adjust path as needed
 
 const App = () => {
@@ -22,12 +22,13 @@ const App = () => {
   const dispatch = useDispatch();
   const isLoggedIn = useSelector((state) => state.user.isLoggedIn);
   const userDetails = useSelector((state) => state.user.user);
-  const likedSongsId = useSelector((state) => state.likes.likedSongs);
+  const likedSongsId = useSelector((state) => state.songs.likedSongs);
   // dispatch(fetchLikedSongs(userDetails._id));
 
   useEffect(() => {
     console.log("User Details:", userDetails);
     console.log("Liked sonsgs:", likedSongsId);
+
     dispatch(fetchTopSongs());
   }, [userDetails]);
 
@@ -48,20 +49,23 @@ const App = () => {
         credentials: "include",
       });
 
+      
       if (res.ok) {
         const user = await res.json();
+        console.log("serverprofile response", user);
         dispatch(setUser(user)); // refresh with real data
-        dispatch(setLikedSongs(user.likedSongs));
+        dispatch(setUserSongs({likedSongs: user.likedSongs, userPlaylists: user.playlists})); // set liked songs
         // console.log("likedSongs:", user.likedSongs);
       } else {
-        dispatch(clearUser());   // localStorage token was outdated
-        dispatch(clearLikeData());
+        dispatch(clearUser());   
+        dispatch(clearSongSlice());
       }
     };
 
     verify();
   }, []);
-
+  
+  // console.log("user Song slice",useSelector((state)=>state.songs));
 
   return (
     <>

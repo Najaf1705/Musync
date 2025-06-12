@@ -1,7 +1,7 @@
 import SongCard from './songCard';
 import { useSelector, useDispatch } from 'react-redux';
 
-import { fetchLikedSongs } from '../redux/features/likeSlice';
+import { fetchLikedSongs } from '../redux/features/songSlice';
 
 const songData=useSelector((state) => state.songs);
 console.log(songData);

@@ -1,47 +1,45 @@
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from 'react-redux';
 import { toast } from "react-toastify";
-import { toggleLikeSong } from '../redux/features/likeSlice';
+import { toggleLikeSong } from '../redux/features/songSlice';
 import { Vibrant } from "node-vibrant/browser";
 
 const SongCard = ({ item, index }) => {
   const dispatch = useDispatch();
   const isLoggedIn = useSelector(state => state.user.isLoggedIn);
-  const likedSongs = useSelector(state => state.likes.likedSongs);
-  const userDetails = useSelector(state => state.user.user);
+  
+  const userPlaylists = useSelector(state => state.songs.userPlaylists);
+
+  const likedSongs =userPlaylists?.find(playlist => playlist.playlistName === "Liked Songs")?.songs || [];
+
   const [isLiked, setIsLiked] = useState(likedSongs?.includes(item.id));
   const [likeLoading, setLikeLoading] = useState(false);
 
-
-
   // Local state for colors
-  const [bgColor, setBgColor] = useState("#fff");
-  const [textColor, setTextColor] = useState("#000");
+  const [bgColor, setBgColor] = useState("#181818");
+  const [textColor, setTextColor] = useState("#fff");
 
-  // Extract colors using Vibrant when the image changes
+  useEffect(() => {
+    setIsLiked(likedSongs?.includes(item.id));
+  }, [likedSongs, item.id]);
+
   useEffect(() => {
     if (item.album?.images[0]?.url) {
       Vibrant.from(item.album.images[0].url)
         .getPalette()
         .then((palette) => {
-          const dominantColor = palette.Vibrant?.hex || "#fff";
+          const dominantColor = palette.Vibrant?.hex || "#181818";
           setBgColor(dominantColor);
-          const rgb = palette.Vibrant?.rgb || [255, 255, 255];
+          const rgb = palette.Vibrant?.rgb || [24, 24, 24];
           const brightness = (rgb[0] * 299 + rgb[1] * 587 + rgb[2] * 114) / 1000;
           setTextColor(brightness > 128 ? "#000" : "#fff");
         })
         .catch(() => {
-          setBgColor("#fff");
-          setTextColor("#000");
+          setBgColor("#181818");
+          setTextColor("#fff");
         });
     }
   }, [item.album]);
-
-
-
-  if (!item || !item.name || !item.artists) {
-    return null;
-  }
 
   const handleLike = async () => {
     if (!isLoggedIn) {
@@ -52,70 +50,58 @@ const SongCard = ({ item, index }) => {
     setLikeLoading(true);
 
     try {
-      const res = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/toggle-like/${item.id}`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        credentials: "include",
-        body: JSON.stringify({ id: item.id }),
-      });
-      const data = await res.json();
-      setIsLiked(data.isLiked);
-      if (res.ok) {
-        dispatch(toggleLikeSong(item.id));
-        if (data.isLiked) {
-          toast.success("Liked the song!");
-        } else {
-          toast.info("Unliked the song.");
-        }
+      const resultAction = await dispatch(toggleLikeSong(item.id));
+      if (toggleLikeSong.fulfilled.match(resultAction)) {
+        setIsLiked(resultAction.payload.isLiked);
+        toast[resultAction.payload.isLiked ? "success" : "info"](
+          resultAction.payload.isLiked ? "Liked the song!" : "Unliked the song."
+        );
+      } else {
+        toast.error("Failed to toggle like");
       }
-    } catch (err) {
-      console.error("Like toggle failed:", err);
+    } catch {
+      toast.error("Like toggle failed.");
     } finally {
       setLikeLoading(false);
     }
   };
 
+  if (!item || !item.name || !item.artists) return null;
+
   return (
     <div
-      className="card col-5 col-md-4 col-lg-3 mb-3 mx-2"
-      style={{
-        backgroundColor: bgColor,
-        color: textColor,
-        transition: "background 0.3s, color 0.3s"
-      }}
+      className="rounded-xl overflow-hidden w-56 shadow-lg flex m-2 p-3 flex-col transition-shadow hover:shadow-2xl bg-neutral-900"
+      style={{ backgroundColor: bgColor, color: textColor }}
     >
-      <div style={{ minHeight: "8rem", minWidth: "100%" }}>
+      <div className="relative aspect-square w-full">
         <img
           loading="lazy"
           src={item.album?.images[0]?.url}
-          className="card-img-top pt-2"
+          className="w-full h-full object-cover"
           alt={item.name || 'Song'}
         />
-      </div>
-      <div className="card-body">
-        <div className="song-title-marquee">
-          <span>{(item.name || 'Unknown')}</span>
+        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent opacity-0 hover:opacity-100 transition-opacity flex items-end justify-center">
+          <div className="flex gap-5 mb-4">
+            <i
+              className={`fa-${isLiked ? 'solid' : 'regular'} fa-heart cursor-pointer text-white text-xl hover:text-green-400 transition`}
+              onClick={likeLoading ? undefined : handleLike}
+              style={{ pointerEvents: likeLoading ? 'none' : 'auto', opacity: likeLoading ? 0.5 : 1 }}
+              title={isLiked ? "Unlike" : "Like"}
+            ></i>
+            <i className="fa-solid fa-plus cursor-pointer text-white text-xl hover:text-green-400 transition" title="Add to playlist"></i>
+            <i className="fa-solid fa-download cursor-pointer text-white text-xl hover:text-green-400 transition" title="Download"></i>
+          </div>
         </div>
-        <p className="card-text">
+      </div>
+      <div className="px-4 py-3">
+        <div className="font-semibold text-base truncate" style={{ color: textColor }}>
+          {item.name || 'Unknown'}
+        </div>
+        <p className="text-neutral-400 text-sm truncate">
           {item.artists
             ? item.artists.map((artist) => artist.name || 'Unknown Artist').join(", ").slice(0, 30)
             : 'Unknown Artist'}
         </p>
-        <div className="d-flex justify-content-around mt-2">
-          <i
-            className={`fa-${isLiked ? 'solid' : 'regular'} fa-heart curpoint`}
-            onClick={likeLoading ? undefined : handleLike}
-            style={{ pointerEvents: likeLoading ? 'none' : 'auto', opacity: likeLoading ? 0.5 : 1 }}
-          ></i>
-          <i
-            className="fa-solid fa-plus curpoint"
-            title="Add to playlist"
-          ></i>
-          <i
-            className="fa-solid fa-download curpoint"
-            title="Download"
-          ></i>
-        </div>
       </div>
     </div>
   );

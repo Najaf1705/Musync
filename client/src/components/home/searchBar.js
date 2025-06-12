@@ -44,20 +44,21 @@ const SearchBar = () => {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="input-group d-flex justify-content-center mt-1">
+    <form onSubmit={handleSubmit} className="flex justify-center items-center mt-1 gap-2">
       <input
         type="text"
-        className="form-control-md"
+        className="border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400 w-64"
         placeholder="Enter Song Name"
         value={songName}
         required
         onChange={(e) => setSongName(e.target.value)}
       />
-      <div className="input-group-append mx-2">
-        <button className="" type="submit">
-          Search
-        </button>
-      </div>
+      <button
+        className="bg-blue-500 hover:bg-blue-600 text-white font-semibold px-4 py-2 rounded-md transition"
+        type="submit"
+      >
+        Search
+      </button>
     </form>
   );
 };

@@ -13,6 +13,7 @@ app.use(cookieParser());
 // Allow specific origins
 const allowedOrigins = [
   'http://localhost:3000', // For local development
+  'http://192.168.1.121:3000', // For local development
   'https://musync-enzoe.vercel.app' // For production
 ];
 
@@ -41,6 +42,6 @@ app.get("/", (req,res)=>{
   res.send("hello")
 });
 
-app.listen(port, ()=>{
+app.listen(port,'0.0.0.0', ()=>{
   console.log(`running on port  ff${port}`);
 })

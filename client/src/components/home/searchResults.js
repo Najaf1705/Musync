@@ -1,14 +1,10 @@
 import React from "react";
 import { useSelector } from 'react-redux';
 import SongCard from "../songCard";
-import PlaylistCard from "../playlist/playlistCard";
+import PlaylistCard from "../playlistCard";
 
 const SearchResults = () => {
   const { searchResults, playlistData, loading } = useSelector(state => state.songs);
-
-  // Add debug logging
-  // console.log('Search Results:', searchResults);
-  // console.log('Playlist Data:', playlistData);
 
   if (loading) {
     return <div className="text-center"><i className="fa-solid fa-spinner fa-spin"></i></div>;
@@ -19,23 +15,22 @@ const SearchResults = () => {
       {/* Songs */}
       {searchResults?.items?.length > 0 ? (
         <div>
-          <h4>Search Results</h4>
-          <div className="card-deck row d-flex justify-content-center pb-3 mx-1">
+          <h4 className="text-lg font-semibold mt-4 mb-2">Search Results</h4>
+          <div className="flex flex-wrap justify-center pb-3 mx-1">
             {searchResults.items.map((item, index) => (
               <SongCard key={item.id} item={item} index={index} />
             ))}
           </div>
         </div>
       ) : (
-        // <h5>No songs found</h5>
         <></>
       )}
 
       {/* Playlists */}
       {playlistData?.items?.length > 0 ? (
         <div>
-          <h4>Playlists</h4>
-          <div className="card-deck row d-flex justify-content-center pb-3 mx-1">
+          <h4 className="text-lg font-semibold mt-4 mb-2">Playlists</h4>
+          <div className="flex flex-wrap justify-center pb-3 mx-1">
             {playlistData.items
               .filter(playlist => playlist?.id)
               .map(playlist => (
@@ -44,7 +39,6 @@ const SearchResults = () => {
           </div>
         </div>
       ) : (
-        // <h5>No playlists found</h5>
         <></>
       )}
     </div>
