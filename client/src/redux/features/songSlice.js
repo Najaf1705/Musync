@@ -120,7 +120,7 @@ const songSlice = createSlice({
     userPlaylists: null,
     topSongs: [],
     searchResults: null,
-    playlistData: null,
+    searchedPlaylistData: null,
     selectedPlaylist: null,
     playlistTracks: [],
     loading: false,
@@ -145,8 +145,8 @@ const songSlice = createSlice({
     setSearchResults: (state, action) => {
       state.searchResults = action.payload;
     },
-    setPlaylistData: (state, action) => {
-      state.playlistData = action.payload;
+    setSearchedPlaylistData: (state, action) => {
+      state.searchedPlaylistData = action.payload;
     },
     setSelectedPlaylist: (state, action) => {
       state.selectedPlaylist = action.payload;
@@ -179,7 +179,7 @@ const songSlice = createSlice({
       state.userPlaylists= null;
       state.topSongs= [];
       state.searchResults= null;
-      state.playlistData= null;
+      state.searchedPlaylistData= null;
       state.selectedPlaylist= null;
       state.playlistTracks= [];
       state.loading= false;
@@ -252,7 +252,7 @@ const songSlice = createSlice({
         console.log("searchSongsAndPlaylists.fulfilled");
         state.loading = false;
         state.searchResults = action.payload.tracks;
-        state.playlistData = action.payload.playlists;
+        state.searchedPlaylistData = action.payload.playlists;
       })
       .addCase(searchSongsAndPlaylists.rejected, (state, action) => {
         console.log("searchSongsAndPlaylists.rejected");
@@ -283,7 +283,7 @@ export const {
   clearSongSlice,
   setTopSongs,
   setSearchResults,
-  setPlaylistData,
+  setSearchedPlaylistData,
   setSelectedPlaylist,
   setPlaylistTracks,
 } = songSlice.actions;

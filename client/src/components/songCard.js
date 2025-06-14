@@ -7,10 +7,10 @@ import { Vibrant } from "node-vibrant/browser";
 const SongCard = ({ item, index }) => {
   const dispatch = useDispatch();
   const isLoggedIn = useSelector(state => state.user.isLoggedIn);
-  
+
   const userPlaylists = useSelector(state => state.songs.userPlaylists);
 
-  const likedSongs =userPlaylists?.find(playlist => playlist.playlistName === "Liked Songs")?.songs || [];
+  const likedSongs = userPlaylists?.find(playlist => playlist.playlistName === "Liked Songs")?.songs || [];
 
   const [isLiked, setIsLiked] = useState(likedSongs?.includes(item.id));
   const [likeLoading, setLikeLoading] = useState(false);
@@ -70,8 +70,9 @@ const SongCard = ({ item, index }) => {
 
   return (
     <div
-      className="rounded-xl overflow-hidden w-56 shadow-lg flex m-2 p-3 flex-col transition-shadow hover:shadow-2xl bg-neutral-900"
+      className="rounded-xl overflow-hidden w-40 sm:w-56 shadow-lg flex m-2 p-2 sm:p-3 flex-col transition-shadow hover:shadow-2xl bg-neutral-900"
       style={{ backgroundColor: bgColor, color: textColor }}
+      title={`${item.name} - ${item.artists ? item.artists.map(a => a.name).join(", ") : "Unknown Artist"}`}
     >
       <div className="relative aspect-square w-full">
         <img
@@ -90,14 +91,24 @@ const SongCard = ({ item, index }) => {
             ></i>
             <i className="fa-solid fa-plus cursor-pointer text-white text-xl hover:text-green-400 transition" title="Add to playlist"></i>
             <i className="fa-solid fa-download cursor-pointer text-white text-xl hover:text-green-400 transition" title="Download"></i>
+            <i className="fa-brands fa-spotify cursor-pointer text-white text-xl hover:text-green-400 transition" title="Open on Spotify"
+              onClick={() => {
+                window.open(`https://open.spotify.com/track/${item.id}`, '_blank');
+              }}
+            ></i>
           </div>
         </div>
       </div>
-      <div className="px-4 py-3">
-        <div className="font-semibold text-base truncate" style={{ color: textColor }}>
+      <div className="px-2 py-2 sm:px-4 sm:py-3">
+        <div
+          className="font-semibold text-sm sm:text-base truncate"
+          style={{ color: textColor }}
+        >
           {item.name || 'Unknown'}
         </div>
-        <p className="text-neutral-400 text-sm truncate">
+        <p
+          className="text-xs sm:text-sm truncate"
+        >
           {item.artists
             ? item.artists.map((artist) => artist.name || 'Unknown Artist').join(", ").slice(0, 30)
             : 'Unknown Artist'}

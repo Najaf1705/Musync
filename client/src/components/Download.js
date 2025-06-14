@@ -106,7 +106,7 @@ const Download = (props) => {
                 {searchResults.map((video) => (
                   <div
                     key={video.id.videoId}
-                    className={`video-item card mb-3 mx-2 curpoint ${
+                    className={`video-item card mb-3 mx-2 cursor-pointer ${
                       selectedVideo &&
                       selectedVideo.id.videoId === video.id.videoId
                         ? "selected"

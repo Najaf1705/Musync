@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { setUser } from "../../redux/features/userSlice"; // adjust path as needed
-import { setLikedSongs } from "../../redux/features/songSlice"; // adjust path as needed
+import { setUserSongs, clearSongSlice } from "../../redux/features/songSlice"; // adjust path as needed
 import { toast } from "react-toastify";
 
 
@@ -35,7 +35,7 @@ export const useAuthUtils = () => {
             }
 
             dispatch(setUser(serRes.user));
-            dispatch(setLikedSongs(serRes.user.likedSongs));
+            dispatch(setUserSongs({likedSongs: serRes.user.likedSongs, userPlaylists: serRes.user.playlists})); // set liked songs
 
             toast.success("Logged in Successfully");
             navigate("/");
@@ -72,7 +72,7 @@ export const useAuthUtils = () => {
 
             console.log("google login data", data);
             dispatch(setUser(data.user));
-            dispatch(setLikedSongs(data.user.likedSongs));
+            dispatch(clearSongSlice());
 
             toast.success("Logged in Successfully");
             navigate("/");

@@ -67,7 +67,7 @@ const Navbar = () => {
   ];
 
   return (
-    <nav className="fixed top-0 left-0 w-full z-50 shadow-lg border-white/10 backdrop-filter backdrop-blur-lg bg-opacity-10">
+    <nav className="fixed top-0 left-0 w-full z-50 shadow-lg backdrop-blur-xl">
       <div className="container mx-auto flex items-center justify-between py-2 px-4" ref={navbarRef}>
         {/* Logo and Profile Section */}
         <div className="flex items-center">
@@ -81,7 +81,11 @@ const Navbar = () => {
               />
             </NavLink>
           )}
-          <NavLink className="text-white text-xl font-bold flex items-center gap-2" to="/">
+          <NavLink
+            className="text-2xl font-bold flex items-center gap-2"
+            style={{ textShadow: '-1px -1px 0 #f20, 1px -1px 0 #00ff37, -1px 1px 0 #ff00f2, 1px 1px 0 #1500ff' }}
+            to="/"
+          >
             <i className="fa-solid fa-backward-step"></i> Musync <i className="fa-solid fa-forward-step"></i>
           </NavLink>
         </div>
@@ -106,7 +110,7 @@ const Navbar = () => {
         </button>
 
         {/* Navigation Items */}
-        <div className={`flex-col lg:flex-row lg:flex items-center gap-2 lg:gap-4 absolute lg:static top-full left-0 w-full lg:w-auto bg-black backdrop-filter backdrop-blur-lg  lg:bg-transparent transition-all duration-200 ease-in-out ${isNavbarOpen ? 'flex' : 'hidden'}`}>
+        <div className={`flex-col lg:flex-row lg:flex items-center gap-2 lg:gap-4 absolute lg:static top-full left-0 w-full lg:w-auto bg-black bg-opacity-80 lg:bg-transparent transition-all duration-200 ease-in-out ${isNavbarOpen ? 'flex' : 'hidden'}`}>
           <ul className="flex flex-col lg:flex-row items-center w-full lg:w-auto">
             {navItems.map(({ path, label }) => (
               <li key={path} className="px-2 py-2 lg:py-0">
@@ -133,9 +137,9 @@ const Navbar = () => {
                 </button>
               ) : (
                 <>
-                  <NavLink className="text-white hover:text-blue-400 px-2 py-1 rounded transition" to="/login" onClick={() => setIsNavbarOpen(false)}>Login</NavLink>
-                  <span className="text-white px-1">/</span>
-                  <NavLink className="text-white hover:text-blue-400 px-2 py-1 rounded transition" to="/signup" onClick={() => setIsNavbarOpen(false)}>Signup</NavLink>
+                  <NavLink className="text-white hover:text-blue-400 pl-2 py-1 rounded transition" to="/login" onClick={() => setIsNavbarOpen(false)}>Login</NavLink>
+                  <span className="text-white">/</span>
+                  <NavLink className="text-white hover:text-blue-400 pr-2 py-1 rounded transition" to="/signup" onClick={() => setIsNavbarOpen(false)}>Signup</NavLink>
                 </>
               )}
             </li>

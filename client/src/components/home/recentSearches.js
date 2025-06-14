@@ -1,6 +1,6 @@
 import React from "react";
 
-const RecentSearches = ({ recentSearches, handleRemoveRecent, setSongName }) => {
+const RecentSearches = ({ recentSearches, handleRemoveRecent, setSongName, handleSubmit }) => {
   return recentSearches.length > 0 ? (
     <div>
       <h6 className="pt-2 text-base font-semibold">Recents</h6>
@@ -16,7 +16,10 @@ const RecentSearches = ({ recentSearches, handleRemoveRecent, setSongName }) => 
             ></i>
             <div
               className="text-gray-800 dark:text-gray-200"
-              onClick={() => setSongName(search)}
+              onClick={() => {
+                setSongName(search);
+                handleSubmit(null, search);
+              }}
             >
               {search}
             </div>

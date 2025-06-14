@@ -14,29 +14,14 @@ const Login = () => {
     }
   }, [isLoggedIn, navigate]);
 
-  
   const [userData, setUserData] = useState({
     name: "", email: "", password: ""
   });
-
-
-
-
-  const hide = () => {
-    if (document.getElementById("password").type === 'password') {
-      document.getElementById("password").type = "text";
-      document.getElementById("hideeye1").style.display = "block";
-      document.getElementById("hideeye2").style.display = "none";
-    } else {
-      document.getElementById("password").type = "password";
-      document.getElementById("hideeye1").style.display = "none";
-      document.getElementById("hideeye2").style.display = "block";
-    }
-  }
+  const [showPassword, setShowPassword] = useState(false);
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-neutral-900 to-neutral-800">
-      <div className="w-full max-w-md bg-neutral-900 rounded-xl shadow-lg p-8">
+    <div className="min-h-screen flex items-center justify-center">
+      <div className="w-full max-w-md rounded-xl shadow-lg p-8 bg-slate-300/10 backdrop-blur-lg">
         <form
           onSubmit={(e) => {
             e.preventDefault();
@@ -69,7 +54,7 @@ const Login = () => {
             </label>
             <div className="relative">
               <input
-                type="password"
+                type={showPassword ? "text" : "password"}
                 className="w-full px-4 py-2 rounded-lg bg-neutral-800 text-white border border-neutral-700 focus:outline-none focus:ring-2 focus:ring-green-400"
                 id="password"
                 placeholder="Password"
@@ -79,9 +64,11 @@ const Login = () => {
                 onChange={(e) => setUserData({ ...userData, password: e.target.value })}
                 required
               />
-              <span className="absolute right-3 top-1/2 -translate-y-1/2 cursor-pointer text-neutral-400" onClick={hide}>
-                <i id="hideeye1" className="fa-regular fa-eye"></i>
-                <i id="hideeye2" className="fa-regular fa-eye-slash"></i>
+              <span
+                className="absolute right-3 top-1/2 -translate-y-1/2 cursor-pointer text-neutral-400"
+                onClick={() => setShowPassword((prev) => !prev)}
+              >
+                <i className={`fa-regular ${showPassword ? "fa-eye-slash" : "fa-eye"}`}></i>
               </span>
             </div>
           </div>

@@ -33,8 +33,8 @@ const Signup = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-neutral-900 to-neutral-800">
-      <div className="w-full max-w-md bg-neutral-900 rounded-xl shadow-lg p-8">
+    <div className="min-h-screen flex items-center justify-center ">
+      <div className="w-full max-w-md rounded-xl shadow-lg p-8 bg-slate-300/10 backdrop-blur-lg">
         <form
           onSubmit={(e) => {
             e.preventDefault();

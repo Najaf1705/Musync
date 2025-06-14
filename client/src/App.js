@@ -49,47 +49,54 @@ const App = () => {
         credentials: "include",
       });
 
-      
+
       if (res.ok) {
         const user = await res.json();
         console.log("serverprofile response", user);
         dispatch(setUser(user)); // refresh with real data
-        dispatch(setUserSongs({likedSongs: user.likedSongs, userPlaylists: user.playlists})); // set liked songs
+        dispatch(setUserSongs({ likedSongs: user.likedSongs, userPlaylists: user.playlists })); // set liked songs
         // console.log("likedSongs:", user.likedSongs);
       } else {
-        dispatch(clearUser());   
+        dispatch(clearUser());
         dispatch(clearSongSlice());
       }
     };
 
     verify();
   }, []);
-  
+
   // console.log("user Song slice",useSelector((state)=>state.songs));
 
   return (
     <>
       <Navbar />
-      <Routes>
-        <Route path="" element={
-          <Home
-            selectedSong={selectedSong}
-            onSelectedSongChange={handleSelectedSongChange}
-          />
-        } />
-        <Route path="/discover" element={
-          <Discover
-            selectedSong={selectedSong}
-            onSelectedSongChange={handleSelectedSongChange}
-          />
-        } />
-        <Route path="/download" element={<Download selectedSong={selectedSong} />} />
-        <Route path="/profile" element={<Profile />} />
-        <Route path="/login" element={<Login />} />
-        <Route path="/signup" element={<Signup />} />
-        <Route path="/playlists" element={<Playlists />} />
-        <Route path="*" element={<Errorpage />} />
-      </Routes>
+      <div
+        className="min-h-screen text-white pt-16 bg-fixed bg-cover bg-center"
+        style={{
+          backgroundImage: "url('/gbg.png')"
+        }}
+      >
+        <Routes>
+          <Route path="" element={
+            <Home
+              selectedSong={selectedSong}
+              onSelectedSongChange={handleSelectedSongChange}
+            />
+          } />
+          <Route path="/discover" element={
+            <Discover
+              selectedSong={selectedSong}
+              onSelectedSongChange={handleSelectedSongChange}
+            />
+          } />
+          <Route path="/download" element={<Download selectedSong={selectedSong} />} />
+          <Route path="/profile" element={<Profile />} />
+          <Route path="/login" element={<Login />} />
+          <Route path="/signup" element={<Signup />} />
+          <Route path="/playlists" element={<Playlists />} />
+          <Route path="*" element={<Errorpage />} />
+        </Routes>
+      </div>
       <ToastContainer position="bottom-right" />
     </>
   )

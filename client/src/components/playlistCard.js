@@ -22,10 +22,11 @@ const PlaylistCard = ({
 
   return (
     <div
-      className="flex flex-col items-center bg-white dark:bg-gray-800 rounded-lg shadow-md m-2 p-3 w-48 h-64 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700 transition"
+      className="flex flex-col items-center rounded-lg shadow-md m-2 p-2 w-36 h-48 sm:w-48 sm:h-64 cursor-pointer bg-slate-300/10 hover:bg-slate-300/20 transition backdrop-blur-lg"
       onClick={handlePlaylistSelect}
+      title={`${playlist.name} - ${playlist.owner.display_name ? playlist.owner.display_name : "Unknown Artist"}`}
     >
-      <div className="w-full flex justify-center min-h-24">
+      <div className="w-full flex justify-center min-h-20 sm:min-h-24">
         <img
           loading="lazy"
           src={playlist.images[0]?.url}
@@ -34,7 +35,7 @@ const PlaylistCard = ({
         />
       </div>
       <div className="mt-2 text-center flex-1 flex items-center justify-center w-full">
-        <p className="font-semibold text-sm truncate max-w-[10rem]">
+        <p className="font-semibold text-xs sm:text-sm truncate max-w-[7.5rem] sm:max-w-[10rem]">
           {playlist.name} - {playlist.owner.display_name}
         </p>
       </div>

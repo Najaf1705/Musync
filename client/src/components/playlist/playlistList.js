@@ -5,7 +5,7 @@ import PlaylistCard from '../playlistCard';
 const PlaylistList = () => {
   const playlistsData = useSelector((state) => state.songs.userPlaylists);
   return (
-    <div className="flex flex-wrap justify-center mx-1">
+    <div className="flex flex-wrap justify-around mx-1">
       {playlistsData.map((playlist, index) => (
         <PlaylistCard
           playlist={{

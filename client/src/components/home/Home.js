@@ -7,7 +7,9 @@ import RecentSearches from "./recentSearches";
 import SearchResults from "./searchResults";
 import TopSongs from "./topSongs";
 import CreatePlaylist from "../playlist/CreatePlaylist";
-import { fetchTopSongs, fetchPlaylistTracks, searchSongsAndPlaylists } from "../utils/api";
+import { fetchTopSongs, fetchPlaylistTracks } from "../utils/api";
+import { searchSongsAndPlaylists } from '../../redux/features/songSlice';
+
 
 const Home = () => {
   const navigate = useNavigate();
@@ -54,9 +56,9 @@ const Home = () => {
     // setLoading(false);
   }, [songName]);
 
-  useEffect(() => {
-    searchSong();
-  }, [songName, searchSong]);
+  // useEffect(() => {
+  //   searchSong();
+  // }, [songName, searchSong]);
 
   // Handle recent searches
   useEffect(() => {
@@ -68,12 +70,27 @@ const Home = () => {
     localStorage.setItem("recentSearches", JSON.stringify(searches));
   };
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    if (songName.trim() !== "" && !recentSearches.includes(songName)) {
-      const updatedSearches = [songName, ...recentSearches.slice(0, 4)];
-      setRecentSearches(updatedSearches);
-      saveRecentSearchesToLocalStorage(updatedSearches);
+  const handleSubmit = async (e, value) => {
+    if (e) e.preventDefault();
+    const trimmedSongName = (value ?? songName).trim();
+
+    if (!trimmedSongName) {
+      toast.error('Please enter a song name');
+      return;
+    }
+
+    try {
+      // Update recent searches
+      if (!recentSearches.includes(trimmedSongName)) {
+        const updatedSearches = [trimmedSongName, ...recentSearches.slice(0, 4)];
+        setRecentSearches(updatedSearches);
+        saveRecentSearchesToLocalStorage(updatedSearches);
+      }
+
+      // Perform search
+      await dispatch(searchSongsAndPlaylists(trimmedSongName)).unwrap();
+    } catch (error) {
+      toast.error('Failed to search songs');
     }
   };
 
@@ -84,7 +101,7 @@ const Home = () => {
   };
 
   return (
-    <div className="home pb-6">
+    <div className="pb-6">
       <div className="mx-4">
         <h3 className="text-2xl font-semibold mb-4">
           Ohiyooo {userDetails?.name?.split(" ")[0] || "Luffy"}
@@ -98,6 +115,7 @@ const Home = () => {
           recentSearches={recentSearches}
           handleRemoveRecent={handleRemoveRecent}
           setSongName={setSongName}
+          handleSubmit={handleSubmit}
         />
         <SearchResults
           songData={songData}
@@ -106,6 +124,7 @@ const Home = () => {
           setSelectedPlaylist={setSelectedPlaylist}
           setSelectedPlaylistName={setSelectedPlaylistName}
           playlistTracks={playlistTracks}
+          setSongName={setSongName}
           // handleDownload={onSelectedSongChange}
           // likedSongs={likedSongs}
           // setLikedSongs={setLikedSongs}

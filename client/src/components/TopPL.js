@@ -148,7 +148,7 @@ const TopPL = (props) => {
             {playlists.map((playlist) => (
               <div
                 key={playlist.id}
-                className="col-4 col-md-4 col-lg-3 mb-3 curpoint"
+                className="col-4 col-md-4 col-lg-3 mb-3 cursor-pointer"
                 onClick={() => {
                   setSelectedPlaylist(playlist.id);
                   setSelectedPlaylistName(playlist.name);
