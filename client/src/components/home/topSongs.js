@@ -1,7 +1,7 @@
 import React from "react";
 import SongCard from "../songCard";
 
-const TopSongs = ({ topSongs, cardColors, cardTextColors, setCardColors, setCardTextColors }) => {
+const TopSongs = ({ topSongs }) => {
   return (
     <div>
       <h3 className="mt-2 text-xl font-semibold">Top Songs</h3>

@@ -71,7 +71,7 @@ const App = () => {
     <>
       <Navbar />
       <div
-        className="min-h-screen text-white pt-16 bg-fixed bg-cover bg-center"
+        className="min-h-screen text-white pt-16 pb-6 bg-fixed bg-cover bg-center"
         style={{
           backgroundImage: "url('/gbg.png')"
         }}
@@ -97,6 +97,16 @@ const App = () => {
           <Route path="*" element={<Errorpage />} />
         </Routes>
       </div>
+      <footer className="text-center text-sm font-medium mt-auto bg-black text-white">
+        © {new Date().getFullYear()}{" "}
+        <span className="text-green-600 cursor-pointer hover:underline"
+          onClick={() => window.open("https://github.com/Najaf1705", "_blank")}
+          title="Visit Najaf's GitHub Profile" aria-label="Najaf's GitHub Profile"
+        >
+          {`Najaf`}
+        </span>
+        {` All rights reserved.`}
+      </footer>
       <ToastContainer position="bottom-right" />
     </>
   )

@@ -4,6 +4,8 @@ import { useDispatch, useSelector } from 'react-redux';
 import { clearUser } from '../redux/features/userSlice';
 import { clearSongSlice } from '../redux/features/songSlice';
 import { toast } from 'react-toastify';
+import { AiFillGithub } from "react-icons/ai";
+
 
 const defaultProfilePicture = process.env.PUBLIC_URL + '/images/pp.png';
 
@@ -61,9 +63,9 @@ const Navbar = () => {
 
   const navItems = [
     { path: "", label: "Home" },
-    { path: "/discover", label: "Discover" },
-    { path: "/download", label: "Download" },
-    ...(isLoggedIn ? [{ path: "/playlists", label: "Playlists" }] : [])
+    ...(isLoggedIn ? [{ path: "/playlists", label: "Playlists" }] : []),
+    // { path: "/discover", label: "Discover" },
+    // { path: "/download", label: "Download" },
   ];
 
   return (
@@ -88,6 +90,12 @@ const Navbar = () => {
           >
             <i className="fa-solid fa-backward-step"></i> Musync <i className="fa-solid fa-forward-step"></i>
           </NavLink>
+          <AiFillGithub size={28} Add commentMore actions
+            className="cursor-pointer text-white hover:text-black ml-4 transition"
+            onClick={() => window.open("https://github.com/Najaf1705/Musync", "_blank")}
+            aria-label="Visit GitHub repository"
+            title="Visit GitHub repository"
+          />
         </div>
 
         {/* Navbar Toggle Button */}
@@ -116,7 +124,7 @@ const Navbar = () => {
               <li key={path} className="px-2 py-2 lg:py-0">
                 <NavLink
                   className={({ isActive }) =>
-                    `text-white hover:text-blue-400 px-2 py-1 rounded transition ${isActive ? 'font-semibold underline' : ''}`
+                    `text-white hover:text-black px-2 py-1 rounded transition ${isActive ? 'font-semibold underline' : ''}`
                   }
                   to={path}
                   end={path === ""}
@@ -129,7 +137,7 @@ const Navbar = () => {
             <li className="px-2 py-2 lg:py-0 flex items-center">
               {isLoggedIn ? (
                 <button
-                  className="text-white hover:text-red-400 px-2 py-1 rounded transition"
+                  className="text-white hover:text-black px-2 py-1 rounded transition"
                   onClick={handleLogout}
                   style={{ cursor: "pointer" }}
                 >
@@ -137,9 +145,9 @@ const Navbar = () => {
                 </button>
               ) : (
                 <>
-                  <NavLink className="text-white hover:text-blue-400 pl-2 py-1 rounded transition" to="/login" onClick={() => setIsNavbarOpen(false)}>Login</NavLink>
+                  <NavLink className="text-white hover:text-black pl-2 py-1 rounded transition" to="/login" onClick={() => setIsNavbarOpen(false)}>Login</NavLink>
                   <span className="text-white">/</span>
-                  <NavLink className="text-white hover:text-blue-400 pr-2 py-1 rounded transition" to="/signup" onClick={() => setIsNavbarOpen(false)}>Signup</NavLink>
+                  <NavLink className="text-white hover:text-black pr-2 py-1 rounded transition" to="/signup" onClick={() => setIsNavbarOpen(false)}>Signup</NavLink>
                 </>
               )}
             </li>

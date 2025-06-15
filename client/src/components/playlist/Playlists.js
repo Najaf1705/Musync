@@ -27,6 +27,8 @@ const Playlist = () => {
       (playlist) => playlist.playlistName === pname
     );
 
+    setSelectedPlaylistSongsData([]);
+
     if (!selectedPlaylist?.songs?.length) return;
 
     try {
@@ -61,7 +63,9 @@ const Playlist = () => {
               Your playlists
             </h2>
             <div className="flex flex-wrap justify-center mx-1">
-              {userPlaylists.map((playlist, index) => (
+              {userPlaylists.map((playlist, index) => 
+              // {
+                (
                 <PlaylistCard
                   playlist={{
                     ...playlist,
@@ -75,7 +79,10 @@ const Playlist = () => {
                   fetchSelectedPlaylistSongs={fetchSelectedPlaylistSongs}
                   key={playlist._id || playlist.id || index}
                 />
-              ))}
+              )
+              // console.log("playlist Playlist:", playlist);
+            // }
+              )}
               {/* Create Playlist Card */}
               <div className="flex flex-col items-center justify-center bg-white dark:bg-gray-800 rounded-lg shadow-md m-2 p-3 w-64 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700 transition">
                 <div className="flex flex-col items-center justify-center mt-1">
