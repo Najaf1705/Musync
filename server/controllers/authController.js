@@ -67,8 +67,8 @@ const serverLogin = async (req, res) => {
       res.cookie("jtoken", token, {
         httpOnly: true,
         secure: false,
-        sameSite: 'lax', // Required for cross-site requests
-        maxAge: 1000*60*60*24,         // 1 week expiration
+        sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
+        maxAge: 1000 * 60 * 60 * 24,   // 1 day expiration
       });
 
       return res.status(200).json({
@@ -103,7 +103,7 @@ const googleServerLogin = async (req, res) => {
       res.cookie("jtoken", token, {
         httpOnly: true,
         secure: false, // Use secure cookies in production
-        sameSite: 'lax', // Required for cross-site requests
+        sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
         maxAge: 1000*60*60*24,         // 1 week expiration
       });
 
