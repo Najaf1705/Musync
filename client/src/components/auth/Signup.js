@@ -33,7 +33,7 @@ const Signup = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center ">
+    <div className="flex items-center justify-center ">
       <div className="w-full max-w-md rounded-xl shadow-lg p-8 bg-slate-300/10 backdrop-blur-lg">
         <form
           onSubmit={(e) => {
@@ -122,7 +122,7 @@ const Signup = () => {
               Passwords do not match. Please try again.
             </div>
           )}
-          <div className="flex items-center justify-between">
+          <div className="flex flex-wrap items-center justify-between">
             <button
               type="submit"
               className="bg-green-500 hover:bg-green-600 text-white font-semibold py-2 px-6 rounded-lg transition"

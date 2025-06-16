@@ -1,10 +1,11 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { clearUser } from '../redux/features/userSlice';
 import { clearSongSlice } from '../redux/features/songSlice';
 import { toast } from 'react-toastify';
 import { AiFillGithub } from "react-icons/ai";
+import { Dropdown, DropdownTrigger, DropdownMenu, DropdownItem, Button } from "@heroui/react";
 
 
 const defaultProfilePicture = process.env.PUBLIC_URL + '/images/pp.png';
@@ -24,20 +25,6 @@ const Navbar = () => {
       setProfilePictureURL(defaultProfilePicture);
     }
   }, [userDetails]);
-
-  const [isNavbarOpen, setIsNavbarOpen] = useState(false);
-  const navbarRef = useRef(null);
-
-  useEffect(() => {
-    const handleDocumentClick = (event) => {
-      if (navbarRef.current && !navbarRef.current.contains(event.target)) {
-        setIsNavbarOpen(false);
-      }
-    };
-
-    document.addEventListener('click', handleDocumentClick);
-    return () => document.removeEventListener('click', handleDocumentClick);
-  }, []);
 
   const handleLogout = async () => {
     try {
@@ -64,13 +51,13 @@ const Navbar = () => {
   const navItems = [
     { path: "", label: "Home" },
     ...(isLoggedIn ? [{ path: "/playlists", label: "Playlists" }] : []),
-    // { path: "/discover", label: "Discover" },
-    // { path: "/download", label: "Download" },
+    {path: "/discover", label: "Discover"},
+    {path: "/download", label: "Download"},
   ];
 
   return (
     <nav className="fixed top-0 left-0 w-full z-50 shadow-lg backdrop-blur-xl">
-      <div className="container mx-auto flex items-center justify-between py-2 px-4" ref={navbarRef}>
+      <div className="container mx-auto flex items-center justify-between py-2 px-4">
         {/* Logo and Profile Section */}
         <div className="flex items-center">
           {isLoggedIn && (
@@ -90,7 +77,8 @@ const Navbar = () => {
           >
             <i className="fa-solid fa-backward-step"></i> Musync <i className="fa-solid fa-forward-step"></i>
           </NavLink>
-          <AiFillGithub size={28} Add commentMore actions
+          <AiFillGithub
+            size={28}
             className="cursor-pointer text-white hover:text-black ml-4 transition"
             onClick={() => window.open("https://github.com/Najaf1705/Musync", "_blank")}
             aria-label="Visit GitHub repository"
@@ -98,61 +86,84 @@ const Navbar = () => {
           />
         </div>
 
-        {/* Navbar Toggle Button */}
-        <button
-          className="lg:hidden p-2 rounded bg-gray-700 text-white focus:outline-none"
-          type="button"
-          onClick={() => setIsNavbarOpen(!isNavbarOpen)}
-          aria-label="Toggle navigation"
-        >
-          <span>
-            <svg className="w-6 h-6" fill="none" stroke="currentColor" strokeWidth="2"
-              viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round"
-                d={isNavbarOpen
-                  ? "M6 18L18 6M6 6l12 12"
-                  : "M4 6h16M4 12h16M4 18h16"}
-              />
-            </svg>
-          </span>
-        </button>
+        {/* Navigation Links */}
+        <div className="hidden lg:flex space-x-6">
+          {navItems.map(({ path, label }) => (
+            <NavLink
+              key={path}
+              className={({ isActive }) =>
+                `text-white hover:text-gray-300 transition ${isActive ? 'font-semibold' : ''}`
+              }
+              to={path}
+              end={path === ""}
+            >
+              {label}
+            </NavLink>
+          ))}
+          {isLoggedIn ? (
+            <button
+              className="text-red-500 hover:text-red-400 transition"
+              onClick={handleLogout}
+            >
+              Logout
+            </button>
+          ) : (
+            <>
+              <NavLink
+                className="text-white hover:text-gray-300 transition"
+                to="/login"
+              >
+                Login
+              </NavLink>
+              <NavLink
+                className="text-white hover:text-gray-300 transition"
+                to="/signup"
+              >
+                Signup
+              </NavLink>
+            </>
+          )}
+        </div>
 
-        {/* Navigation Items */}
-        <div className={`flex-col lg:flex-row lg:flex items-center gap-2 lg:gap-4 absolute lg:static top-full left-0 w-full lg:w-auto bg-black bg-opacity-80 lg:bg-transparent transition-all duration-200 ease-in-out ${isNavbarOpen ? 'flex' : 'hidden'}`}>
-          <ul className="flex flex-col lg:flex-row items-center w-full lg:w-auto">
+        {/* Dropdown Menu */}
+        <Dropdown>
+          <DropdownTrigger>
+            <Button className="lg:hidden text-white text-2xl">
+              <i className="fa-solid fa-bars"></i> {/* Hamburger Icon */}
+            </Button>
+          </DropdownTrigger>
+          <DropdownMenu aria-label="Navigation Menu" className="bg-gray-800 rounded-md text-white px-6">
             {navItems.map(({ path, label }) => (
-              <li key={path} className="px-2 py-2 lg:py-0">
+              <DropdownItem key={path} className="py-2">
                 <NavLink
-                  className={({ isActive }) =>
-                    `text-white hover:text-black px-2 py-1 rounded transition ${isActive ? 'font-semibold underline' : ''}`
-                  }
+                  className="w-full text-white hover:text-gray-300"
                   to={path}
                   end={path === ""}
-                  onClick={() => setIsNavbarOpen(false)}
                 >
                   {label}
                 </NavLink>
-              </li>
+              </DropdownItem>
             ))}
-            <li className="px-2 py-2 lg:py-0 flex items-center">
-              {isLoggedIn ? (
-                <button
-                  className="text-white hover:text-black px-2 py-1 rounded transition"
-                  onClick={handleLogout}
-                  style={{ cursor: "pointer" }}
-                >
-                  Logout
-                </button>
-              ) : (
-                <>
-                  <NavLink className="text-white hover:text-black pl-2 py-1 rounded transition" to="/login" onClick={() => setIsNavbarOpen(false)}>Login</NavLink>
-                  <span className="text-white">/</span>
-                  <NavLink className="text-white hover:text-black pr-2 py-1 rounded transition" to="/signup" onClick={() => setIsNavbarOpen(false)}>Signup</NavLink>
-                </>
-              )}
-            </li>
-          </ul>
-        </div>
+            {isLoggedIn ? (
+              <DropdownItem key="logout" className="py-2 text-danger" onClick={handleLogout}>
+                Logout
+              </DropdownItem>
+            ) : (
+              <>
+                <DropdownItem key="login" className="py-2">
+                  <NavLink className="w-full text-white hover:text-gray-300" to="/login">
+                    Login
+                  </NavLink>
+                </DropdownItem>
+                <DropdownItem key="signup" className="py-2">
+                  <NavLink className="w-full text-white hover:text-gray-300" to="/signup">
+                    Signup
+                  </NavLink>
+                </DropdownItem>
+              </>
+            )}
+          </DropdownMenu>
+        </Dropdown>
       </div>
     </nav>
   );

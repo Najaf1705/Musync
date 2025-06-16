@@ -3,6 +3,7 @@ import { useDispatch } from 'react-redux';
 import { setSelectedPlaylist } from '../redux/features/songSlice';
 
 const PlaylistCard = ({
+  parentComponent,
   playlist,
   setDisplaySongs,
   setSelectedPlaylistData,
@@ -11,13 +12,22 @@ const PlaylistCard = ({
   const dispatch = useDispatch();
 
   const handlePlaylistSelect = () => {
-    dispatch(setSelectedPlaylist({
-      id: playlist.id,
-      name: playlist.name
-    }));
-    setDisplaySongs(true);
-    setSelectedPlaylistData(playlist);
-    fetchSelectedPlaylistSongs(playlist.name);
+
+    if (parentComponent === "searchResults") {
+      setDisplaySongs(true);
+      setSelectedPlaylistData(playlist);
+      fetchSelectedPlaylistSongs(playlist.id);
+    }
+
+    if (parentComponent === "playlist") {
+      dispatch(setSelectedPlaylist({
+        id: playlist.id,
+        name: playlist.name
+      }));
+      setDisplaySongs(true);
+      setSelectedPlaylistData(playlist);
+      fetchSelectedPlaylistSongs(playlist.name);
+    }
   };
 
   return (

@@ -68,12 +68,12 @@ const App = () => {
   // console.log("user Song slice",useSelector((state)=>state.songs));
 
   return (
-    <>
+    <div className="flex flex-col min-h-screen">
       <Navbar />
       <div
-        className="min-h-screen text-white pt-16 pb-6 bg-fixed bg-cover bg-center"
+        className="flex-1 text-white pt-16 pb-6"
         style={{
-          backgroundImage: "url('/gbg.png')"
+          // backgroundImage: "url('/gbg.png')"
         }}
       >
         <Routes>
@@ -97,7 +97,7 @@ const App = () => {
           <Route path="*" element={<Errorpage />} />
         </Routes>
       </div>
-      <footer className="text-center text-sm font-medium mt-auto bg-black text-white">
+      <footer className="text-center text-sm font-medium bg-gray-900 text-white">
         © {new Date().getFullYear()}{" "}
         <span className="text-green-600 cursor-pointer hover:underline"
           onClick={() => window.open("https://github.com/Najaf1705", "_blank")}
@@ -108,7 +108,7 @@ const App = () => {
         {` All rights reserved.`}
       </footer>
       <ToastContainer position="bottom-right" />
-    </>
+    </div>
   )
 }
 

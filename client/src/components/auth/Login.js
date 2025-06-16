@@ -20,8 +20,8 @@ const Login = () => {
   const [showPassword, setShowPassword] = useState(false);
 
   return (
-    <div className="min-h-screen flex items-center justify-center">
-      <div className="w-full max-w-md rounded-xl shadow-lg p-8 bg-slate-300/10 backdrop-blur-lg">
+    <div className="flex items-center justify-center">
+      <div className="w-full max-w-md rounded-xl shadow-lg p-8 mt-16 bg-slate-300/10 backdrop-blur-lg">
         <form
           onSubmit={(e) => {
             e.preventDefault();

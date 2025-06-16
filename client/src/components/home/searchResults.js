@@ -3,25 +3,44 @@ import { useSelector, useDispatch } from 'react-redux';
 import SongCard from "../songCard";
 import PlaylistCard from "../playlistCard";
 import { setSearchedPlaylistData, setSearchResults } from "../../redux/features/songSlice";
+import PlaylistDetail from "../playlist/playlistDetail";
 
 const SearchResults = ({ setSongName }) => {
   const { searchResults, searchedPlaylistData, loading } = useSelector(state => state.songs);
 
   const dispatch = useDispatch();
   const [displayPlaylistSongs, setDisplayPlaylistSongs] = useState(false);
+  const [selectedPlaylistData, setSelectedPlaylistData] = useState(null)
+  const [selectedPlaylistSongsData, setSelectedPlaylistSongsData] = useState([]);
+
 
   if (loading) {
     return <div className="text-center"><i className="fa-solid fa-spinner fa-spin"></i></div>;
   }
 
+  const fetchSelectedPlaylistSongs = async (pid) => {
+    try {
+      const playlistData = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/playlist-tracks/${pid}`);
+      setSelectedPlaylistSongsData([]);
+  
+      if (playlistData.ok) {
+        const playlistDataResponse = await playlistData.json();
+        // console.log("playlistDataResponse.items", playlistDataResponse.items);
+        if (!playlistDataResponse?.items?.length) return;
+  
+        setSelectedPlaylistSongsData(playlistDataResponse.items.map(item => item.track));
+      }
+    } catch (error) {
+      console.log("Error fetching playlist songs")
+    }
+  };
+
   const clearSearchResults = () => {
+    setDisplayPlaylistSongs(false);
+    setSelectedPlaylistSongsData([]);
     dispatch(setSearchResults(null)); // Clear search results in Redux state
     dispatch(setSearchedPlaylistData(null));
     setSongName(""); // Reset song name in parent component
-
-    // Clear search results by dispatching an action or resetting state
-    // Assuming you have an action to clear search results
-    // dispatch(clearSearchResultsAction());
   }
 
   return (
@@ -50,6 +69,7 @@ const SearchResults = ({ setSongName }) => {
 
       {/* Playlists */}
       {displayPlaylistSongs === false ? (
+        // playlist cards
         <>
           {searchedPlaylistData?.items?.length > 0 ? (
             <div>
@@ -57,14 +77,16 @@ const SearchResults = ({ setSongName }) => {
               <div className="flex flex-wrap justify-center pb-3 mx-1">
                 {searchedPlaylistData.items
                   .filter(playlist => playlist?.id)
-                  .map(playlist => 
-                    // {
-                    (
-                      <PlaylistCard key={playlist.id} playlist={playlist} />
-                    )
-                    // console.log("Playlist:", playlist);
-                  // }
-                  )}
+                  .map(playlist =>(
+                    <PlaylistCard
+                      parentComponent="searchResults"
+                      key={playlist.id}
+                      playlist={playlist}
+                      setDisplaySongs={setDisplayPlaylistSongs}
+                      setSelectedPlaylistData={setSelectedPlaylistData}
+                      fetchSelectedPlaylistSongs={fetchSelectedPlaylistSongs}
+                    />
+                  ))}
               </div>
             </div>
           ) : (
@@ -72,15 +94,16 @@ const SearchResults = ({ setSongName }) => {
           )}
         </>
       ) : (
-        // <PlaylistDetail
-        //   selectedPlaylistData={selectedPlaylistData}
-        //   setDisplaySongs={setDisplaySongs}
-        //   selectedPlaylistSongsData={selectedPlaylistSongsData}
-        // />
-        <></>
+        <PlaylistDetail
+          selectedPlaylistData={selectedPlaylistData}
+          setDisplaySongs={setDisplayPlaylistSongs}
+          selectedPlaylistSongsData={selectedPlaylistSongsData}
+        />
       )}
     </div>
   );
 };
 
 export default SearchResults;
+
+

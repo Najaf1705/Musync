@@ -47,18 +47,6 @@ const Home = () => {
     }
   }, [selectedPlaylist]);
 
-  // Search songs and playlists
-  const searchSong = useCallback(async () => {
-    // setLoading(true);
-    const { songs, playlists } = await searchSongsAndPlaylists(songName);
-    setSongData(songs);
-    setPlaylistData(playlists);
-    // setLoading(false);
-  }, [songName]);
-
-  // useEffect(() => {
-  //   searchSong();
-  // }, [songName, searchSong]);
 
   // Handle recent searches
   useEffect(() => {
@@ -66,10 +54,13 @@ const Home = () => {
     setRecentSearches(storedSearches);
   }, []);
 
+  // Save recent searches to localStorage
   const saveRecentSearchesToLocalStorage = (searches) => {
     localStorage.setItem("recentSearches", JSON.stringify(searches));
   };
 
+
+  // search or song and update recent searches
   const handleSubmit = async (e, value) => {
     if (e) e.preventDefault();
     const trimmedSongName = (value ?? songName).trim();
@@ -93,6 +84,7 @@ const Home = () => {
       toast.error('Failed to search songs');
     }
   };
+  
 
   const handleRemoveRecent = (removedItem) => {
     const updatedSearches = recentSearches.filter((item) => item !== removedItem);
@@ -125,9 +117,6 @@ const Home = () => {
           setSelectedPlaylistName={setSelectedPlaylistName}
           playlistTracks={playlistTracks}
           setSongName={setSongName}
-          // handleDownload={onSelectedSongChange}
-          // likedSongs={likedSongs}
-          // setLikedSongs={setLikedSongs}
           cardColors={cardColors}
           cardTextColors={cardTextColors}
           setCardColors={setCardColors}

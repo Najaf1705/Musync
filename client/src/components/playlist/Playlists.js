@@ -58,6 +58,7 @@ const Playlist = () => {
     <div className="home">
       <div className="mx-4">
         {displaySongs === false ? (
+          // playlist cards
           <>
             <h2 className="my-6 text-2xl font-semibold">
               Your playlists
@@ -74,6 +75,7 @@ const Playlist = () => {
                     images: [{ url: "/images/playlists.png" }],
                     owner: { display_name: "You" }
                   }}
+                  parentComponent="playlist"
                   setDisplaySongs={setDisplaySongs}
                   setSelectedPlaylistData={setSelectedPlaylistData}
                   fetchSelectedPlaylistSongs={fetchSelectedPlaylistSongs}
@@ -96,6 +98,7 @@ const Playlist = () => {
             </div>
           </>
         ) : (
+          // playlist songs
           <PlaylistDetail
             selectedPlaylistData={selectedPlaylistData}
             setDisplaySongs={setDisplaySongs}
