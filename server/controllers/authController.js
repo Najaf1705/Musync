@@ -66,10 +66,11 @@ const serverLogin = async (req, res) => {
 
       res.cookie("jtoken", token, {
         httpOnly: true,
-        secure: false,
+        secure: process.env.NODE_ENV === "production", // must be true in prod
         sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
-        maxAge: 1000 * 60 * 60 * 24,   // 1 day expiration
+        maxAge: 1000 * 60 * 60 * 24 // 1 day
       });
+
 
       return res.status(200).json({
         message: "Logged in successfully",
@@ -102,10 +103,11 @@ const googleServerLogin = async (req, res) => {
 
       res.cookie("jtoken", token, {
         httpOnly: true,
-        secure: false, // Use secure cookies in production
+        secure: process.env.NODE_ENV === "production", // must be true in prod
         sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
-        maxAge: 1000*60*60*24,         // 1 week expiration
+        maxAge: 1000 * 60 * 60 * 24 // 1 day
       });
+
 
       return res.status(200).json({
         message: "Logged in successfully",
