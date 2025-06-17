@@ -17,6 +17,8 @@ const allowedOrigins = [
   'https://musync-enzoe.vercel.app' // For production
 ];
 
+app.set("trust proxy", 1);
+
 app.use(
   cors({
     origin: (origin, callback) => {
