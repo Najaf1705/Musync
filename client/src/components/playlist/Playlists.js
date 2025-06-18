@@ -5,6 +5,8 @@ import CreatePlaylist from "./CreatePlaylist";
 import SongCard from "../songCard";
 import PlaylistCard from "../playlistCard";
 import PlaylistDetail from "./playlistDetail"; // <-- Import the PlaylistDetail component
+import { toast } from 'react-toastify';
+
 
 const Playlist = () => {
   const navigate = useNavigate();
@@ -20,6 +22,15 @@ const Playlist = () => {
   const [selectedPlaylistSongsData, setSelectedPlaylistSongsData] = useState([]);
   const [playlistModal, setPlaylistModal] = useState(false);
   const [selectedPlaylistData, setSelectedPlaylistData] = useState(null);
+
+  useEffect(() => {  
+    if(!isLoggedIn){
+      navigate('/');
+      toast.info("Log in to see your playlists");
+      return;
+    }
+  }, [isLoggedIn])
+  
 
 
   const fetchSelectedPlaylistSongs = async (pname) => {
@@ -103,6 +114,7 @@ const Playlist = () => {
             selectedPlaylistData={selectedPlaylistData}
             setDisplaySongs={setDisplaySongs}
             selectedPlaylistSongsData={selectedPlaylistSongsData}
+            loading={loading}
           />
         )}
         {/* </div> */}

@@ -262,7 +262,7 @@ const songSlice = createSlice({
 
       // top songs cases
       .addCase(fetchTopSongs.pending, (state) => {
-        state.loading = true;
+        state.loading = false;
         state.error = null;
       })
       .addCase(fetchTopSongs.rejected, (state, action) => {

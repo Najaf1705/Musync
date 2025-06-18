@@ -2,8 +2,8 @@ import React from 'react'
 
 const Errorpage = () => {
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-900">
-      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-8 flex flex-col items-center">
+    <div className="min-h-[80vh] flex items-center justify-center">
+      <div className="rounded-lg shadow-xl shadow-gray-500/10 bg-black border border-white/10 p-8 flex flex-col items-center">
         <h1 className="text-4xl font-bold text-red-600 mb-4">404</h1>
         <h2 className="text-2xl font-semibold text-gray-800 dark:text-gray-100 mb-2">Page Not Found</h2>
         <p className="text-gray-600 dark:text-gray-300 mb-4 text-center">

@@ -5,7 +5,7 @@ import { NavLink, useNavigate } from 'react-router-dom';
 import { useAuthUtils } from './authUtils';
 
 const Signup = () => {
-  const { signupUser, googleSignupUser, isLoggedIn } = useAuthUtils();
+  const { signupUser, googleSignupUser, isLoggedIn, signupLoading } = useAuthUtils();
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -34,13 +34,13 @@ const Signup = () => {
 
   return (
     <div className="flex items-center justify-center ">
-      <div className="w-full max-w-md rounded-xl shadow-lg p-8 bg-slate-300/10 backdrop-blur-lg">
+      <div className="w-full max-w-md rounded-xl border border-white/10 shadow-xl shadow-white/10 p-8 mt-2 backdrop-blur-sm">
         <form
           onSubmit={(e) => {
             e.preventDefault();
             signupUser(userData);
           }}
-          className="space-y-6"
+          className={`space-y-6 ${signupLoading ? "opacity-50 cursor-not-allowed" : ""}`}
         >
           <div className="text-center mb-6">
             <h2 className="text-3xl font-bold text-white mb-2">Registration</h2>
@@ -59,6 +59,7 @@ const Signup = () => {
               value={userData.name}
               name="name"
               onChange={handleInputs}
+              disabled={signupLoading}
             />
           </div>
           <div>
@@ -75,6 +76,7 @@ const Signup = () => {
               value={userData.email}
               name="email"
               onChange={handleInputs}
+              disabled={signupLoading}
             />
           </div>
           <div>
@@ -91,6 +93,7 @@ const Signup = () => {
               value={userData.password}
               name="password"
               onChange={handleInputs}
+              disabled={signupLoading}
             />
           </div>
           <div>
@@ -108,6 +111,7 @@ const Signup = () => {
                 value={userData.cpassword}
                 name="cpassword"
                 onChange={handleInputs}
+                disabled={signupLoading}
               />
               <span
                 className="absolute right-3 top-1/2 -translate-y-1/2 cursor-pointer text-neutral-400"
@@ -127,9 +131,13 @@ const Signup = () => {
               type="submit"
               className="bg-green-500 hover:bg-green-600 text-white font-semibold py-2 px-6 rounded-lg transition"
             >
-              Register
+              {signupLoading ? (
+                <i className="fa-solid fa-spinner fa-spin" aria-hidden="true"></i>
+              ) : (
+                "Register"
+              )}
             </button>
-            <NavLink to="/login" className="text-green-400 hover:underline text-sm">
+            <NavLink to="/login" className={`text-green-400 hover:underline text-sm ${signupLoading ? "pointer-events-none opacity-50" : ""}`}>
               Already have an account?
             </NavLink>
           </div>
@@ -139,25 +147,29 @@ const Signup = () => {
             <div className="flex-grow border-t border-neutral-700"></div>
           </div>
           <div className="flex justify-center">
-            <GoogleOAuthProvider clientId={process.env.REACT_APP_GOOGLE_CLIENT_ID}>
-              <GoogleLogin
-                onSuccess={(credentialResponse) => {
-                  const decoded = jwtDecode(credentialResponse.credential);
-                  googleSignupUser({
-                    email: decoded.email,
-                    name: decoded.name,
-                    image: decoded.picture
-                  });
-                }}
-                onFailure={(error) => {
-                  console.error(error);
-                }}
-                width="100%"
-                theme="filled_black"
-                text="continue_with"
-                shape="pill"
-              />
-            </GoogleOAuthProvider>
+            <button
+              className={`${signupLoading ? "pointer-events-none opacity-50" : ""}`}
+            >
+              <GoogleOAuthProvider clientId={process.env.REACT_APP_GOOGLE_CLIENT_ID}>
+                <GoogleLogin
+                  onSuccess={(credentialResponse) => {
+                    const decoded = jwtDecode(credentialResponse.credential);
+                    googleSignupUser({
+                      email: decoded.email,
+                      name: decoded.name,
+                      image: decoded.picture
+                    });
+                  }}
+                  onFailure={(error) => {
+                    console.error(error);
+                  }}
+                  width="100%"
+                  theme="filled_black"
+                  text="continue_with"
+                  shape="pill"
+                />
+              </GoogleOAuthProvider>
+            </button>
           </div>
         </form>
       </div>

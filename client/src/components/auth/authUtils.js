@@ -9,6 +9,8 @@ import { toast } from "react-toastify";
 export const useAuthUtils = () => {
 
     const [invalidCredentialsErr, setInvalidCredentialsErr] = useState("");
+    const [loginLoading, setLoginLoading]=useState(false);
+    const [signupLoading, setSignupLoading]=useState(false);
     const navigate = useNavigate();
     const dispatch = useDispatch();
 
@@ -18,12 +20,19 @@ export const useAuthUtils = () => {
     const loginUser = async (userData) => {
         const { email, password } = userData;
         try {
+            setLoginLoading(true);
             const res = await fetch(`${process.env.REACT_APP_BACKEND_URL}/serverlogin`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 credentials: "include", // important!
                 body: JSON.stringify({ email, password }),
             });
+            
+            // await new Promise((resolve) => {
+            //     setTimeout(() => {
+            //         resolve();
+            //     }, 6000);
+            // });
 
             const serRes = await res.json();
             console.log("serRes", serRes);
@@ -41,6 +50,8 @@ export const useAuthUtils = () => {
             navigate("/");
         } catch (error) {
             console.error("Error:", error);
+        }finally{
+            setLoginLoading(false);
         }
     }
 
@@ -49,6 +60,7 @@ export const useAuthUtils = () => {
     const googleLoginUser = async (userData) => {
         const { email, name, image } = userData;
         try {
+            setLoginLoading(true);
             const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/googleserverlogin`, {
                 method: "POST",
                 headers: {
@@ -78,6 +90,8 @@ export const useAuthUtils = () => {
             navigate("/");
         } catch (error) {
             console.error("Error:", error);
+        } finally{
+            setLoginLoading(false);
         }
     };
 
@@ -86,6 +100,7 @@ export const useAuthUtils = () => {
         const { name, email, password, cpassword } = userData;
 
         try {
+            setSignupLoading(true);
 
             const res = await fetch(`${process.env.REACT_APP_BACKEND_URL}/serverregister`, {
                 method: "POST",
@@ -96,6 +111,12 @@ export const useAuthUtils = () => {
                     name, email, password, cpassword
                 })
             });
+
+            // await new Promise((resolve) => {
+            //     setTimeout(() => {
+            //         resolve();
+            //     }, 6000);
+            // });
 
             if (res.status === 409) {
                 toast.warning("User already exists!! Try logging in");
@@ -116,6 +137,8 @@ export const useAuthUtils = () => {
             }
         } catch (error) {
             console.error("Error:", error);
+        } finally{
+            setSignupLoading(false);
         }
     }
 
@@ -123,6 +146,7 @@ export const useAuthUtils = () => {
     const googleSignupUser = async (userData) => {
         const { email, name, image } = userData;
         try {
+            setSignupLoading(true);
             const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/googleserverregister`, {
                 method: "POST",
                 headers: {
@@ -154,8 +178,10 @@ export const useAuthUtils = () => {
             }
         } catch (error) {
             console.error("Error:", error);
+        }finally{
+            setSignupLoading(false);
         }
     };
 
-    return { loginUser, invalidCredentialsErr, googleLoginUser, signupUser, googleSignupUser, isLoggedIn };
+    return { loginUser, invalidCredentialsErr, googleLoginUser, signupUser, googleSignupUser, isLoggedIn, loginLoading, signupLoading };
 };

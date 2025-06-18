@@ -6,6 +6,8 @@ const cors = require('cors');
 const app=express();
 const cookieParser = require('cookie-parser');
 
+console.log("env", process.env.NODE_ENV);
+
 require('./db/conn');
 app.use(cookieParser());
 

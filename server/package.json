@@ -5,7 +5,7 @@
   "main": "app.js",
   "scripts": {
     "start": "node server",
-    "dev": "nodemon server",
+    "dev": "cross-env NODE_ENV=development node server",
     "build": "npm install",
     "start:prod": "cross-env NODE_ENV=production node server"
   },

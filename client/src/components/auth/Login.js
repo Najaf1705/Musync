@@ -5,7 +5,7 @@ import { jwtDecode } from "jwt-decode";
 import { useAuthUtils } from './authUtils'; // adjust path as needed
 
 const Login = () => {
-  const { loginUser, invalidCredentialsErr, googleLoginUser, isLoggedIn } = useAuthUtils();
+  const { loginUser, invalidCredentialsErr, googleLoginUser, isLoggedIn, loginLoading } = useAuthUtils();
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -21,13 +21,13 @@ const Login = () => {
 
   return (
     <div className="flex items-center justify-center">
-      <div className="w-full max-w-md rounded-xl shadow-lg p-8 mt-16 bg-slate-300/10 backdrop-blur-lg">
+      <div className="w-full max-w-md rounded-xl border border-white/10 shadow-xl shadow-gray-500/10 p-8 mt-16 backdrop-blur-sm">
         <form
           onSubmit={(e) => {
             e.preventDefault();
             loginUser(userData);
           }}
-          className="space-y-6"
+          className={`space-y-6 ${loginLoading ? "opacity-50 cursor-not-allowed" : ""}`}
         >
           <div className="text-center mb-6">
             <h2 className="text-3xl font-bold text-white mb-2">Login</h2>
@@ -46,6 +46,7 @@ const Login = () => {
               name="email"
               onChange={(e) => setUserData({ ...userData, email: e.target.value })}
               required
+              disabled={loginLoading} // Disable Google Login when loading
             />
           </div>
           <div>
@@ -63,6 +64,7 @@ const Login = () => {
                 name="password"
                 onChange={(e) => setUserData({ ...userData, password: e.target.value })}
                 required
+                disabled={loginLoading} // Disable Google Login when loading
               />
               <span
                 className="absolute right-3 top-1/2 -translate-y-1/2 cursor-pointer text-neutral-400"
@@ -76,11 +78,17 @@ const Login = () => {
           <div className="flex items-center justify-between">
             <button
               type="submit"
-              className="bg-green-500 hover:bg-green-600 text-white font-semibold py-2 px-6 rounded-lg transition"
+              className={`bg-green-500 hover:bg-green-600 text-white font-semibold py-2 px-6 rounded-lg transition ${loginLoading ? "opacity-50 cursor-not-allowed" : ""
+                }`}
+              disabled={loginLoading}
             >
-              Login
+              {loginLoading ? (
+                <i className="fa-solid fa-spinner fa-spin" aria-hidden="true"></i>
+              ) : (
+                "Login"
+              )}
             </button>
-            <NavLink to="/signup" className="text-green-400 hover:underline text-sm">
+            <NavLink to="/signup" className={`text-green-400 hover:underline text-sm ${loginLoading ? "pointer-events-none opacity-50" : ""}`}>
               Need an account?
             </NavLink>
           </div>
@@ -89,23 +97,29 @@ const Login = () => {
             <span className="mx-3 text-neutral-400">or</span>
             <div className="flex-grow border-t border-neutral-700"></div>
           </div>
+          
           <div className="flex justify-center">
-            <GoogleOAuthProvider clientId={process.env.REACT_APP_GOOGLE_CLIENT_ID}>
-              <GoogleLogin
-                onSuccess={(credentialResponse) => {
-                  const decoded = jwtDecode(credentialResponse.credential);
-                  googleLoginUser({ email: decoded.email, name: decoded.name, image: decoded.picture });
-                }}
-                onFailure={(error) => {
-                  console.error(error);
-                }}
-                redirect_uri={process.env.REACT_APP_REDIRECT_URI}
-                width="100%"
-                theme="filled_black"
-                text="continue_with"
-                shape="pill"
-              />
-            </GoogleOAuthProvider>
+            <button
+            className={`${loginLoading?"pointer-events-none opacity-50":""}`}
+            >
+              <GoogleOAuthProvider clientId={process.env.REACT_APP_GOOGLE_CLIENT_ID}>
+                <GoogleLogin
+                  onSuccess={(credentialResponse) => {
+                    const decoded = jwtDecode(credentialResponse.credential);
+                    googleLoginUser({ email: decoded.email, name: decoded.name, image: decoded.picture });
+                  }}
+                  onFailure={(error) => {
+                    console.error(error);
+                  }}
+                  redirect_uri={process.env.REACT_APP_REDIRECT_URI}
+                  width="100%"
+                  theme="filled_black"
+                  text="continue_with"
+                  shape="pill"
+                  disabled={loginLoading} // Disable Google Login when loading
+                />
+              </GoogleOAuthProvider>
+            </button>
           </div>
         </form>
       </div>

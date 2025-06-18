@@ -97,7 +97,7 @@ const App = () => {
           <Route path="*" element={<Errorpage />} />
         </Routes>
       </div>
-      <footer className="text-center text-sm font-medium bg-gray-900 text-white">
+      <footer className="text-center text-sm font-medium text-white">
         © {new Date().getFullYear()}{" "}
         <span className="text-green-600 cursor-pointer hover:underline"
           onClick={() => window.open("https://github.com/Najaf1705", "_blank")}

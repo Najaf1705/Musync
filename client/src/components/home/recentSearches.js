@@ -7,12 +7,12 @@ const RecentSearches = ({ recentSearches, handleRemoveRecent, setSongName, handl
       <ul className="flex list-none mb-0 p-0 overflow-x-auto">
         {recentSearches.map((search, index) => (
           <li
-            className="flex items-center bg-gray-300/30 rounded-full px-3 py-1 mr-2 mb-2 cursor-pointer hover:bg-gray-300/50  transition max-w-48"
+            className="flex items-center bg-gray-300/30 rounded-full px-3 py-0 mr-2 mb-2 cursor-pointer hover:bg-gray-300/50  transition max-w-48"
             key={index}
-            title= {search}
+            title={search}
           >
             <i
-              className="fa-solid fa-xmark text-gray-800 hover:text-red-500 mr-2 cursor-pointer"
+              className="fa-solid fa-xmark text-white hover:text-red-500 mr-2 cursor-pointer"
               onClick={() => handleRemoveRecent(search)}
             ></i>
             <div

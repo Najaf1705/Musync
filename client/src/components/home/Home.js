@@ -30,6 +30,7 @@ const Home = () => {
   const [playlistModal, setPlaylistModal] = useState(false);
   const [cardColors, setCardColors] = useState([]);
   const [cardTextColors, setCardTextColors] = useState([]);
+  const [displayPlaylistSongs, setDisplayPlaylistSongs] = useState(false);
 
 
   // Fetch playlist tracks
@@ -60,9 +61,10 @@ const Home = () => {
   };
 
 
-  // search or song and update recent searches
+  // search a song and update recent searches
   const handleSubmit = async (e, value) => {
     if (e) e.preventDefault();
+    setDisplayPlaylistSongs(false);
     const trimmedSongName = (value ?? songName).trim();
 
     if (!trimmedSongName) {
@@ -92,11 +94,18 @@ const Home = () => {
     saveRecentSearchesToLocalStorage(updatedSearches);
   };
 
+  const getGreeting = () => {
+    const currentHour = new Date().getHours();
+    if (currentHour < 12) return "Good Morning";
+    if (currentHour < 18) return "Good Afternoon";
+    return "Good Evening";
+  };
+
   return (
     <div className="pb-6">
       <div className="mx-4">
         <h3 className="text-2xl font-semibold mb-4">
-          Ohiyooo {userDetails?.name?.split(" ")[0] || "Luffy"}
+          {getGreeting()} {userDetails?.name?.split(" ")[0] || "Luffy"}
         </h3>
         <SearchBar
           songName={songName}
@@ -125,6 +134,8 @@ const Home = () => {
           playlists={userDetails?.playlists}
           setPlaylistModal={setPlaylistModal}
           login={isLoggedIn}
+          displayPlaylistSongs={displayPlaylistSongs}
+          setDisplayPlaylistSongs={setDisplayPlaylistSongs}
         />
         <TopSongs
           topSongs={topSongs}
