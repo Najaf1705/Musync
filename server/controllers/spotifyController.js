@@ -128,7 +128,7 @@ const searchSongsAndPlaylists = async (req, res) => {
   try {
     // Search for both tracks and playlists in parallel
     const [tracksResponse, playlistsResponse] = await Promise.all([
-      fetch(`https://api.spotify.com/v1/search?type=track&q=${encodeURIComponent(query)}&limit=20`, {
+      fetch(`https://api.spotify.com/v1/search?type=track&q=${encodeURIComponent(query)}&limit=40`, {
         headers: {
           'Authorization': `Bearer ${accessToken}`,
         },

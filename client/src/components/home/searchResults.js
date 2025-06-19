@@ -4,14 +4,24 @@ import SongCard from "../songCard";
 import PlaylistCard from "../playlistCard";
 import PlaylistDetail from "../playlist/playlistDetail";
 import { setSearchedPlaylistData, setSearchResults } from "../../redux/features/songSlice";
+import CustomPagination from "../common/CustomPagination"; // <-- import here
+
 
 const SearchResults = ({ setSongName, displayPlaylistSongs, setDisplayPlaylistSongs }) => {
   const { searchResults, searchedPlaylistData, loading } = useSelector(state => state.songs);
+  // console.log("searchResults: ", searchResults);
+  // console.log("searchedPlaylistData: ", searchedPlaylistData);
 
   const dispatch = useDispatch();
   const [selectedPlaylistData, setSelectedPlaylistData] = useState(null);
   const [selectedPlaylistSongsData, setSelectedPlaylistSongsData] = useState([]);
   const [loadingPlaylistSongs, setLoadingPlaylistSongs] = useState(false);
+
+  const [songPage, setSongPage] = useState(1);
+  const SONGS_PER_PAGE = 10;
+  const songs = searchResults?.items || [];
+  const totalPages = Math.ceil(songs.length / SONGS_PER_PAGE);
+  const paginatedSongs = songs.slice((songPage - 1) * SONGS_PER_PAGE, songPage * SONGS_PER_PAGE);
 
   const fetchSelectedPlaylistSongs = async (pid) => {
     setSelectedPlaylistSongsData([]);
@@ -21,11 +31,14 @@ const SearchResults = ({ setSongName, displayPlaylistSongs, setDisplayPlaylistSo
       if (playlistData.ok) {
         const playlistDataResponse = await playlistData.json();
         if (!playlistDataResponse?.items?.length) return;
-        setSelectedPlaylistSongsData(playlistDataResponse.items.map(item => item.track));
+        const transformedPlaylistDataResponse = playlistDataResponse.items.map(item => item.track)
+        console.log("transformedPlaylistDataResponse", transformedPlaylistDataResponse);
+
+        setSelectedPlaylistSongsData(transformedPlaylistDataResponse);
       }
     } catch (error) {
       console.log("Error fetching playlist songs");
-    }finally{
+    } finally {
       setLoadingPlaylistSongs(false)
     }
   };
@@ -78,14 +91,22 @@ const SearchResults = ({ setSongName, displayPlaylistSongs, setDisplayPlaylistSo
             Search Results
           </h4>
           <div className="flex flex-wrap justify-center pb-3 mx-1">
-            {searchResults.items.map((item, index) => (
+            {paginatedSongs.map((item, index) => (
               <SongCard key={item.id} item={item} index={index} />
             ))}
           </div>
+          {totalPages > 1 && (
+            <div className="flex justify-center my-4">
+              <CustomPagination
+                className=" backdrop-blur-sm rounded-md bg-white/10"
+                page={songPage}
+                onChange={setSongPage}
+                total={totalPages}
+              />
+            </div>
+          )}
         </div>
-      ) : (
-        <></>
-      )}
+      ) : null}
 
       {/* Playlists */}
       {displayPlaylistSongs === false ? (
@@ -108,9 +129,8 @@ const SearchResults = ({ setSongName, displayPlaylistSongs, setDisplayPlaylistSo
                   ))}
               </div>
             </div>
-          ) : (
-            <></>
-          )}
+          ) : null
+        }
         </>
       ) : (
         <PlaylistDetail

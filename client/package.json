@@ -4,6 +4,7 @@
   "private": true,
   "dependencies": {
     "@auth0/auth0-react": "^2.2.3",
+    "@chakra-ui/react": "^3.21.0",
     "@headlessui/react": "^1.7.18",
     "@heroui/react": "^2.7.10",
     "@react-oauth/google": "^0.11.1",

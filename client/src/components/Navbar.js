@@ -79,7 +79,7 @@ const Navbar = () => {
           </NavLink>
           <AiFillGithub
             size={28}
-            className="cursor-pointer text-white hover:text-black ml-4 transition"
+            className="cursor-pointer text-white hover:text-gray-600 ml-4 transition"
             onClick={() => window.open("https://github.com/Najaf1705/Musync", "_blank")}
             aria-label="Visit GitHub repository"
             title="Visit GitHub repository"
