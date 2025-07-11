@@ -1,17 +1,24 @@
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from 'react-redux';
-import { toast } from "react-toastify";
 import { toggleLikeSong } from '../redux/features/songSlice';
 import { Vibrant } from "node-vibrant/browser";
+import { showErrorToast, showSuccessToast, showInfoToast } from "./utils/toast";
+import {
+  Popover,
+  PopoverTrigger,
+  PopoverContent
+} from '@heroui/react'
+import PlaylistPopover from './common/PlaylistPopover'
+
 
 const SongCard = ({ item, index }) => {
+
   const dispatch = useDispatch();
+
+  const [isPopoverOpen, setIsPopoverOpen] = useState(false);
   const isLoggedIn = useSelector(state => state.user.isLoggedIn);
-
   const userPlaylists = useSelector(state => state.songs.userPlaylists);
-
   const likedSongs = userPlaylists?.find(playlist => playlist.playlistName === "Liked Songs")?.songs || [];
-
   const [isLiked, setIsLiked] = useState(likedSongs?.includes(item.id));
   const [likeLoading, setLikeLoading] = useState(false);
 
@@ -41,9 +48,11 @@ const SongCard = ({ item, index }) => {
     }
   }, [item.album]);
 
+  
+
   const handleLike = async () => {
     if (!isLoggedIn) {
-      toast.error("Please log in to like songs.");
+      showInfoToast("Please log in to like songs.");
       return;
     }
     if (likeLoading) return;
@@ -53,14 +62,12 @@ const SongCard = ({ item, index }) => {
       const resultAction = await dispatch(toggleLikeSong(item.id));
       if (toggleLikeSong.fulfilled.match(resultAction)) {
         setIsLiked(resultAction.payload.isLiked);
-        toast[resultAction.payload.isLiked ? "success" : "info"](
-          resultAction.payload.isLiked ? "Liked the song!" : "Unliked the song."
-        );
+        showSuccessToast(resultAction.payload.isLiked ? "Liked the song!" : "Unliked the song.");
       } else {
-        toast.error("Failed to toggle like");
+        showErrorToast("Failed to toggle like");
       }
     } catch {
-      toast.error("Like toggle failed.");
+      showErrorToast("Like toggle failed.");
     } finally {
       setLikeLoading(false);
     }
@@ -89,7 +96,25 @@ const SongCard = ({ item, index }) => {
               style={{ pointerEvents: likeLoading ? 'none' : 'auto', opacity: likeLoading ? 0.5 : 1 }}
               title={isLiked ? "Unlike" : "Like"}
             ></i>
-            <i className="fa-solid fa-plus cursor-pointer text-white text-xl hover:text-green-400 transition" title="Add to playlist"></i>
+
+            <Popover
+              showArrow={true}
+              placement="bottom"
+              shouldBlockScroll={true}
+              open={isPopoverOpen}
+              onOpenChange={setIsPopoverOpen}
+            >
+              <PopoverTrigger>
+                <i className="fa-solid fa-plus cursor-pointer text-white text-xl hover:text-green-400 transition" title="Add to playlist"></i>
+              </PopoverTrigger>
+              <PopoverContent className="p-1">
+                <PlaylistPopover
+                  setIsPopoverOpen={setIsPopoverOpen}
+                  songId={item.id}
+                />
+              </PopoverContent>
+            </Popover>
+
             <i className="fa-solid fa-download cursor-pointer text-white text-xl hover:text-green-400 transition" title="Download"></i>
             <i className="fa-brands fa-spotify cursor-pointer text-white text-xl hover:text-green-400 transition" title="Open on Spotify"
               onClick={() => {

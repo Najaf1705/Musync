@@ -6,6 +6,6 @@ const playlistController = require('../controllers/playlistController');
 router.post('/api/create-playlist/:playlistName/:userId', playlistController.createPlaylist);
 
 // Route to add a song to a playlist
-router.post('/api/addToPlaylist/:playlistName/:songId/:userId', playlistController.addToPlaylist);
+router.post('/api/addToPlaylist/:playlistId/:songId/:userId', playlistController.addToPlaylist);
 
 module.exports = router;

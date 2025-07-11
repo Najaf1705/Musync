@@ -6,6 +6,7 @@ import SongCard from "../songCard";
 import PlaylistCard from "../playlistCard";
 import PlaylistDetail from "./playlistDetail"; // <-- Import the PlaylistDetail component
 import { toast } from 'react-toastify';
+import { showInfoToast } from "../utils/toast";
 
 
 const Playlist = () => {
@@ -13,6 +14,7 @@ const Playlist = () => {
   const dispatch = useDispatch();
   const userDetails = useSelector((state) => state.user.user);
   const isLoggedIn = useSelector((state) => state.user.isLoggedIn);
+  const isAuthReady = useSelector((state) => state.user.isAuthReady);
   const likedSongs = useSelector((state) => state.songs.likedSongs);
   const userPlaylists = useSelector((state) => state.songs.userPlaylists);
 
@@ -23,13 +25,17 @@ const Playlist = () => {
   const [playlistModal, setPlaylistModal] = useState(false);
   const [selectedPlaylistData, setSelectedPlaylistData] = useState(null);
 
-  useEffect(() => {  
+  useEffect(() => {
+    console.log("isLoggedIn:", isLoggedIn);
+    console.log("isAuthReady:", isAuthReady);
+    if(!isAuthReady)return;
+
     if(!isLoggedIn){
       navigate('/');
-      toast.info("Log in to see your playlists");
+      showInfoToast("Log in to see your playlists");
       return;
     }
-  }, [isLoggedIn])
+  }, [isLoggedIn, isAuthReady])
   
 
 
@@ -60,6 +66,8 @@ const Playlist = () => {
       setLoading(false);
     }
   };
+
+  
 
   if (!userDetails) {
     return <div>Loading...</div>;

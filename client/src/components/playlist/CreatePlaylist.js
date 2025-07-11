@@ -2,6 +2,7 @@ import React, {useEffect, useState} from 'react'
 import { toast } from 'react-toastify';
 import { useSelector, useDispatch } from 'react-redux';
 import { setUser } from '../../redux/features/userSlice';
+import { showErrorToast, showSuccessToast } from '../utils/toast';
 
 const CreatePlaylist = ({ playlistModal }) => {
   const dispatch = useDispatch();
@@ -18,7 +19,7 @@ const CreatePlaylist = ({ playlistModal }) => {
       });
   
       if (!response.ok) {
-        toast.error(`${playlistName} already exists, choose another name`);
+        showErrorToast(`${playlistName} already exists, choose another name`);
       } else {
         const newPlaylist = await response.json();
   
@@ -29,7 +30,7 @@ const CreatePlaylist = ({ playlistModal }) => {
   
         dispatch(setUser(updatedUserDetails));
         console.log(updatedUserDetails.playlists);
-        toast.success(`Playlist ${playlistName} created successfully`);
+        showSuccessToast(`Playlist ${playlistName} created successfully`);
         playlistModal(false);
       }
     } catch (error) {

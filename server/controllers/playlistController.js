@@ -37,26 +37,28 @@ const createPlaylist = async (req, res) => {
 // Add a song to a playlist
 const addToPlaylist = async (req, res) => {
   try {
-    const { playlistName, songId, userId } = req.params;
+    const { playlistId, songId, userId } = req.params;
 
     const user = await User.findById(userId);
     if (!user) {
       return res.status(404).json({ error: 'User not found' });
     }
 
-    const playlistIndex = user.playlists.findIndex(
-      (playlist) => playlist.playlistName === playlistName
-    );
+    console.log("User Playlists:", user.playlists[0]);
 
-    if (playlistIndex === -1) {
+    const playlist = await user.playlists.findById(playlistId);
+
+    console.log("Playlist Index:", playlist);
+
+    if (!playlist) {
       return res.status(404).json({ error: 'Playlist not found' });
     }
 
-    if (user.playlists[playlistIndex].songs.includes(songId)) {
-      return res.status(400).json({ error: `Song already exists in ${playlistName}` });
+    if (playlist.songs.includes(songId)) {
+      return res.status(400).json({ error: `Song already exists in ${playlistId}` });
     }
 
-    user.playlists[playlistIndex].songs.push(songId);
+    playlist.songs.push(songId);
     await user.save();
     return res.status(200).json({ message: 'Song added to the playlist' });
   } catch (error) {

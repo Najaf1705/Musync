@@ -9,6 +9,7 @@ import TopSongs from "./topSongs";
 import CreatePlaylist from "../playlist/CreatePlaylist";
 import { fetchTopSongs, fetchPlaylistTracks } from "../utils/api";
 import { searchSongsAndPlaylists } from '../../redux/features/songSlice';
+import { showErrorToast } from "../utils/toast";
 
 
 const Home = () => {
@@ -68,7 +69,7 @@ const Home = () => {
     const trimmedSongName = (value ?? songName).trim();
 
     if (!trimmedSongName) {
-      toast.error('Please enter a song name');
+      showErrorToast('Please enter a song name');
       return;
     }
 
@@ -83,7 +84,7 @@ const Home = () => {
       // Perform search
       await dispatch(searchSongsAndPlaylists(trimmedSongName)).unwrap();
     } catch (error) {
-      toast.error('Failed to search songs');
+      showErrorToast('Failed to search songs');
     }
   };
   
@@ -139,10 +140,8 @@ const Home = () => {
         />
         <TopSongs
           topSongs={topSongs}
-          cardColors={cardColors}
-          cardTextColors={cardTextColors}
-          setCardColors={setCardColors}
-          setCardTextColors={setCardTextColors}
+          loading={loading}
+          // setLoading={setLoading}
         />
         {playlistModal && (
           <CreatePlaylist

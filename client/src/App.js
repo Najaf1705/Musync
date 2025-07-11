@@ -1,8 +1,8 @@
-import React, { useState, useEffect } from 'react';
-import { ToastContainer } from 'react-toastify';
+import { useState, useEffect } from 'react';
+import { Toaster } from 'react-hot-toast';
 import { Route, Routes } from "react-router-dom";
-import { useDispatch, useSelector } from 'react-redux';
-import 'react-toastify/dist/ReactToastify.css';
+import { useDispatch } from 'react-redux';
+// import 'react-hot-toast/dist/index.css';
 import "./index.css";
 import Navbar from './components/Navbar';
 import Home from './components/home/Home.js';
@@ -13,29 +13,20 @@ import Login from './components/auth/Login.js';
 import Signup from './components/auth/Signup.js';
 import Errorpage from './components/Errorpage';
 import Playlists from './components/playlist/Playlists';
-import { fetchTopSongs, setUserPlaylists, setUserSongs } from './redux/features/songSlice'; // adjust path as needed
-import { fetchLikedSongs, setLikedSongs, clearSongSlice } from './redux/features/songSlice'; // adjust path as needed
+import { fetchTopSongs, setUserSongs } from './redux/features/songSlice'; // adjust path as needed
+import { clearSongSlice } from './redux/features/songSlice'; // adjust path as needed
 import { setUser, clearUser } from './redux/features/userSlice'; // adjust path as needed
 
 const App = () => {
   const [selectedSong, setSelectedSong] = useState('');
   const dispatch = useDispatch();
-  const isLoggedIn = useSelector((state) => state.user.isLoggedIn);
-  const userDetails = useSelector((state) => state.user.user);
-  const likedSongsId = useSelector((state) => state.songs.likedSongs);
+  // const userDetails = useSelector((state) => state.user.user);
+  // const likedSongsId = useSelector((state) => state.songs.likedSongs);
   // dispatch(fetchLikedSongs(userDetails._id));
-
-  useEffect(() => {
-    console.log("User Details:", userDetails);
-    console.log("Liked sonsgs:", likedSongsId);
-
-    dispatch(fetchTopSongs());
-  }, [userDetails]);
 
   useEffect(() => {
     dispatch(fetchTopSongs());
   }, [dispatch]);
-
 
   const handleSelectedSongChange = (songDetails) => {
     setSelectedSong(songDetails);
@@ -53,9 +44,8 @@ const App = () => {
       if (res.ok) {
         const user = await res.json();
         console.log("serverprofile response", user);
-        dispatch(setUser(user)); // refresh with real data
+        dispatch(setUser(user));
         dispatch(setUserSongs({ likedSongs: user.likedSongs, userPlaylists: user.playlists })); // set liked songs
-        // console.log("likedSongs:", user.likedSongs);
       } else {
         dispatch(clearUser());
         dispatch(clearSongSlice());
@@ -63,19 +53,15 @@ const App = () => {
     };
 
     verify();
-  }, []);
+  }, [dispatch]);
 
   // console.log("user Song slice",useSelector((state)=>state.songs));
 
   return (
     <div className="flex flex-col min-h-screen">
+      <Toaster position="bottom-right" />
       <Navbar />
-      <div
-        className="flex-1 text-white pt-16 pb-6"
-        style={{
-          // backgroundImage: "url('/gbg.png')"
-        }}
-      >
+      <div className="flex-1 text-white pt-16 pb-6">
         <Routes>
           <Route path="" element={
             <Home
@@ -107,7 +93,6 @@ const App = () => {
         </span>
         {` All rights reserved.`}
       </footer>
-      <ToastContainer position="bottom-right" />
     </div>
   )
 }

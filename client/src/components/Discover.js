@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
+import { showErrorToast } from './utils/toast';
 
 const Discover = (props) => {
   const navigate = useNavigate();
@@ -30,7 +31,7 @@ const Discover = (props) => {
         const details = await Promise.all(detailsPromises);
         setSongDetails(details);
       } else {
-        toast.error(`Can't find "${songName}" in dataset`);
+        showErrorToast(`Can't find "${songName}" in dataset`);
         setRecommendations([]);
         setSongDetails([]);
         return;

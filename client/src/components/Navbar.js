@@ -6,6 +6,7 @@ import { clearSongSlice } from '../redux/features/songSlice';
 import { toast } from 'react-toastify';
 import { AiFillGithub } from "react-icons/ai";
 import { Dropdown, DropdownTrigger, DropdownMenu, DropdownItem, Button } from "@heroui/react";
+import { showErrorToast, showSuccessToast } from './utils/toast';
 
 
 const defaultProfilePicture = process.env.PUBLIC_URL + '/images/pp.png';
@@ -41,10 +42,10 @@ const Navbar = () => {
       dispatch(clearUser());
       dispatch(clearSongSlice());
       navigate('/');
-      toast.success("Logged out Successfully");
+      showSuccessToast("Logged out Successfully");
     } catch (error) {
       console.error('Logout error:', error);
-      toast.error("Logout failed. Please try again.");
+      showErrorToast("Logout failed. Please try again.");
     }
   };
 

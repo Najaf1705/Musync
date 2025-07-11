@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { setUser } from "../../redux/features/userSlice"; // adjust path as needed
 import { setUserSongs, clearSongSlice } from "../../redux/features/songSlice"; // adjust path as needed
 import { toast } from "react-toastify";
+import { showErrorToast, showInfoToast, showSuccessToast } from "../utils/toast";
 
 
 export const useAuthUtils = () => {
@@ -46,7 +47,7 @@ export const useAuthUtils = () => {
             dispatch(setUser(serRes.user));
             dispatch(setUserSongs({likedSongs: serRes.user.likedSongs, userPlaylists: serRes.user.playlists})); // set liked songs
 
-            toast.success("Logged in Successfully");
+            showSuccessToast("Logged in Successfully");
             navigate("/");
         } catch (error) {
             console.error("Error:", error);
@@ -86,7 +87,7 @@ export const useAuthUtils = () => {
             dispatch(setUser(data.user));
             dispatch(clearSongSlice());
 
-            toast.success("Logged in Successfully");
+            showSuccessToast("Logged in Successfully");
             navigate("/");
         } catch (error) {
             console.error("Error:", error);
@@ -119,19 +120,19 @@ export const useAuthUtils = () => {
             // });
 
             if (res.status === 409) {
-                toast.warning("User already exists!! Try logging in");
+                showInfoToast("User already exists!! Try logging in");
                 navigate("/login");
                 return;
             }
 
             if (res.status === 400) {
-                toast.error("Please fill all the fields");
+                showErrorToast("Please fill all the fields");
                 return;
             }
 
             if (res.status === 201) {
                 await loginUser(userData); // Call loginUser to log in the user after successful registration
-                toast.success("Registered Successfully");
+                showSuccessToast("Registered Successfully");
                 navigate("/");
                 return;
             }
@@ -157,7 +158,7 @@ export const useAuthUtils = () => {
 
             if (response.status === 409) {
                 // If user already exists, try logging in
-                toast.warning("User already exists!! Logging in...");
+                showInfoToast("User already exists!! Logging in...");
                 try {
                     await googleLoginUser(userData);
                 } catch (error) {
@@ -168,7 +169,7 @@ export const useAuthUtils = () => {
 
 
             if (response.status === 201) {
-                toast.success("Registered Successfully");
+                showSuccessToast("Registered Successfully");
                 try {
                     await googleLoginUser(userData); // Call googleLoginUser to log in the user after successful registration
                 } catch (error) {

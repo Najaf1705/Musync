@@ -4,9 +4,35 @@
 
 @import url('https://fonts.googleapis.com/css2?family=Quicksand:wght@300..700&family=Saira:ital,wght@0,100..900;1,100..900&display=swap');
 
+html {
+  scrollbar-width: none;
+} 
+
 body {
   background-size: 50px 50px;
   background-image: radial-gradient(circle, rgba(120, 120, 120, 0.5) 1px, black 1px);
   background-attachment: fixed;
   font-family: 'Quicksand', sans-serif; /* Use font name directly */
+}
+
+@layer utilities {
+  .scrollbar::-webkit-scrollbar {
+    width: 5px;
+    height: 10px;
+  }
+
+  .scrollbar::-webkit-scrollbar-track {
+    border-radius: 100vh;
+    background: #797979;
+  }
+
+  .scrollbar::-webkit-scrollbar-thumb {
+    background: #000000;
+    border-radius: 100vh;
+    border: 3px solid #000000;
+  }
+
+  .scrollbar::-webkit-scrollbar-thumb:hover {
+    background: #000000;
+  }
 }

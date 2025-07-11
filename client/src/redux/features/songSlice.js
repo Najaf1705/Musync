@@ -10,6 +10,8 @@ export const fetchLikedSongs = createAsyncThunk(
   }
 );
 
+
+
 export const fetchTopSongs = createAsyncThunk(
   'songs/fetchTopSongs',
   async () => {
@@ -39,6 +41,9 @@ export const fetchTopSongs = createAsyncThunk(
   }
 );
 
+
+
+
 export const toggleLikeSong = createAsyncThunk(
   'songs/toggleLike',
   async (songId, { rejectWithValue }) => {
@@ -63,6 +68,9 @@ export const toggleLikeSong = createAsyncThunk(
     }
   }
 );
+
+
+
 
 export const searchSongsAndPlaylists = createAsyncThunk(
   'songs/search',
@@ -113,6 +121,40 @@ export const searchSongsAndPlaylists = createAsyncThunk(
   }
 );
 
+
+
+
+export const addSongToPlaylist = createAsyncThunk(
+  'songs/addSongToPlaylist',
+  async ({playlistId, userId, songId}, { dispatch, rejectWithValue }) => {
+    dispatch(addSongToPlaylistRed({ playlistId, songId }));
+    try {
+      const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/addToPlaylist/${playlistId}/${songId}/${userId}`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ songId }),
+        credentials: 'include'
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to add song to playlist');
+      }
+
+      const data = await response.json();
+      return data; // Return the updated playlist or relevant data
+    } catch (error) {
+      dispatch(removeSongFromPlaylistRed({ playlistId, songId }));
+      console.error('Error adding song to playlist:', error);
+      return rejectWithValue(error.message);
+    }
+  }
+);
+
+
+
+
 const songSlice = createSlice({
   name: 'songs',
   initialState: {
@@ -154,6 +196,29 @@ const songSlice = createSlice({
     setPlaylistTracks: (state, action) => {
       state.playlistTracks = action.payload;
     },
+
+    addSongToPlaylistRed: (state, action) => {
+      const { playlistId, songId } = action.payload;
+      const playlist = state.userPlaylists.find(playlist => playlist._id === playlistId);
+      if (playlist) {
+        if(!playlist.songs.includes(songId)){
+          playlist.songs.push(songId);
+          return;
+        }
+      }
+    },
+
+    removeSongFromPlaylistRed: (state, action) => {
+      const { playlistId, songId: sid } = action.payload;
+      const playlist = state.userPlaylists.find(playlist => playlist._id === playlistId);
+      if (playlist) {
+        if(playlist.songs.includes(sid)){
+          playlist.songs=playlist.songs.filter(songId=>songId !== sid);
+          return;
+        }
+      }
+    },
+
     setLikedSongs: (state, action) => {
       state.likedSongs = action.payload;
       state.userPlaylists.filter((playlist)=>{
@@ -272,6 +337,12 @@ const songSlice = createSlice({
       .addCase(fetchTopSongs.fulfilled, (state, action) => {
         state.topSongs = action.payload; // Set resolved data
       })
+       .addCase(addSongToPlaylist.rejected, (state, action) => {
+        state.error = 'Something went gdsjfgj';
+      })
+      .addCase(addSongToPlaylist.fulfilled, (state) => {
+        state.error = null;
+      });
   }
 });
 
@@ -286,6 +357,8 @@ export const {
   setSearchedPlaylistData,
   setSelectedPlaylist,
   setPlaylistTracks,
+  addSongToPlaylistRed,
+  removeSongFromPlaylistRed
 } = songSlice.actions;
 
 export default songSlice.reducer;

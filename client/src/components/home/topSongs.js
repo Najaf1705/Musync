@@ -23,9 +23,10 @@ const TopSongs = ({ topSongs, loading }) => {
             />
           ))
         ) : (
-          <h3 className="flex justify-center w-full pb-12 text-lg text-gray-500">
-            Top Songs will appear here
-          </h3>
+          <></>
+          // <h3 className="flex justify-center w-full pb-12 text-lg text-gray-500">
+          //   Top Songs will appear here
+          // </h3>
         )}
       </div>
     </div>
