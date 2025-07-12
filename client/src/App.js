@@ -59,7 +59,7 @@ const App = () => {
 
   return (
     <div className="flex flex-col min-h-screen">
-      <Toaster position="bottom-right" />
+      <Toaster position="bottom-center" />
       <Navbar />
       <div className="flex-1 text-white pt-16 pb-6">
         <Routes>

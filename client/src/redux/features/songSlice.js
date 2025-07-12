@@ -1,6 +1,7 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import { fetchTrackDetails } from '../../components/utils/api'
 import axios from 'axios';
+import { showErrorToast } from '../../components/utils/toast';
 
 export const fetchLikedSongs = createAsyncThunk(
   "likes/fetchLikedSongs",
@@ -126,15 +127,14 @@ export const searchSongsAndPlaylists = createAsyncThunk(
 
 export const addSongToPlaylist = createAsyncThunk(
   'songs/addSongToPlaylist',
-  async ({playlistId, userId, songId}, { dispatch, rejectWithValue }) => {
+  async ({ playlistId, playlistName, userId, songId }, { dispatch, rejectWithValue }) => {
     dispatch(addSongToPlaylistRed({ playlistId, songId }));
     try {
-      const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/addToPlaylist/${playlistId}/${songId}/${userId}`, {
+      const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/addToPlaylist/${playlistName}/${songId}/${userId}`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
         },
-        body: JSON.stringify({ songId }),
         credentials: 'include'
       });
 
@@ -147,6 +147,73 @@ export const addSongToPlaylist = createAsyncThunk(
     } catch (error) {
       dispatch(removeSongFromPlaylistRed({ playlistId, songId }));
       console.error('Error adding song to playlist:', error);
+      return rejectWithValue(error.message);
+    }
+  }
+);
+
+
+
+
+export const removeSongFromPlaylist = createAsyncThunk(
+  'songs/removeSongFromPlaylist',
+  async ({ playlistId, playlistName, userId, songId }, { dispatch, rejectWithValue }) => {
+    dispatch(removeSongFromPlaylistRed({ playlistId, songId }));
+    try {
+      const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/removeFromPlaylist/${playlistName}/${songId}/${userId}`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        credentials: 'include'
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to remove song from playlist');
+      }
+
+      const data = await response.json();
+      return data; // Return the updated playlist or relevant data
+    } catch (error) {
+      dispatch(addSongToPlaylistRed({ playlistId, songId }));
+      console.error('Error removing song from playlist:', error);
+      return rejectWithValue(error.message);
+    }
+  }
+);
+
+
+
+export const createPlaylist = createAsyncThunk(
+  'songs/createPlaylist',
+  async ({ playlistName, userId, songId=null }, { dispatch, rejectWithValue }) => {
+    dispatch(addNewPlaylistRed({playlistName, songId}));
+
+    try {
+      // throw new Error('Failed to create playlist');
+      const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/create-playlist/${playlistName}/${userId}`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        credentials: 'include',
+      });
+      if (!response.ok) {
+        throw new Error('Failed to create playlist');
+      }
+      const data = await response.json();
+      console.log("Playlist created:", data);
+
+      if (songId) {
+        await dispatch(addSongToPlaylist({ playlistId: data._id, playlistName, userId, songId }));
+      }
+
+
+      return data; // Return the created playlist data
+    } catch (error) {
+      dispatch(removePlaylistRed(playlistName));
+      showErrorToast("Failed to create playlist");
+      console.error('Error creating playlist:', error);
       return rejectWithValue(error.message);
     }
   }
@@ -201,7 +268,7 @@ const songSlice = createSlice({
       const { playlistId, songId } = action.payload;
       const playlist = state.userPlaylists.find(playlist => playlist._id === playlistId);
       if (playlist) {
-        if(!playlist.songs.includes(songId)){
+        if (!playlist.songs.includes(songId)) {
           playlist.songs.push(songId);
           return;
         }
@@ -212,17 +279,33 @@ const songSlice = createSlice({
       const { playlistId, songId: sid } = action.payload;
       const playlist = state.userPlaylists.find(playlist => playlist._id === playlistId);
       if (playlist) {
-        if(playlist.songs.includes(sid)){
-          playlist.songs=playlist.songs.filter(songId=>songId !== sid);
+        if (playlist.songs.includes(sid)) {
+          playlist.songs = playlist.songs.filter(songId => songId !== sid);
           return;
         }
       }
     },
 
+    addNewPlaylistRed: (state, action) => {
+      const {playlistName, songId=null} = action.payload;
+      if (!state.userPlaylists) {
+        state.userPlaylists = [];
+      }
+      state.userPlaylists.push({playlistName: playlistName, songs: songId ? [songId] : [], _id: Date.now().toString()});
+    },
+
+    removePlaylistRed: (state, action) => {
+      const playlistName = action.payload;
+      state.userPlaylists = state.userPlaylists.filter(playlist => playlist.playlistName !== playlistName);
+      // if (state.selectedPlaylist && state.selectedPlaylist.plaplaylistName===playlistName) {
+      //   state.selectedPlaylist = null; // Clear selected playlist if it was the one removed
+      // }
+    },
+
     setLikedSongs: (state, action) => {
       state.likedSongs = action.payload;
-      state.userPlaylists.filter((playlist)=>{
-        if(playlist.playlistName === "Liked Songs"){
+      state.userPlaylists.filter((playlist) => {
+        if (playlist.playlistName === "Liked Songs") {
           playlist.songs = action.payload;
         }
       })
@@ -240,15 +323,15 @@ const songSlice = createSlice({
       setLikedSongs(state, { payload: state.likedSongs }); // Update likedSongs in the state
     },
     clearSongSlice: (state) => {
-      state.likedSongs= [];
-      state.userPlaylists= null;
-      state.topSongs= [];
-      state.searchResults= null;
-      state.searchedPlaylistData= null;
-      state.selectedPlaylist= null;
-      state.playlistTracks= [];
-      state.loading= false;
-      state.error= null;
+      state.likedSongs = [];
+      state.userPlaylists = null;
+      state.topSongs = [];
+      state.searchResults = null;
+      state.searchedPlaylistData = null;
+      state.selectedPlaylist = null;
+      state.playlistTracks = [];
+      state.loading = false;
+      state.error = null;
     },
   },
 
@@ -287,7 +370,7 @@ const songSlice = createSlice({
         if (isLiked) {
           // Add to likedSongs if not already present
           if (!state.userPlaylists
-            .find(playlist=>playlist.playlistName === "Liked Songs")
+            .find(playlist => playlist.playlistName === "Liked Songs")
             .songs.includes(songId)) {
             state.userPlaylists
               .find(playlist => playlist.playlistName === "Liked Songs")
@@ -337,10 +420,18 @@ const songSlice = createSlice({
       .addCase(fetchTopSongs.fulfilled, (state, action) => {
         state.topSongs = action.payload; // Set resolved data
       })
-       .addCase(addSongToPlaylist.rejected, (state, action) => {
+      .addCase(addSongToPlaylist.rejected, (state, action) => {
+        showErrorToast("Failed to add song to playlist");
         state.error = 'Something went gdsjfgj';
       })
       .addCase(addSongToPlaylist.fulfilled, (state) => {
+        state.error = null;
+      })
+      .addCase(removeSongFromPlaylist.rejected, (state, action) => {
+        showErrorToast("Failed to remove song from playlist");
+        state.error = 'Something went gdsjfgj';
+      })
+      .addCase(removeSongFromPlaylist.fulfilled, (state) => {
         state.error = null;
       });
   }
@@ -358,7 +449,9 @@ export const {
   setSelectedPlaylist,
   setPlaylistTracks,
   addSongToPlaylistRed,
-  removeSongFromPlaylistRed
+  removeSongFromPlaylistRed,
+  addNewPlaylistRed,
+  removePlaylistRed
 } = songSlice.actions;
 
 export default songSlice.reducer;

@@ -34,40 +34,85 @@ const createPlaylist = async (req, res) => {
   }
 };
 
+
 // Add a song to a playlist
 const addToPlaylist = async (req, res) => {
   try {
-    const { playlistId, songId, userId } = req.params;
+    const { playlistName, songId, userId } = req.params;
+
+    // Defensive check for missing params
+    if (!userId || !playlistName || !songId) {
+      return res.status(400).json({ error: 'Missing required parameters' });
+    }
 
     const user = await User.findById(userId);
     if (!user) {
       return res.status(404).json({ error: 'User not found' });
     }
 
-    console.log("User Playlists:", user.playlists[0]);
-
-    const playlist = await user.playlists.findById(playlistId);
-
-    console.log("Playlist Index:", playlist);
-
+    const playlist = user.playlists.find(p => p.playlistName === playlistName);
     if (!playlist) {
       return res.status(404).json({ error: 'Playlist not found' });
     }
 
     if (playlist.songs.includes(songId)) {
-      return res.status(400).json({ error: `Song already exists in ${playlistId}` });
+      return res.status(400).json({ error: 'Song already exists in the playlist' });
     }
 
     playlist.songs.push(songId);
     await user.save();
+
     return res.status(200).json({ message: 'Song added to the playlist' });
+
   } catch (error) {
     console.error('Error adding to playlist:', error);
     res.status(500).json({ error: 'Internal Server Error' });
   }
 };
 
+
+
+
+const removeFromPlaylist = async (req, res) => {
+  console.log("Removing song from playlist");
+
+  try {
+    const { playlistName, songId, userId } = req.params;
+
+    // Defensive check
+    if (!userId || !playlistName || !songId) {
+      return res.status(400).json({ error: 'Missing required parameters' });
+    }
+
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+
+    const playlist = user.playlists.find(p => p.playlistName === playlistName);
+    if (!playlist) {
+      return res.status(404).json({ error: 'Playlist not found' });
+    }
+
+    if (!playlist.songs.includes(songId)) {
+      return res.status(400).json({ error: 'Song not found in playlist' });
+    }
+
+    // Remove the song
+    playlist.songs = playlist.songs.filter(id => id !== songId);
+
+    await user.save();
+    return res.status(200).json({ message: 'Song removed from the playlist' });
+
+  } catch (error) {
+    console.error('Error removing song from playlist:', error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+};
+
+
 module.exports = {
   createPlaylist,
   addToPlaylist,
+  removeFromPlaylist,
 };

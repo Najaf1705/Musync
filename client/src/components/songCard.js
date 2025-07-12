@@ -8,6 +8,7 @@ import {
   PopoverTrigger,
   PopoverContent
 } from '@heroui/react'
+
 import PlaylistPopover from './common/PlaylistPopover'
 
 
@@ -48,7 +49,7 @@ const SongCard = ({ item, index }) => {
     }
   }, [item.album]);
 
-  
+
 
   const handleLike = async () => {
     if (!isLoggedIn) {
@@ -97,23 +98,10 @@ const SongCard = ({ item, index }) => {
               title={isLiked ? "Unlike" : "Like"}
             ></i>
 
-            <Popover
-              showArrow={true}
-              placement="bottom"
-              shouldBlockScroll={true}
-              open={isPopoverOpen}
-              onOpenChange={setIsPopoverOpen}
-            >
-              <PopoverTrigger>
-                <i className="fa-solid fa-plus cursor-pointer text-white text-xl hover:text-green-400 transition" title="Add to playlist"></i>
-              </PopoverTrigger>
-              <PopoverContent className="p-1">
-                <PlaylistPopover
-                  setIsPopoverOpen={setIsPopoverOpen}
-                  songId={item.id}
-                />
-              </PopoverContent>
-            </Popover>
+            <PlaylistPopover
+              setIsPopoverOpen={setIsPopoverOpen}
+              songId={item.id}
+            />
 
             <i className="fa-solid fa-download cursor-pointer text-white text-xl hover:text-green-400 transition" title="Download"></i>
             <i className="fa-brands fa-spotify cursor-pointer text-white text-xl hover:text-green-400 transition" title="Open on Spotify"
