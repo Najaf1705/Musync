@@ -47,8 +47,9 @@ export const fetchTopSongs = createAsyncThunk(
 
 export const toggleLikeSong = createAsyncThunk(
   'songs/toggleLike',
-  async (songId, { rejectWithValue }) => {
+  async (songId, { rejectWithValue, dispatch }) => {
     try {
+      dispatch(toggleLikeSongReducer(songId)); // Optimistically update the state
       const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/toggle-like/${songId}`, {
         method: 'POST',
         credentials: 'include',
@@ -65,6 +66,7 @@ export const toggleLikeSong = createAsyncThunk(
       const data = await response.json();
       return { songId, isLiked: data.isLiked };
     } catch (error) {
+      dispatch(toggleLikeSongReducer(songId)); // Rollback optimistic update
       return rejectWithValue(error.message);
     }
   }
@@ -322,6 +324,7 @@ const songSlice = createSlice({
       }
       setLikedSongs(state, { payload: state.likedSongs }); // Update likedSongs in the state
     },
+
     clearSongSlice: (state) => {
       state.likedSongs = [];
       state.userPlaylists = null;

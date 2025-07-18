@@ -1,151 +1,147 @@
 const bcrypt = require('bcryptjs');
-const jwt = require('jsonwebtoken');
 const User = require('../models/userSchema');
 
-// Email Registration
-const serverRegister = async (req, res) => {
-  const { name, email, password, cpassword } = req.body;
-  if (!name || !email || !password || !cpassword) {
-    return res.status(400).json({ error: "Please provide all details" });
-  }
+// Check if user exists by email utility function
+const checkUserExistsByEmail = async (email) => {
+  if (!email) return false;
+  const user = await User.findOne({ email });
+  return user;
+};
 
+// User existence controller
+const userExists = async (req, res) => {
   try {
-    const userExist = await User.findOne({ email: email });
-    if (userExist) {
-      return res.status(409).json({ error: "User already exists" });
+    const email = req.query?.email;
+    if (!email) {
+      return res.status(400).json({ error: 'Email is required' });
     }
 
-    const user = new User({ name, email, password, cpassword });
-    await user.save();
-    res.status(201).json({ message: "User registered successfully" });
+    const user = await checkUserExistsByEmail(email);
+    return res.status(200).json({ exists: !!user, message: user ? 'User exists' : 'User does not exist' });
   } catch (error) {
-    console.log(error);
-    res.status(500).json({ error: "Server Error" });
+    console.error('Error checking user existence:', error);
+    return res.status(500).json({ error: 'Internal server error' });
   }
 };
 
-// Google Registration
-const googleServerRegister = async (req, res) => {
-  const { email, name, image } = req.body;
-  try {
-    const existingUser = await User.findOne({ email: email });
 
-    if (existingUser) {
-      return res.status(409).json({ error: 'User already registered with Google' });
+
+
+// Login Controller
+const login = async (req, res) => {
+  try {
+    const { email, password = null, type } = req.body;
+
+    if (!email) {
+      return res.status(400).json({ error: 'Please provide email' });
     }
 
-    const newUser = new User({ email, name, image });
-    await newUser.save();
-    res.status(201).json({ message: "User registered successfully" });
-  } catch (error) {
-    console.log(error);
-    res.status(500).json({ error: "Server Error" });
-  }
-};
-
-// Email Login
-const serverLogin = async (req, res) => {
-  try {
-    const { email, password } = req.body;
-    if (!email || !password) {
-      return res.status(400).json({ error: "Please fill all fields" });
+    const user = await checkUserExistsByEmail(email);
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
     }
 
-    const userExists = await User.findOne({ email: email });
-
-
-    if (userExists && userExists.password) {
-      const passmatch = await bcrypt.compare(password, userExists.password);
-
-      if (!passmatch) {
-        return res.status(401).json({ error: "Invalid credentials" });
+    // If not Google login, validate password
+    if (type !== 'google') {
+      if (!password) {
+        return res.status(400).json({ error: 'Please provide password' });
       }
 
-      const token = await userExists.generateAuthToken();
-      console.log("Generated Token:", token);
-
-      res.cookie("jtoken", token, {
-        httpOnly: true,
-        secure: process.env.NODE_ENV === "production", // must be true in prod
-        sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
-        maxAge: 1000 * 60 * 60 * 24 // 1 day
-      });
-
-
-      return res.status(200).json({
-        message: "Logged in successfully",
-        user: {
-          id: userExists._id,
-          name: userExists.name,
-          email: userExists.email,
-          likedSongs: userExists.likedSongs, // only safe fields
-          playlists: userExists.playlists,
-        },
-      });
-    } else {
-      return res.status(401).json({ error: "Invalid credentials" });
+      const isMatch = await bcrypt.compare(password, user.password);
+      if (!isMatch) {
+        return res.status(401).json({ error: 'Invalid credentials' });
+      }
     }
+
+    // Generate JWT token
+    const token = await user.generateAuthToken();
+
+    // Set JWT in cookie
+    res.cookie("jtoken", token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
+      maxAge: 24 * 60 * 60 * 1000 // 1 day
+    });
+
+    // Return safe user data
+    return res.status(200).json({
+      message: "Logged in successfully",
+      user: {
+        id: user._id,
+        name: user.name,
+        email: user.email,
+        likedSongs: user.likedSongs,
+        playlists: user.playlists,
+        image: user.image,
+      },
+    });
+
   } catch (error) {
-    console.log(error);
-    res.status(500).json({ error: "Server Error" });
+    res.status(500).json({ error: error.message || 'Server Error' });
   }
 };
 
-// Google Login
-const googleServerLogin = async (req, res) => {
+// Signup Controller
+const signup = async (req, res) => {
   try {
-    const { email } = req.body;
-    const userExists = await User.findOne({ email: email });
+    const { name, email, password, image } = req.body;
 
-    if (userExists) {
-      const token = await userExists.generateAuthToken();
-      // console.log("Generated Token:", token);
-
-      res.cookie("jtoken", token, {
-        httpOnly: true,
-        secure: process.env.NODE_ENV === "production", // must be true in prod
-        sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
-        maxAge: 1000 * 60 * 60 * 24 // 1 day
-      });
-
-
-      return res.status(200).json({
-        message: "Logged in successfully",
-        user: {
-          id: userExists._id,
-          name: userExists.name,
-          email: userExists.email,
-          likedSongs: userExists.likedSongs, // only safe fields
-          playlists: userExists.playlists,
-        },
-      });
-
-    } else {
-      return res.status(409).json({ message: "User doesn't exist! Try registering" });
+    if (!name || !email || !password) {
+      return res.status(400).json({ error: 'Please provide all details' });
     }
+
+    const existingUser = await checkUserExistsByEmail(email);
+    if (existingUser) {
+      return res.status(409).json({ error: 'User already exists' });
+    }
+
+    const newUser = new User({ name, email, password, image });
+    await newUser.save();
+
+    const token = await newUser.generateAuthToken();
+
+    res.cookie("jtoken", token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
+      maxAge: 24 * 60 * 60 * 1000
+    });
+
+    return res.status(201).json({
+      message: "User registered successfully",
+      user: {
+        id: newUser._id,
+        name: newUser.name,
+        email: newUser.email,
+        likedSongs: newUser.likedSongs,
+        playlists: newUser.playlists,
+        image: newUser.image,
+      },
+    });
+
   } catch (error) {
-    console.log(error);
-    res.status(500).json({ error: "Server Error" });
+    console.error('Signup error:', error);
+    res.status(500).json({ error: 'Internal server error' });
   }
 };
 
-// Logout
+// Logout Controller
 const logout = (req, res) => {
   res.clearCookie('jtoken');
   return res.status(200).json({ message: 'Logout successful' });
 };
 
-// Profile Endpoint
+// Profile Controller
 const serverProfile = (req, res) => {
   console.log("Fetching user profile");
   res.status(200).json(req.rootuser);
 };
 
 module.exports = {
-  serverRegister,
-  googleServerRegister,
-  serverLogin,
-  googleServerLogin,
+  login,
+  signup,
+  userExists,
   logout,
   serverProfile,
 };

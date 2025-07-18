@@ -39,6 +39,8 @@ const getLikedSongs = async (req, res) => {
 // Toggle like status for a song
 const toggleLike = async (req, res) => {
   try {
+    // await new Promise(res=> setTimeout(res, 2000)); // Simulate delay for optimistic UI update
+    // return res.status(500).json({ success: false, message: 'Internal server error' });
     const { trackId } = req.params;
     const userId = req.rootuser._id; // From auth middleware
     

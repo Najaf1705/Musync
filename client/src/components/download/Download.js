@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import '../../App.css';
-import SearchForm from './searchForm';
 import VideoList from './videoList';
 import SelectedVideoPlayer from './selectedVideoPlayer';
+import SearchBar from '../common/searchBar';
 
 const Download = ({ selectedSong }) => {
   const [searchQuery, setSearchQuery] = useState('');
@@ -15,7 +15,9 @@ const Download = ({ selectedSong }) => {
     console.log(selectedSong);
   }, [selectedSong]);
 
-  const handleSearch = async () => {
+  const handleSearch = async (e) => {
+    e.preventDefault();
+    console.log("Search Query:", searchQuery);
     const API_KEY = process.env.REACT_APP_YOUTUBE_KEY2;
     const maxResults = 20;
     const apiUrl = `https://www.googleapis.com/youtube/v3/search?key=${API_KEY}&part=snippet&q=${searchQuery}&maxResults=${maxResults}&type=video`;
@@ -65,15 +67,20 @@ const Download = ({ selectedSong }) => {
 
   return (
     <div className="home pb-6">
-      <div className="flex flex-col my-2 mx-auto max-w-3xl">
+      <div className="flex flex-col my-2 mx-auto">
         <div className="back-blur">
           <h3 className="text-center text-2xl font-semibold py-2">Download Song</h3>
         </div>
-        <SearchForm
-          searchQuery={searchQuery}
+        <SearchBar
+          songName={searchQuery}
+          setSongName={setSearchQuery}
+          handleSubmit={handleSearch}
+        />
+        {/* <SearchForm
+          songname={searchQuery}
           setSearchQuery={setSearchQuery}
           onSearch={handleSearch}
-        />
+        /> */}
         <div>
           <VideoList
             videos={searchResults}

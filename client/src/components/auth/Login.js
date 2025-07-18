@@ -5,7 +5,7 @@ import { jwtDecode } from "jwt-decode";
 import { useAuthUtils } from './authUtils'; // adjust path as needed
 
 const Login = () => {
-  const { loginUser, invalidCredentialsErr, googleLoginUser, isLoggedIn, loginLoading } = useAuthUtils();
+  const { loginUser, invalidCredentialsErr, isLoggedIn, loginLoading } = useAuthUtils();
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -15,7 +15,7 @@ const Login = () => {
   }, [isLoggedIn, navigate]);
 
   const [userData, setUserData] = useState({
-    name: "", email: "", password: ""
+    email: "", password: "", type: "email"
   });
   const [showPassword, setShowPassword] = useState(false);
 
@@ -97,31 +97,35 @@ const Login = () => {
             <span className="mx-3 text-neutral-400">or</span>
             <div className="flex-grow border-t border-neutral-700"></div>
           </div>
-          
-          <div className="flex justify-center">
-            <button
-            className={`${loginLoading?"pointer-events-none opacity-50":""}`}
-            >
-              <GoogleOAuthProvider clientId={process.env.REACT_APP_GOOGLE_CLIENT_ID}>
-                <GoogleLogin
-                  onSuccess={(credentialResponse) => {
-                    const decoded = jwtDecode(credentialResponse.credential);
-                    googleLoginUser({ email: decoded.email, name: decoded.name, image: decoded.picture });
-                  }}
-                  onFailure={(error) => {
-                    console.error(error);
-                  }}
-                  redirect_uri={process.env.REACT_APP_REDIRECT_URI}
-                  width="100%"
-                  theme="filled_black"
-                  text="continue_with"
-                  shape="pill"
-                  disabled={loginLoading} // Disable Google Login when loading
-                />
-              </GoogleOAuthProvider>
-            </button>
-          </div>
         </form>
+
+
+        <div className="flex justify-center mt-2">
+          <button
+            className={`${loginLoading ? "pointer-events-none opacity-50" : ""}`}
+          >
+            <GoogleOAuthProvider clientId={process.env.REACT_APP_GOOGLE_CLIENT_ID}>
+              <GoogleLogin
+                onSuccess={(credentialResponse) => {
+                  const decoded = jwtDecode(credentialResponse.credential);
+                  loginUser({
+                    email: decoded.email,
+                    type: "google"
+                  });
+                }}
+                onFailure={(error) => {
+                  console.error(error);
+                }}
+                redirect_uri={process.env.REACT_APP_REDIRECT_URI}
+                width="100%"
+                theme="filled_black"
+                text="continue_with"
+                shape="pill"
+                disabled={loginLoading} // Disable Google Login when loading
+              />
+            </GoogleOAuthProvider>
+          </button>
+        </div>
       </div>
     </div>
   );

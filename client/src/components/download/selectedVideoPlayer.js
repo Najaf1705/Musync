@@ -1,37 +1,57 @@
-import React from 'react';
+import {
+  Modal,
+  ModalContent,
+  ModalHeader,
+  ModalBody,
+  ModalFooter,
+  Button
+} from "@heroui/react";
 
 const SelectedVideoPlayer = ({ video, isVisible, onClose, onDownload }) => {
-  if (!isVisible || !video) return null;
+  if (!video) return null;
 
   return (
-    <div className="fixed inset-0 flex items-center justify-center z-50 bg-black bg-opacity-60">
-      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-4 relative w-full max-w-lg">
-        <button
-          className="absolute top-2 right-2 text-gray-500 hover:text-red-500 text-xl font-bold rounded-full px-2 py-1 transition"
-          onClick={onClose}
-          aria-label="Close"
-        >
-          ×
-        </button>
-        <div className="flex flex-col items-center">
-          <iframe
-            title="Selected Video"
-            className="rounded-lg mb-4"
-            width="100%"
-            height="222"
-            src={`https://www.youtube.com/embed/${video.id.videoId}`}
-            frameBorder="0"
-            allowFullScreen
-          />
-          <button
-            className="w-1/2 bg-blue-500 hover:bg-blue-600 text-white font-semibold px-4 py-2 rounded transition"
-            onClick={onDownload}
-          >
-            Download Song
-          </button>
-        </div>
-      </div>
-    </div>
+    <Modal
+      backdrop="opaque"
+      placement="center"
+      isOpen={isVisible}
+      onOpenChange={onClose}
+      classNames={{
+        body: "py-6",
+        backdrop: "bg-black/80 backdrop-opacity-40 backdrop-blur-md",
+        base: "border-[#1f1f1f] bg-gray-600 text-[#e0e0e0] rounded-lg shadow-lg",
+        closeButton: "hover:bg-white/5 active:bg-white/10 top-2 right-2",
+      }}
+
+    >
+      <ModalContent>
+        {(onCloseFn) => (
+          <>
+            <ModalHeader className="text-white font-semibold text-xl pt-4 pb-0">
+              {video.snippet.title}
+            </ModalHeader>
+            <ModalBody className="flex flex-col items-center">
+              <iframe
+                title="Selected Video"
+                className="rounded-lg"
+                width="100%"
+                height="222"
+                src={`https://www.youtube.com/embed/${video.id.videoId}`}
+                allowFullScreen
+              />
+            </ModalBody>
+            <ModalFooter className="flex justify-center pb-6 pt-0">
+              <Button
+                onPress={onDownload}
+                className="bg-blue-600 hover:bg-blue-700 text-white rounded-md px-4 py-2"
+              >
+                Download Song
+              </Button>
+            </ModalFooter>
+          </>
+        )}
+      </ModalContent>
+    </Modal>
   );
 };
 

@@ -5,20 +5,14 @@ const authController = require('../controllers/authController');
 
 // Test Route
 router.get('/', (req, res) => {
-  res.send("Hello, I'm auth from router");
+  res.send("Hello niggas i'm working");
 });
 
-// Email Registration
-router.post('/serverregister', authController.serverRegister);
+router.get('/userExists', authController.userExists);
 
-// Google Registration
-router.post('/googleserverregister', authController.googleServerRegister);
+router.post('/login', authController.login);
 
-// Email Login
-router.post('/serverlogin', authController.serverLogin);
-
-// Google Login
-router.post('/googleserverlogin', authController.googleServerLogin);
+router.post('/signup', authController.signup);
 
 // Logout
 router.post('/logout', authController.logout);

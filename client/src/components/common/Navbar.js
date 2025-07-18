@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
-import { clearUser } from '../redux/features/userSlice';
-import { clearSongSlice } from '../redux/features/songSlice';
+import { clearUser } from '../../redux/features/userSlice';
+import { clearSongSlice } from '../../redux/features/songSlice';
 import { toast } from 'react-toastify';
 import { AiFillGithub } from "react-icons/ai";
 import { Dropdown, DropdownTrigger, DropdownMenu, DropdownItem, Button } from "@heroui/react";
-import { showErrorToast, showSuccessToast } from './utils/toast';
+import { showErrorToast, showSuccessToast } from '../utils/toast';
 
 
 const defaultProfilePicture = process.env.PUBLIC_URL + '/images/pp.png';

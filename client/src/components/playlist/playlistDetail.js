@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import SongCard from '../songCard';
+import SongCard from '../common/songCard';
 import CustomPagination from "../common/CustomPagination"; // <-- import here
 import { useNavigate } from 'react-router-dom';
 

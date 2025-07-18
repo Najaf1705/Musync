@@ -1,15 +1,10 @@
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from 'react-redux';
-import { toggleLikeSong } from '../redux/features/songSlice';
+import { toggleLikeSong } from '../../redux/features/songSlice';
 import { Vibrant } from "node-vibrant/browser";
-import { showErrorToast, showSuccessToast, showInfoToast } from "./utils/toast";
-import {
-  Popover,
-  PopoverTrigger,
-  PopoverContent
-} from '@heroui/react'
+import { showErrorToast, showSuccessToast, showInfoToast } from "../utils/toast";
 
-import PlaylistPopover from './common/PlaylistPopover'
+import PlaylistPopover from './PlaylistPopover'
 
 
 const SongCard = ({ item, index }) => {
@@ -58,14 +53,17 @@ const SongCard = ({ item, index }) => {
     }
     if (likeLoading) return;
     setLikeLoading(true);
+    
 
     try {
+      setIsLiked(!isLiked); // Optimistically update the like state
+      isLiked ? showSuccessToast("Song unliked") : showSuccessToast("Song liked");
       const resultAction = await dispatch(toggleLikeSong(item.id));
       if (toggleLikeSong.fulfilled.match(resultAction)) {
         setIsLiked(resultAction.payload.isLiked);
-        showSuccessToast(resultAction.payload.isLiked ? "Liked the song!" : "Unliked the song.");
       } else {
         showErrorToast("Failed to toggle like");
+        setIsLiked(isLiked); // Revert optimistic update on error
       }
     } catch {
       showErrorToast("Like toggle failed.");
@@ -94,7 +92,7 @@ const SongCard = ({ item, index }) => {
             <i
               className={`fa-${isLiked ? 'solid' : 'regular'} fa-heart cursor-pointer text-white text-xl hover:text-green-400 transition`}
               onClick={likeLoading ? undefined : handleLike}
-              style={{ pointerEvents: likeLoading ? 'none' : 'auto', opacity: likeLoading ? 0.5 : 1 }}
+              // style={{ pointerEvents: likeLoading ? 'none' : 'auto', opacity: likeLoading ? 0.5 : 1 }}
               title={isLiked ? "Unlike" : "Like"}
             ></i>
 

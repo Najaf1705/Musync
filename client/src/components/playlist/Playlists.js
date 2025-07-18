@@ -2,10 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useSelector, useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { showInfoToast, showSuccessToast, showErrorToast } from "../utils/toast";
-import { setUser } from '../../redux/features/userSlice';
-
-import SongCard from "../songCard";
-import PlaylistCard from "../playlistCard";
+import PlaylistCard from "../common/playlistCard";
 import PlaylistDetail from "./playlistDetail";
 
 import {

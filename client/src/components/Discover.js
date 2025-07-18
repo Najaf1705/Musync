@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { toast } from 'react-toastify';
 import { showErrorToast } from './utils/toast';
+import SearchBar from './common/searchBar';
 
 const Discover = (props) => {
   const navigate = useNavigate();
@@ -58,21 +58,11 @@ const Discover = (props) => {
           <div className="back-blur">
             <h3 className='text-center text-2xl font-semibold py-2'>Get Song Recommendations</h3>
           </div>
-          <form className='flex justify-center items-center gap-2 mt-2' onSubmit={handleFetchRecommendations}>
-            <input
-              type="text"
-              className="border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400 w-64"
-              placeholder="Enter Song Name"
-              value={songName}
-              onChange={(e) => setSongName(e.target.value.toLowerCase())}
-            />
-            <button
-              className="bg-blue-500 hover:bg-blue-600 text-white font-semibold px-4 py-2 rounded-md transition"
-              type="submit"
-            >
-              Search
-            </button>
-          </form>
+          <SearchBar
+            songName={songName}
+            setSongName={setSongName}
+            handleSubmit={handleFetchRecommendations}
+          />
 
           {recommendations.length > 0 && (
             <div

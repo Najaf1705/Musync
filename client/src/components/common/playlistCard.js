@@ -1,6 +1,5 @@
-import React from "react";
 import { useDispatch } from 'react-redux';
-import { setSelectedPlaylist } from '../redux/features/songSlice';
+import { setSelectedPlaylist } from '../../redux/features/songSlice';
 
 const PlaylistCard = ({
   parentComponent,

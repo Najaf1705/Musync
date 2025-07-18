@@ -4,7 +4,7 @@ import { Route, Routes } from "react-router-dom";
 import { useDispatch } from 'react-redux';
 // import 'react-hot-toast/dist/index.css';
 import "./index.css";
-import Navbar from './components/Navbar';
+import Navbar from './components/common/Navbar.js';
 import Home from './components/home/Home.js';
 import Discover from './components/Discover';
 import Download from './components/download/Download';
@@ -59,7 +59,7 @@ const App = () => {
 
   return (
     <div className="flex flex-col min-h-screen">
-      <Toaster position="bottom-center" />
+      <Toaster position="bottom-center" limit={5} />
       <Navbar />
       <div className="flex-1 text-white pt-16 pb-6">
         <Routes>

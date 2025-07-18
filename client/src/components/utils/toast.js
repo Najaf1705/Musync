@@ -1,5 +1,5 @@
 import toast from 'react-hot-toast';
-import CustomToast from '../CustomToast'; // adjust path if needed
+import CustomToast from './CustomToast'; // adjust path if needed
 
 export const showSuccessToast = (message) => {
   toast.custom((t) => (

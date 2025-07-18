@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { useSelector, useDispatch } from 'react-redux';
-import SongCard from "../songCard";
-import PlaylistCard from "../playlistCard";
+import SongCard from "../common/songCard";
+import PlaylistCard from "../common/playlistCard";
 import PlaylistDetail from "../playlist/playlistDetail";
 import { setSearchedPlaylistData, setSearchResults } from "../../redux/features/songSlice";
 import CustomPagination from "../common/CustomPagination"; // <-- import here

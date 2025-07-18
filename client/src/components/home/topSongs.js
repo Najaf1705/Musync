@@ -1,5 +1,5 @@
 import React from "react";
-import SongCard from "../songCard";
+import SongCard from "../common/songCard";
 
 const TopSongs = ({ topSongs, loading }) => {
   return (
