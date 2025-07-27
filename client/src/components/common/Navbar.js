@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { clearUser } from '../../redux/features/userSlice';
-import { clearSongSlice } from '../../redux/features/songSlice';
+import { clearSongSliceThunk } from '../../redux/features/song/songThunks';
 import { toast } from 'react-toastify';
 import { AiFillGithub } from "react-icons/ai";
 import { Dropdown, DropdownTrigger, DropdownMenu, DropdownItem, Button } from "@heroui/react";
@@ -40,7 +40,7 @@ const Navbar = () => {
       }
 
       dispatch(clearUser());
-      dispatch(clearSongSlice());
+      dispatch(clearSongSliceThunk());
       navigate('/');
       showSuccessToast("Logged out Successfully");
     } catch (error) {

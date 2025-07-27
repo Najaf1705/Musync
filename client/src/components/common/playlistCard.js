@@ -1,5 +1,5 @@
 import { useDispatch } from 'react-redux';
-import { setSelectedPlaylist } from '../../redux/features/songSlice';
+import { setSelectedPlaylistThunk } from '../../redux/features/song/songThunks';
 
 const PlaylistCard = ({
   parentComponent,
@@ -19,7 +19,7 @@ const PlaylistCard = ({
     }
 
     if (parentComponent === "playlist") {
-      dispatch(setSelectedPlaylist({
+      dispatch(setSelectedPlaylistThunk({
         id: playlist.id,
         name: playlist.name
       }));

@@ -8,7 +8,7 @@ import SearchResults from "./searchResults";
 import TopSongs from "./topSongs";
 import CreatePlaylist from "../playlist/CreatePlaylist";
 import { fetchTopSongs, fetchPlaylistTracks } from "../utils/api";
-import { searchSongsAndPlaylists } from '../../redux/features/songSlice';
+import { searchSongsAndPlaylistsThunk } from '../../redux/features/song/songThunks';
 import { showErrorToast } from "../utils/toast";
 
 
@@ -82,7 +82,7 @@ const Home = () => {
       }
 
       // Perform search
-      await dispatch(searchSongsAndPlaylists(trimmedSongName)).unwrap();
+      await dispatch(searchSongsAndPlaylistsThunk(trimmedSongName)).unwrap();
     } catch (error) {
       showErrorToast('Failed to search songs');
     }

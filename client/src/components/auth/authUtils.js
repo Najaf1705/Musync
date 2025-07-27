@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
-import { setUserSongs } from "../../redux/features/songSlice";
+import { setUserSongsThunk } from "../../redux/features/song/songThunks";
 import { setUser } from "../../redux/features/userSlice";
 import { showErrorToast, showInfoToast, showSuccessToast } from "../utils/toast";
 
@@ -53,6 +53,7 @@ export const useAuthUtils = () => {
             });
 
             const serRes = await res.json();
+            console.log("Login response:", serRes);
 
             if (!res.ok) {
                 const msg =
@@ -70,7 +71,7 @@ export const useAuthUtils = () => {
             // ✅ Login success
             dispatch(setUser(serRes.user));
             dispatch(
-                setUserSongs({
+                setUserSongsThunk({
                     likedSongs: serRes.user.likedSongs,
                     userPlaylists: serRes.user.playlists,
                 })
@@ -118,7 +119,7 @@ export const useAuthUtils = () => {
                 // ✅ backend already logs the user in after signup
                 dispatch(setUser(data.user));
                 dispatch(
-                    setUserSongs({
+                    setUserSongsThunk({
                         likedSongs: data.user.likedSongs,
                         userPlaylists: data.user.playlists,
                     })

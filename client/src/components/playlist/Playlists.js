@@ -15,7 +15,7 @@ import {
   useDisclosure,
 } from "@heroui/react";
 
-import { createPlaylist } from "../../redux/features/songSlice";
+import { createPlaylistThunk } from "../../redux/features/song/songThunks";
 
 const Playlist = () => {
   const navigate = useNavigate();
@@ -133,7 +133,7 @@ const Playlist = () => {
                 e.preventDefault();
                 if (!playlistName.trim()) return;
                 showSuccessToast("Playlist created successfully!");
-                dispatch(createPlaylist({ playlistName: playlistName.trim(), userId: userDetails._id }));
+                dispatch(createPlaylistThunk({ playlistName: playlistName.trim(), userId: userDetails._id }));
                 setPlaylistName('');
                 onCloseModal(); // ✅ properly close modal
               }}

@@ -31,6 +31,7 @@ const userExists = async (req, res) => {
 const login = async (req, res) => {
   try {
     const { email, password = null, type } = req.body;
+    console.log("Login request:", { email, password, type });
 
     if (!email) {
       return res.status(400).json({ error: 'Please provide email' });
@@ -78,6 +79,7 @@ const login = async (req, res) => {
     });
 
   } catch (error) {
+    console.error('Login error:', error);
     res.status(500).json({ error: error.message || 'Server Error' });
   }
 };

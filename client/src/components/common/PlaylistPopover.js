@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { FiCheckCircle, FiPlus } from 'react-icons/fi';
 import { useSelector, useDispatch } from 'react-redux';
-import { addSongToPlaylist, createPlaylist, removeSongFromPlaylist } from '../../redux/features/songSlice';
+import { addSongToPlaylistThunk, createPlaylistThunk, removeSongFromPlaylistThunk } from '../../redux/features/song/songThunks';
 import { showSuccessToast } from '../utils/toast';
 import {
   Dropdown,
@@ -31,12 +31,12 @@ const PlaylistPopover = ({ setIsPopoverOpen, songId }) => {
 
 
   const addToPlaylist = (playlistId, playlistName) => {
-    dispatch(addSongToPlaylist({ playlistId, playlistName, userId: userDetails._id, songId }));
+    dispatch(addSongToPlaylistThunk({ playlistId, playlistName, userId: userDetails._id, songId }));
   };
 
   const handleRemove = () => {
     if (selectedPlaylist) {
-      dispatch(removeSongFromPlaylist({
+      dispatch(removeSongFromPlaylistThunk({
         playlistId: selectedPlaylist._id,
         playlistName: selectedPlaylist.playlistName,
         userId: userDetails._id,
@@ -181,7 +181,7 @@ const PlaylistPopover = ({ setIsPopoverOpen, songId }) => {
                 e.preventDefault();
                 if (!newPlaylistName.trim()) return;
                 console.log("Creating playlist:", newPlaylistName); // 🔁 Replace with Redux/Backend call
-                dispatch(createPlaylist({ playlistName: newPlaylistName, userId: userDetails._id, songId }));
+                dispatch(createPlaylistThunk({ playlistName: newPlaylistName, userId: userDetails._id, songId }));
                 setNewPlaylistName('');
                 setIsCreateOpen(false);
               }}

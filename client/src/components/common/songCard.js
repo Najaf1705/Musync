@@ -1,15 +1,17 @@
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from 'react-redux';
-import { toggleLikeSong } from '../../redux/features/songSlice';
+import { toggleLikeSongThunk } from '../../redux/features/song/songThunks';
 import { Vibrant } from "node-vibrant/browser";
 import { showErrorToast, showSuccessToast, showInfoToast } from "../utils/toast";
-
+import { useNavigate } from "react-router-dom";
 import PlaylistPopover from './PlaylistPopover'
+import { setDownloadQuery } from "../../redux/features/downloadSlice";
 
 
 const SongCard = ({ item, index }) => {
 
   const dispatch = useDispatch();
+  const navigate = useNavigate();
 
   const [isPopoverOpen, setIsPopoverOpen] = useState(false);
   const isLoggedIn = useSelector(state => state.user.isLoggedIn);
@@ -53,13 +55,13 @@ const SongCard = ({ item, index }) => {
     }
     if (likeLoading) return;
     setLikeLoading(true);
-    
+
 
     try {
       setIsLiked(!isLiked); // Optimistically update the like state
       isLiked ? showSuccessToast("Song unliked") : showSuccessToast("Song liked");
-      const resultAction = await dispatch(toggleLikeSong(item.id));
-      if (toggleLikeSong.fulfilled.match(resultAction)) {
+      const resultAction = await dispatch(toggleLikeSongThunk(item.id));
+      if (toggleLikeSongThunk.fulfilled.match(resultAction)) {
         setIsLiked(resultAction.payload.isLiked);
       } else {
         showErrorToast("Failed to toggle like");
@@ -101,7 +103,14 @@ const SongCard = ({ item, index }) => {
               songId={item.id}
             />
 
-            <i className="fa-solid fa-download cursor-pointer text-white text-xl hover:text-green-400 transition" title="Download"></i>
+            <i className="fa-solid fa-download cursor-pointer text-white text-xl hover:text-green-400 transition"
+              title="Download"
+              onClick={() => {
+                dispatch(setDownloadQuery(item.name));
+                navigate('/download');
+              }}
+            ></i>
+
             <i className="fa-brands fa-spotify cursor-pointer text-white text-xl hover:text-green-400 transition" title="Open on Spotify"
               onClick={() => {
                 window.open(`https://open.spotify.com/track/${item.id}`, '_blank');

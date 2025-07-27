@@ -1,9 +1,9 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useSelector, useDispatch } from 'react-redux';
 import SongCard from "../common/songCard";
 import PlaylistCard from "../common/playlistCard";
 import PlaylistDetail from "../playlist/playlistDetail";
-import { setSearchedPlaylistData, setSearchResults } from "../../redux/features/songSlice";
+import { setSearchedPlaylistDataThunk, setSearchResultsThunk } from "../../redux/features/song/songThunks";
 import CustomPagination from "../common/CustomPagination"; // <-- import here
 
 
@@ -43,11 +43,15 @@ const SearchResults = ({ setSongName, displayPlaylistSongs, setDisplayPlaylistSo
     }
   };
 
+  useEffect(() => {
+    setSongPage(1);
+  }, [searchResults]);
+
   const clearSearchResults = () => {
     setDisplayPlaylistSongs(false)
     setSelectedPlaylistSongsData([]);
-    dispatch(setSearchResults(null)); // Clear search results in Redux state
-    dispatch(setSearchedPlaylistData(null));
+    dispatch(setSearchResultsThunk(null)); // Clear search results in Redux state
+    dispatch(setSearchedPlaylistDataThunk(null));
     setSongName(""); // Reset song name in parent component
   };
 

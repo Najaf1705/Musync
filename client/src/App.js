@@ -1,21 +1,19 @@
-import { useState, useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { Toaster } from 'react-hot-toast';
-import { Route, Routes } from "react-router-dom";
 import { useDispatch } from 'react-redux';
-// import 'react-hot-toast/dist/index.css';
-import "./index.css";
-import Navbar from './components/common/Navbar.js';
-import Home from './components/home/Home.js';
-import Discover from './components/Discover';
-import Download from './components/download/Download';
-import Profile from './components/Profile';
+import { Route, Routes } from "react-router-dom";
 import Login from './components/auth/Login.js';
 import Signup from './components/auth/Signup.js';
+import Navbar from './components/common/Navbar.js';
+import Discover from './components/Discover';
+import Download from './components/download/Download';
 import Errorpage from './components/Errorpage';
+import Home from './components/home/Home.js';
 import Playlists from './components/playlist/Playlists';
-import { fetchTopSongs, setUserSongs } from './redux/features/songSlice'; // adjust path as needed
-import { clearSongSlice } from './redux/features/songSlice'; // adjust path as needed
-import { setUser, clearUser } from './redux/features/userSlice'; // adjust path as needed
+import Profile from './components/Profile';
+import "./index.css";
+import { clearSongSliceThunk, fetchTopSongsThunk, setUserSongsThunk } from './redux/features/song/songThunks.js'; // adjust path as needed
+import { clearUser, setUser } from './redux/features/userSlice'; // adjust path as needed
 
 const App = () => {
   const [selectedSong, setSelectedSong] = useState('');
@@ -25,7 +23,7 @@ const App = () => {
   // dispatch(fetchLikedSongs(userDetails._id));
 
   useEffect(() => {
-    dispatch(fetchTopSongs());
+    dispatch(fetchTopSongsThunk());
   }, [dispatch]);
 
   const handleSelectedSongChange = (songDetails) => {
@@ -45,10 +43,10 @@ const App = () => {
         const user = await res.json();
         console.log("serverprofile response", user);
         dispatch(setUser(user));
-        dispatch(setUserSongs({ likedSongs: user.likedSongs, userPlaylists: user.playlists })); // set liked songs
+        dispatch(setUserSongsThunk({ likedSongs: user.likedSongs, userPlaylists: user.playlists })); // set liked songs
       } else {
         dispatch(clearUser());
-        dispatch(clearSongSlice());
+        dispatch(clearSongSliceThunk());
       }
     };
 
