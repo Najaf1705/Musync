@@ -91,10 +91,12 @@ const removeFromPlaylist = async (req, res) => {
 
     const playlist = user.playlists.find(p => p.playlistName === playlistName);
     if (!playlist) {
+      console.log("Playlist not found");
       return res.status(404).json({ error: 'Playlist not found' });
     }
 
     if (!playlist.songs.includes(songId)) {
+      console.log("Song not found in playlist");
       return res.status(400).json({ error: 'Song not found in playlist' });
     }
 

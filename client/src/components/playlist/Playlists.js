@@ -4,18 +4,9 @@ import { useNavigate } from 'react-router-dom';
 import { showInfoToast, showSuccessToast, showErrorToast } from "../utils/toast";
 import PlaylistCard from "../common/playlistCard";
 import PlaylistDetail from "./playlistDetail";
-
-import {
-  Modal,
-  ModalContent,
-  ModalHeader,
-  ModalBody,
-  ModalFooter,
-  Button,
-  useDisclosure,
-} from "@heroui/react";
-
 import { createPlaylistThunk } from "../../redux/features/song/songThunks";
+import CreatePlaylistModal from "../common/CreatePlaylistModal";
+import { useDisclosure } from "@heroui/react";
 
 const Playlist = () => {
   const navigate = useNavigate();
@@ -31,8 +22,8 @@ const Playlist = () => {
   const [selectedPlaylistSongsData, setSelectedPlaylistSongsData] = useState([]);
   const [selectedPlaylistData, setSelectedPlaylistData] = useState(null);
 
-  const [playlistName, setPlaylistName] = useState('');
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
+  const [playlistName, setPlaylistName] = useState('');
 
   useEffect(() => {
     if (!isAuthReady) return;
@@ -40,7 +31,7 @@ const Playlist = () => {
       navigate('/');
       showInfoToast("Log in to see your playlists");
     }
-  }, [isLoggedIn, isAuthReady]);
+  }, [isLoggedIn, isAuthReady, navigate]);
 
   const fetchSelectedPlaylistSongs = async (pname) => {
     const selectedPlaylist = userPlaylists.find((playlist) => playlist.playlistName === pname);
@@ -113,58 +104,22 @@ const Playlist = () => {
         )}
       </div>
 
-      {/* ✅ Modal for Create Playlist */}
-      <Modal
-        backdrop="opaque"
-        placement="center"
+      <CreatePlaylistModal
         isOpen={isOpen}
         onOpenChange={onOpenChange}
-        classNames={{
-          body: "py-6",
-          backdrop: "bg-black/80 backdrop-opacity-40",
-          base: "border-[#1f1f1f] bg-[#121212] text-[#e0e0e0]",
-          closeButton: "hover:bg-white/5 active:bg-white/10 top-2 right-2",
+        newPlaylistName={playlistName}
+        setNewPlaylistName={setPlaylistName}
+        onCreate={(onClose) => {
+          if (!playlistName.trim()) return;
+          if (userPlaylists.some(p => p.playlistName.trim().toLowerCase() === playlistName.trim().toLowerCase())) {
+            showErrorToast("Playlist with this name already exists.");
+            return;
+          }
+          dispatch(createPlaylistThunk({ playlistName: playlistName.trim(), userId: userDetails._id }));
+          setPlaylistName('');
+          onClose();
         }}
-      >
-        <ModalContent>
-          {(onCloseModal) => (
-            <form
-              onSubmit={(e) => {
-                e.preventDefault();
-                if (!playlistName.trim()) return;
-                showSuccessToast("Playlist created successfully!");
-                dispatch(createPlaylistThunk({ playlistName: playlistName.trim(), userId: userDetails._id }));
-                setPlaylistName('');
-                onCloseModal(); // ✅ properly close modal
-              }}
-            >
-              <ModalHeader className="text-white font-semibold text-xl pt-4 pb-0">
-                Create New Playlist
-              </ModalHeader>
-              <ModalBody>
-                <input
-                  type="text"
-                  value={playlistName}
-                  required
-                  onChange={(e) => setPlaylistName(e.target.value)}
-                  className="w-full px-4 py-2 bg-gray-700 text-white rounded-md outline-none focus:ring-2 focus:ring-green-400"
-                  placeholder="Enter playlist name"
-                  autoFocus
-                />
-              </ModalBody>
-              <ModalFooter className="flex justify-end items-center gap-4 p-4">
-                <Button onPress={onCloseModal}>Cancel</Button>
-                <Button
-                  type="submit"
-                  className="bg-green-600 hover:bg-green-700 text-white rounded-md px-4 py-2"
-                >
-                  Create
-                </Button>
-              </ModalFooter>
-            </form>
-          )}
-        </ModalContent>
-      </Modal>
+      />
     </div>
   );
 };

@@ -2,21 +2,17 @@ import React, { useEffect, useState } from 'react';
 import { FiCheckCircle, FiPlus } from 'react-icons/fi';
 import { useSelector, useDispatch } from 'react-redux';
 import { addSongToPlaylistThunk, createPlaylistThunk, removeSongFromPlaylistThunk } from '../../redux/features/song/songThunks';
-import { showSuccessToast } from '../utils/toast';
+import { showErrorToast, showSuccessToast } from '../utils/toast';
 import {
   Dropdown,
   DropdownTrigger,
   DropdownMenu,
   DropdownItem,
   DropdownSection,
-  Button,
-  Modal,
-  ModalContent,
-  ModalHeader,
-  ModalBody,
-  ModalFooter,
   useDisclosure,
 } from '@heroui/react';
+import RemoveSongModal from './RemoveSongModal';
+import CreatePlaylistModal from './CreatePlaylistModal';
 
 const PlaylistPopover = ({ setIsPopoverOpen, songId }) => {
   const dispatch = useDispatch();
@@ -31,15 +27,15 @@ const PlaylistPopover = ({ setIsPopoverOpen, songId }) => {
 
 
   const addToPlaylist = (playlistId, playlistName) => {
-    dispatch(addSongToPlaylistThunk({ playlistId, playlistName, userId: userDetails._id, songId }));
+    dispatch(addSongToPlaylistThunk({ playlistId, playlistName, songId }));
   };
 
   const handleRemove = () => {
+    console.log("Removing song from playlist:", { playlistId: selectedPlaylist._id, songId });
     if (selectedPlaylist) {
       dispatch(removeSongFromPlaylistThunk({
         playlistId: selectedPlaylist._id,
         playlistName: selectedPlaylist.playlistName,
-        userId: userDetails._id,
         songId
       }));
       showSuccessToast(`Removed song from ${selectedPlaylist.playlistName}`);
@@ -84,6 +80,7 @@ const PlaylistPopover = ({ setIsPopoverOpen, songId }) => {
                       addToPlaylist(playlist._id, playlist.playlistName);
                       showSuccessToast(`Added song to ${playlist.playlistName}`);
                     } else {
+                      console.log(playlist)
                       setSelectedPlaylist(playlist);
                       onOpen(); // open modal
                     }
@@ -113,106 +110,30 @@ const PlaylistPopover = ({ setIsPopoverOpen, songId }) => {
         </DropdownMenu>
       </Dropdown>
 
-      {/* ✅ Modal for removal confirmation */}
-      <Modal
-        backdrop="opaque"
-        placement='center'
-        motionProps={{
-          variants: {
-            enter: { y: 0, opacity: 1, transition: { duration: 0.3, ease: "easeOut" } },
-            exit: { y: -20, opacity: 0, transition: { duration: 0.2, ease: "easeIn" } },
-          },
-        }}
-        classNames={{
-          body: "py-6",
-          backdrop: "bg-black/80 backdrop-opacity-40",
-          base: "border-[#1f1f1f] bg-[#121212] text-[#e0e0e0]",
-          closeButton: "hover:bg-white/5 active:bg-white/10 top-2 right-2",
-        }}
+      <RemoveSongModal
         isOpen={isOpen}
-        radius="sm"
         onOpenChange={onOpenChange}
-        className='bg-gray-800 text-white rounded-lg shadow-lg'
-      >
-        <ModalContent>
-          {(onCloseModal) => (
-            <>
-              <ModalHeader className="text-red-500 font-semibold text-xl pt-4 pb-0">Remove Song?</ModalHeader>
-              <ModalBody>
-                <p>Are you sure you want to remove this song from <strong>{selectedPlaylist?.playlistName}</strong>?</p>
-              </ModalBody>
-              <ModalFooter
-                className='flex justify-end items-center gap-4 p-4'
-              >
-                <Button onPress={onCloseModal}>
-                  Cancel
-                </Button>
-                <Button
-                  className='bg-green-600 hover:bg-green-700 text-white rounded-md p-2'
-                  onPress={() => {
-                    handleRemove();
-                    onCloseModal();
-                  }}
-                >
-                  Confirm
-                </Button>
-              </ModalFooter>
-            </>
-          )}
-        </ModalContent>
-      </Modal>
+        selectedPlaylist={selectedPlaylist}
+        handleRemove={handleRemove}
+      />
 
-      <Modal
-        backdrop="opaque"
-        placement='center'
+      <CreatePlaylistModal
         isOpen={isCreateOpen}
         onOpenChange={() => setIsCreateOpen(false)}
-        classNames={{
-          body: "py-6",
-          backdrop: "bg-black/80 backdrop-opacity-40",
-          base: "border-[#1f1f1f] bg-[#121212] text-[#e0e0e0]",
-          closeButton: "hover:bg-white/5 active:bg-white/10 top-2 right-2",
+        newPlaylistName={newPlaylistName}
+        setNewPlaylistName={setNewPlaylistName}
+        onCreate={(onClose) => {
+          if (!newPlaylistName.trim()) return;
+          if (playlists.some(p => p.playlistName === newPlaylistName.trim())) {
+            showErrorToast("Playlist with this name already exists.");
+            return;
+          }
+          dispatch(createPlaylistThunk({ playlistName: newPlaylistName, userId: userDetails._id, songId }));
+          setNewPlaylistName('');
+          setIsCreateOpen(false);
+          onClose();
         }}
-      >
-        <ModalContent>
-          {(onClose) => (
-            <form
-              onSubmit={(e) => {
-                e.preventDefault();
-                if (!newPlaylistName.trim()) return;
-                console.log("Creating playlist:", newPlaylistName); // 🔁 Replace with Redux/Backend call
-                dispatch(createPlaylistThunk({ playlistName: newPlaylistName, userId: userDetails._id, songId }));
-                setNewPlaylistName('');
-                setIsCreateOpen(false);
-              }}
-            >
-              <ModalHeader className="text-white font-semibold text-xl pt-4 pb-0">
-                Create New Playlist
-              </ModalHeader>
-              <ModalBody>
-                <input
-                  type="text"
-                  value={newPlaylistName}
-                  onChange={(e) => setNewPlaylistName(e.target.value)}
-                  className="w-full px-4 py-2 bg-gray-700 text-white rounded-md outline-none focus:ring-2 focus:ring-green-400"
-                  placeholder="Enter playlist name"
-                  autoFocus
-                />
-              </ModalBody>
-              <ModalFooter className="flex justify-end items-center gap-4 p-4">
-                <Button onPress={onClose}>Cancel</Button>
-                <Button
-                  type="submit"
-                  className='bg-green-600 hover:bg-green-700 text-white rounded-md px-4 py-2'
-                >
-                  Create
-                </Button>
-              </ModalFooter>
-            </form>
-          )}
-        </ModalContent>
-      </Modal>
-
+      />
     </>
   );
 };

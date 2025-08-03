@@ -16,8 +16,7 @@ import {
     toggleLikeSongRed,
     clearSongSliceRed
 } from './songSlice';
-import { showErrorToast } from "../../../components/utils/toast";
-
+import { showErrorToast, showSuccessToast } from "../../../components/utils/toast";
 export const fetchLikedSongsThunk = createAsyncThunk(
     "likes/fetchLikedSongs",
     async (userId) => {
@@ -145,8 +144,11 @@ export const searchSongsAndPlaylistsThunk = createAsyncThunk(
 
 export const addSongToPlaylistThunk = createAsyncThunk(
     'songs/addSongToPlaylist',
-    async ({ playlistId, playlistName, userId, songId }, { dispatch, rejectWithValue }) => {
+    async ({ playlistId, playlistName, songId }, { dispatch, rejectWithValue, getState }) => {
         dispatch(addSongToPlaylistRed({ playlistId, songId }));
+        const state=getState();
+        const userId=state.user.user._id;
+        console.log("useriddddddddd",userId)
         try {
             const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/addToPlaylist/${playlistName}/${songId}/${userId}`, {
                 method: 'POST',
@@ -175,9 +177,11 @@ export const addSongToPlaylistThunk = createAsyncThunk(
 
 export const removeSongFromPlaylistThunk = createAsyncThunk(
     'songs/removeSongFromPlaylist',
-    async ({ playlistId, playlistName, userId, songId }, { dispatch, rejectWithValue }) => {
+    async ({ playlistId, playlistName, songId }, { dispatch, rejectWithValue, getState }) => {
         dispatch(removeSongFromPlaylistRed({ playlistId, songId }));
         try {
+            const state = getState();
+            const userId = state.user.user._id;
             const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/removeFromPlaylist/${playlistName}/${songId}/${userId}`, {
                 method: 'POST',
                 headers: {
@@ -206,7 +210,7 @@ export const createPlaylistThunk = createAsyncThunk(
     'songs/createPlaylist',
     async ({ playlistName, userId, songId = null }, { dispatch, rejectWithValue }) => {
         dispatch(addNewPlaylistRed({ playlistName, songId }));
-
+        console.log("Creating playlist:", { playlistName, userId, songId });
         try {
             // throw new Error('Failed to create playlist');
             const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/create-playlist/${playlistName}/${userId}`, {
@@ -223,8 +227,10 @@ export const createPlaylistThunk = createAsyncThunk(
             console.log("Playlist created:", data);
 
             if (songId) {
-                await dispatch(addSongToPlaylistRed({ playlistId: data._id, playlistName, userId, songId }));
+                dispatch(addSongToPlaylistThunk({ playlistId: data._id, playlistName, userId, songId }));
             }
+
+            showSuccessToast(`Playlist "${playlistName}" created successfully!`);
 
 
             return data; // Return the created playlist data
