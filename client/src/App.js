@@ -13,7 +13,7 @@ import Playlists from './components/playlist/Playlists';
 import Profile from './components/Profile';
 import "./index.css";
 import { clearSongSliceThunk, fetchTopSongsThunk, setUserSongsThunk } from './redux/features/song/songThunks.js'; // adjust path as needed
-import { clearUser, setUser } from './redux/features/userSlice'; // adjust path as needed
+import { clearUser, setAuthReady, setUser } from './redux/features/userSlice'; // adjust path as needed
 
 const App = () => {
   const [selectedSong, setSelectedSong] = useState('');
@@ -48,6 +48,7 @@ const App = () => {
         dispatch(clearUser());
         dispatch(clearSongSliceThunk());
       }
+      dispatch(setAuthReady(true));
     };
 
     verify();

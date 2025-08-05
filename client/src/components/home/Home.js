@@ -6,8 +6,7 @@ import SearchBar from "../common/searchBar";
 import RecentSearches from "./recentSearches";
 import SearchResults from "./searchResults";
 import TopSongs from "./topSongs";
-import CreatePlaylist from "../playlist/CreatePlaylist";
-import { fetchTopSongs, fetchPlaylistTracks } from "../utils/api";
+import { fetchPlaylistTracks } from "../utils/api";
 import { searchSongsAndPlaylistsThunk } from '../../redux/features/song/songThunks';
 import { showErrorToast } from "../utils/toast";
 
@@ -143,11 +142,11 @@ const Home = () => {
           loading={loading}
           // setLoading={setLoading}
         />
-        {playlistModal && (
+        {/* {playlistModal && (
           <CreatePlaylist
             playlistModal={setPlaylistModal}
           />
-        )}
+        )} */}
       </div>
       <Outlet />
     </div>

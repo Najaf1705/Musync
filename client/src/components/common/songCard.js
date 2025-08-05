@@ -4,12 +4,10 @@ import { toggleLikeSongThunk } from '../../redux/features/song/songThunks';
 import { Vibrant } from "node-vibrant/browser";
 import { showErrorToast, showSuccessToast, showInfoToast } from "../utils/toast";
 import { useNavigate } from "react-router-dom";
-import PlaylistPopover from './PlaylistPopover'
+import PlaylistPopover from './PlaylistPopover';
 import { setDownloadQuery } from "../../redux/features/downloadSlice";
 
-
 const SongCard = ({ item, index }) => {
-
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
@@ -46,8 +44,6 @@ const SongCard = ({ item, index }) => {
     }
   }, [item.album]);
 
-
-
   const handleLike = async () => {
     if (!isLoggedIn) {
       showInfoToast("Please log in to like songs.");
@@ -55,7 +51,6 @@ const SongCard = ({ item, index }) => {
     }
     if (likeLoading) return;
     setLikeLoading(true);
-
 
     try {
       setIsLiked(!isLiked); // Optimistically update the like state
@@ -94,16 +89,15 @@ const SongCard = ({ item, index }) => {
             <i
               className={`fa-${isLiked ? 'solid' : 'regular'} fa-heart cursor-pointer text-white text-xl hover:text-green-400 transition`}
               onClick={likeLoading ? undefined : handleLike}
-              // style={{ pointerEvents: likeLoading ? 'none' : 'auto', opacity: likeLoading ? 0.5 : 1 }}
               title={isLiked ? "Unlike" : "Like"}
             ></i>
 
             <PlaylistPopover
-              setIsPopoverOpen={setIsPopoverOpen}
               songId={item.id}
             />
 
-            <i className="fa-solid fa-download cursor-pointer text-white text-xl hover:text-green-400 transition"
+            <i
+              className="fa-solid fa-download cursor-pointer text-white text-xl hover:text-green-400 transition"
               title="Download"
               onClick={() => {
                 dispatch(setDownloadQuery(item.name));
@@ -111,7 +105,9 @@ const SongCard = ({ item, index }) => {
               }}
             ></i>
 
-            <i className="fa-brands fa-spotify cursor-pointer text-white text-xl hover:text-green-400 transition" title="Open on Spotify"
+            <i
+              className="fa-brands fa-spotify cursor-pointer text-white text-xl hover:text-green-400 transition"
+              title="Open on Spotify"
               onClick={() => {
                 window.open(`https://open.spotify.com/track/${item.id}`, '_blank');
               }}
@@ -126,9 +122,7 @@ const SongCard = ({ item, index }) => {
         >
           {item.name || 'Unknown'}
         </div>
-        <p
-          className="text-xs sm:text-sm truncate"
-        >
+        <p className="text-xs sm:text-sm truncate">
           {item.artists
             ? item.artists.map((artist) => artist.name || 'Unknown Artist').join(", ").slice(0, 30)
             : 'Unknown Artist'}

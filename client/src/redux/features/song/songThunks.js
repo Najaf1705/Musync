@@ -182,6 +182,7 @@ export const removeSongFromPlaylistThunk = createAsyncThunk(
         try {
             const state = getState();
             const userId = state.user.user._id;
+            console.log("Removing song from playlist:", { playlistId, songId, userId });
             const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/removeFromPlaylist/${playlistName}/${songId}/${userId}`, {
                 method: 'POST',
                 headers: {

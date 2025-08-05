@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { FiCheckCircle, FiPlus } from 'react-icons/fi';
 import { useSelector, useDispatch } from 'react-redux';
 import { addSongToPlaylistThunk, createPlaylistThunk, removeSongFromPlaylistThunk } from '../../redux/features/song/songThunks';
-import { showErrorToast, showSuccessToast } from '../utils/toast';
+import { showErrorToast, showInfoToast, showSuccessToast } from '../utils/toast';
 import {
   Dropdown,
   DropdownTrigger,
@@ -10,18 +10,21 @@ import {
   DropdownItem,
   DropdownSection,
   useDisclosure,
+  user,
 } from '@heroui/react';
 import RemoveSongModal from './RemoveSongModal';
 import CreatePlaylistModal from './CreatePlaylistModal';
 
-const PlaylistPopover = ({ setIsPopoverOpen, songId }) => {
+const PlaylistPopover = ({ songId }) => {
   const dispatch = useDispatch();
   const playlists = useSelector(state => state.songs.userPlaylists)?.filter(p => p.playlistName !== "Liked Songs") || [];
-  const userDetails = useSelector(state => state.user.user);
+  const { isAuthReady, isLoggedIn, user: userDetails } = useSelector(state => state.user);
 
   const { isOpen, onOpen, onClose, onOpenChange } = useDisclosure();
   const [selectedPlaylist, setSelectedPlaylist] = useState(null);
 
+
+  const [dropDownOpen, setDropDownOpen] = useState(false);
   const [isCreateOpen, setIsCreateOpen] = useState(false);
   const [newPlaylistName, setNewPlaylistName] = useState('');
 
@@ -46,68 +49,79 @@ const PlaylistPopover = ({ setIsPopoverOpen, songId }) => {
   return (
     <>
       <Dropdown
+        isOpen={dropDownOpen}
+        onOpenChange={() => { setDropDownOpen(!dropDownOpen) }}
         showArrow
         classNames={{
           base: 'before:bg-default-200',
           content: 'p-0 border-small border-divider bg-background',
         }}
       >
-        <DropdownTrigger>
+        <DropdownTrigger
+          onClick={() => {
+            if (!isAuthReady) return;
+            if (!isLoggedIn) {
+              showInfoToast("Please log in to manage playlists.");
+              return;
+            }
+            setDropDownOpen(true);
+          }}
+        >
           <i className="fa-solid fa-plus cursor-pointer text-white text-xl hover:text-green-400 transition" title="Add to playlist"></i>
         </DropdownTrigger>
-
-        <DropdownMenu
-          aria-label="Dynamic Actions"
-          className="bg-gray-700 rounded-md p-0 text-white min-w-36 shadow-xl shadow-gray-900/50"
-          topContent={
-            <div className="text-md font-medium bg-gray-800 rounded-t-md mb-2 text-white px-3 py-2">Your Playlists</div>
-          }
-        >
-          <DropdownSection
-            aria-label="playlists"
-            items={playlists}
-            className="max-h-36 overflow-y-auto scrollbar"
+        {isAuthReady && isLoggedIn &&
+          <DropdownMenu
+            aria-label="Dynamic Actions"
+            className="bg-gray-700 rounded-md p-0 text-white min-w-36 shadow-xl shadow-gray-900/50"
+            topContent={
+              <div className="text-md font-medium bg-gray-800 rounded-t-md mb-2 text-white px-3 py-2">Your Playlists</div>
+            }
           >
-            {(playlist) => {
-              const songExists = playlist.songs.includes(songId);
-              return (
-                <DropdownItem
-                  key={playlist._id}
-                  showDivider
-                  className="flex items-center justify-between cursor-pointer px-4 py-2 hover:bg-gray-100/10 text-sm"
-                  onClick={() => {
-                    if (!songExists) {
-                      addToPlaylist(playlist._id, playlist.playlistName);
-                      showSuccessToast(`Added song to ${playlist.playlistName}`);
-                    } else {
-                      console.log(playlist)
-                      setSelectedPlaylist(playlist);
-                      onOpen(); // open modal
-                    }
-                  }}
+            <DropdownSection
+              aria-label="playlists"
+              items={playlists}
+              className="max-h-36 overflow-y-auto scrollbar"
+            >
+              {(playlist) => {
+                const songExists = playlist.songs.includes(songId);
+                return (
+                  <DropdownItem
+                    key={playlist._id}
+                    showDivider
+                    className="flex items-center justify-between cursor-pointer px-4 py-2 hover:bg-gray-100/10 text-sm"
+                    onClick={() => {
+                      if (!songExists) {
+                        addToPlaylist(playlist._id, playlist.playlistName);
+                        showSuccessToast(`Added song to ${playlist.playlistName}`);
+                      } else {
+                        console.log(playlist)
+                        setSelectedPlaylist(playlist);
+                        onOpen(); // open modal
+                      }
+                    }}
+                  >
+                    <div className="flex items-center justify-between w-full gap-x-2">
+                      <span className="truncate">{playlist.playlistName}</span>
+                      {songExists && <FiCheckCircle className="w-4 h-4 text-green-400" />}
+                    </div>
+                  </DropdownItem>
+                );
+              }}
+            </DropdownSection>
+
+            <DropdownSection className="mb-0">
+              <DropdownItem className="bg-gray-800 pb-2 rounded-b-md">
+                <button
+                  className="w-full flex items-center justify-center text-sm bg-gray-500 hover:bg-gray-100/10 px-3 py-2 mt-2 rounded-md"
+                  onClick={() => setIsCreateOpen(true)}
+
                 >
-                  <div className="flex items-center justify-between w-full gap-x-2">
-                    <span className="truncate">{playlist.playlistName}</span>
-                    {songExists && <FiCheckCircle className="w-4 h-4 text-green-400" />}
-                  </div>
-                </DropdownItem>
-              );
-            }}
-          </DropdownSection>
-
-          <DropdownSection className="mb-0">
-            <DropdownItem className="bg-gray-800 pb-2 rounded-b-md">
-              <button
-                className="w-full flex items-center justify-center text-sm bg-gray-500 hover:bg-gray-100/10 px-3 py-2 mt-2 rounded-md"
-                onClick={() => setIsCreateOpen(true)}
-
-              >
-                <FiPlus className="w-4 h-4" />
-                <span>Create</span>
-              </button>
-            </DropdownItem>
-          </DropdownSection>
-        </DropdownMenu>
+                  <FiPlus className="w-4 h-4" />
+                  <span>Create</span>
+                </button>
+              </DropdownItem>
+            </DropdownSection>
+          </DropdownMenu>}
       </Dropdown>
 
       <RemoveSongModal
