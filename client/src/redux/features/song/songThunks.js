@@ -244,6 +244,35 @@ export const createPlaylistThunk = createAsyncThunk(
     }
 );
 
+export const deletePlaylistThunk = createAsyncThunk(
+    'songs/deletePlaylist',
+    async ({ playlistName }, { dispatch, rejectWithValue, getState }) => {
+        const state = getState();
+        const userId=state.user.user._id;
+        dispatch(removePlaylistRed(playlistName));
+        try {
+            const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/delete-playlist/${playlistName}/${userId}`, {
+                method: 'DELETE',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                credentials: 'include'
+            });
+
+            if (!response.ok) {
+                throw new Error('Failed to delete playlist');
+            }
+
+            const data = await response.json();
+            showSuccessToast(`Playlist "${playlistName}" deleted successfully!`);
+            return data; // Return any relevant data if needed
+        } catch (error) {
+            console.error('Error deleting playlist:', error);
+            return rejectWithValue(error.message);
+        }
+    }
+);
+
 
 export const clearSongSliceThunk = createAsyncThunk(
     'songs/clearSongSlice',

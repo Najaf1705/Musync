@@ -123,6 +123,7 @@ const SearchResults = ({ setSongName, displayPlaylistSongs, setDisplayPlaylistSo
                   .filter(playlist => playlist?.id)
                   .map(playlist => (
                     <PlaylistCard
+                      showDeleteButton={false}
                       parentComponent="searchResults"
                       key={playlist.id}
                       playlist={playlist}

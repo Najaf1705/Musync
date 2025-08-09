@@ -85,7 +85,7 @@ const App = () => {
       <footer className="text-center text-sm font-medium text-white">
         © {new Date().getFullYear()}{" "}
         <span className="text-green-600 cursor-pointer hover:underline"
-          onClick={() => window.open("https://github.com/Najaf1705", "_blank")}
+          onClick={() => window.open("https://najaf.vercel.app", "_blank")}
           title="Visit Najaf's GitHub Profile" aria-label="Najaf's GitHub Profile"
         >
           {`Najaf`}

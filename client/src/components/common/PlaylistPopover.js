@@ -10,7 +10,6 @@ import {
   DropdownItem,
   DropdownSection,
   useDisclosure,
-  user,
 } from '@heroui/react';
 import RemoveSongModal from './RemoveSongModal';
 import CreatePlaylistModal from './CreatePlaylistModal';
@@ -67,7 +66,7 @@ const PlaylistPopover = ({ songId }) => {
             setDropDownOpen(true);
           }}
         >
-          <i className="fa-solid fa-plus cursor-pointer text-white text-xl hover:text-green-400 transition" title="Add to playlist"></i>
+          <i className="fa-solid fa-plus cursor-pointer text-white text-sm md:text-xl hover:text-green-400 transition" title="Add to playlist"></i>
         </DropdownTrigger>
         {isAuthReady && isLoggedIn &&
           <DropdownMenu

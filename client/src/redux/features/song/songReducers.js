@@ -77,7 +77,7 @@ export const addNewPlaylistRed = (state, action) => {
 export const removePlaylistRed = (state, action) => {
     const playlistName = action.payload;
     state.userPlaylists = state.userPlaylists.filter(playlist => playlist.playlistName !== playlistName);
-    // if (state.selectedPlaylist && state.selectedPlaylist.plaplaylistName===playlistName) {
+    // if (state.selectedPlaylist && state.selectedPlaylist.playlistName===playlistName) {
     //   state.selectedPlaylist = null; // Clear selected playlist if it was the one removed
     // }
 };

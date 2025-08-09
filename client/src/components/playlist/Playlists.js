@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { showInfoToast, showSuccessToast, showErrorToast } from "../utils/toast";
 import PlaylistCard from "../common/playlistCard";
 import PlaylistDetail from "./playlistDetail";
-import { createPlaylistThunk } from "../../redux/features/song/songThunks";
+import { createPlaylistThunk, deletePlaylistThunk } from "../../redux/features/song/songThunks";
 import CreatePlaylistModal from "../common/CreatePlaylistModal";
 import { useDisclosure } from "@heroui/react";
 
@@ -76,6 +76,7 @@ const Playlist = () => {
                     owner: { display_name: "You" }
                   }}
                   parentComponent="playlist"
+                  deletePlaylist={()=>dispatch(deletePlaylistThunk({ playlistName: playlist.playlistName}))}
                   setDisplaySongs={setDisplaySongs}
                   setSelectedPlaylistData={setSelectedPlaylistData}
                   fetchSelectedPlaylistSongs={fetchSelectedPlaylistSongs}

@@ -35,6 +35,30 @@ const createPlaylist = async (req, res) => {
 };
 
 
+// Delete a playlist
+const deletePlaylist = async (req, res) => {
+  try {
+    console.log("Deleting playlist");
+    const { playlistName, userId } = req.params;
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+    const playlistIndex = user.playlists.findIndex(p => p.playlistName === playlistName);
+    if (playlistIndex === -1) {
+      return res.status(404).json({ error: 'Playlist not found' });
+    }
+    // Remove the playlist from the user's playlists array
+    user.playlists.splice(playlistIndex, 1);
+    await user.save();
+    return res.status(200).json({ message: 'Playlist deleted successfully' });
+  } catch (error) {
+    console.error('Error deleting playlist:', error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+};
+
+
 // Add a song to a playlist
 const addToPlaylist = async (req, res) => {
   try {
@@ -115,6 +139,7 @@ const removeFromPlaylist = async (req, res) => {
 
 module.exports = {
   createPlaylist,
+  deletePlaylist,
   addToPlaylist,
   removeFromPlaylist,
 };

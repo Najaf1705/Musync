@@ -73,7 +73,7 @@ const SongCard = ({ item, index }) => {
 
   return (
     <div
-      className="rounded-xl overflow-hidden w-40 sm:w-56 shadow-lg flex m-2 p-2 sm:p-3 flex-col transition-shadow hover:shadow-2xl bg-neutral-900"
+      className="rounded-md md:rounded-l overflow-hidden w-40 md:w-56 shadow-lg flex m-2 p-1 md:p-2 flex-col transition-shadow hover:shadow-2xl bg-neutral-900"
       style={{ backgroundColor: bgColor, color: textColor }}
       title={`${item.name} - ${item.artists ? item.artists.map(a => a.name).join(", ") : "Unknown Artist"}`}
     >
@@ -81,13 +81,13 @@ const SongCard = ({ item, index }) => {
         <img
           loading="lazy"
           src={item.album?.images[0]?.url}
-          className="w-full h-full object-cover"
+          className="w-full h-full object-cover rounded-t-md md:rounded-t-l"
           alt={item.name || 'Song'}
         />
         <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent opacity-0 hover:opacity-100 transition-opacity flex items-end justify-center">
           <div className="flex gap-5 mb-4">
             <i
-              className={`fa-${isLiked ? 'solid' : 'regular'} fa-heart cursor-pointer text-white text-xl hover:text-green-400 transition`}
+              className={`fa-${isLiked ? 'solid' : 'regular'} fa-heart cursor-pointer text-white text-sm md:text-xl hover:text-green-400 transition`}
               onClick={likeLoading ? undefined : handleLike}
               title={isLiked ? "Unlike" : "Like"}
             ></i>
@@ -97,8 +97,9 @@ const SongCard = ({ item, index }) => {
             />
 
             <i
-              className="fa-solid fa-download cursor-pointer text-white text-xl hover:text-green-400 transition"
+              className="fa-solid fa-download cursor-pointer text-white text-sm md:text-xl hover:text-green-400 transition"
               title="Download"
+
               onClick={() => {
                 dispatch(setDownloadQuery(item.name));
                 navigate('/download');
@@ -106,7 +107,7 @@ const SongCard = ({ item, index }) => {
             ></i>
 
             <i
-              className="fa-brands fa-spotify cursor-pointer text-white text-xl hover:text-green-400 transition"
+              className="fa-brands fa-spotify cursor-pointer text-white text-sm md:text-xl hover:text-green-400 transition"
               title="Open on Spotify"
               onClick={() => {
                 window.open(`https://open.spotify.com/track/${item.id}`, '_blank');
@@ -115,9 +116,9 @@ const SongCard = ({ item, index }) => {
           </div>
         </div>
       </div>
-      <div className="px-2 py-2 sm:px-4 sm:py-3">
+      <div className="px-1 py-2 md:px-1 md:pt-2">
         <div
-          className="font-semibold text-sm sm:text-base truncate"
+          className="font-semibold text-sm md:text-sm truncate"
           style={{ color: textColor }}
         >
           {item.name || 'Unknown'}
