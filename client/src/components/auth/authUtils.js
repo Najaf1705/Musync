@@ -18,7 +18,7 @@ export const useAuthUtils = () => {
     const userExists = async (email) => {
         try {
             const response = await fetch(
-                `${process.env.REACT_APP_BACKEND_URL}/userExists?email=${encodeURIComponent(email)}`,
+                `${process.env.REACT_APP_BACKEND_URL}/api/userExists?email=${encodeURIComponent(email)}`,
                 {
                     method: "GET",
                     headers: { "Content-Type": "application/json" },
@@ -43,9 +43,9 @@ export const useAuthUtils = () => {
             // prepare payload
             const payload = { email, type: type || "email" };
             if (password !== null) payload.password = password;
-            console.log(`${process.env.REACT_APP_BACKEND_URL}/login`);
+            console.log(`${process.env.REACT_APP_BACKEND_URL}/api/login`);
 
-            const res = await fetch(`${process.env.REACT_APP_BACKEND_URL}/login`, {
+            const res = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/login`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 credentials: "include",
@@ -95,7 +95,7 @@ export const useAuthUtils = () => {
         try {
             setSignupLoading(true);
 
-            const res = await fetch(`${process.env.REACT_APP_BACKEND_URL}/signup`, {
+            const res = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/signup`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 credentials: "include",

@@ -47,7 +47,7 @@ const authenticate = async (req, res, next) => {
     next();
 
   } catch (error) {
-    console.log('Auth Error:', error);
+    console.log('Auth Error:', error.message);
     if (error.name === 'JsonWebTokenError') {
       return res.status(401).json({ error: "Invalid token format" });
     }

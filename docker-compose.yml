@@ -1,0 +1,20 @@
+version: "3.9"
+
+services:
+  srvr:
+    build: ./server
+    env_file:
+      - ./server/config.env
+    expose:
+      - "5000"
+
+  nginx:
+    image: nginx:alpine
+    container_name: mynginx
+    ports:
+      - "80:80"
+    depends_on:
+      - srvr
+    volumes:
+      - ./client/build:/usr/share/nginx/html
+      - ./nginx.conf:/etc/nginx/conf.d/default.conf

@@ -15,7 +15,8 @@ app.use(cookieParser());
 // Allow specific origins
 const allowedOrigins = [
   'http://localhost:3000', // For local development
-  'http://192.168.1.119:3000', // For local development
+  'http://localhost', // For local development
+  'http://192.168.1.109:3000', // For local development
   'https://musync-enzoe.vercel.app' // For production
 ];
 

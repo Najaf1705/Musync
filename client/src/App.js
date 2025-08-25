@@ -33,7 +33,7 @@ const App = () => {
   useEffect(() => {
     console.log(process.env.REACT_APP_BACKEND_URL);
     const verify = async () => {
-      const res = await fetch(`${process.env.REACT_APP_BACKEND_URL}/serverprofile`, {
+      const res = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/serverprofile`, {
         method: "GET",
         credentials: "include",
       });

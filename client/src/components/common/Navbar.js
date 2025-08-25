@@ -29,7 +29,7 @@ const Navbar = () => {
 
   const handleLogout = async () => {
     try {
-      const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/logout`, {
+      const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/logout`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include'
