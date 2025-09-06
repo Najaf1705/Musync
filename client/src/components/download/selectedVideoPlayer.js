@@ -28,7 +28,7 @@ const SelectedVideoPlayer = ({ video, isVisible, onClose, onDownload }) => {
         {(onCloseFn) => (
           <>
             <ModalHeader className="text-white font-semibold text-xl pt-4 pb-0">
-              {video.snippet.title}
+              {video.title}
             </ModalHeader>
             <ModalBody className="flex flex-col items-center">
               <iframe
@@ -36,7 +36,7 @@ const SelectedVideoPlayer = ({ video, isVisible, onClose, onDownload }) => {
                 className="rounded-lg"
                 width="100%"
                 height="222"
-                src={`https://www.youtube.com/embed/${video.id.videoId}`}
+                src={`https://www.youtube.com/embed/${video.videoId}`}
                 allowFullScreen
               />
             </ModalBody>

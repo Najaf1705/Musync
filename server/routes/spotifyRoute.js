@@ -17,6 +17,6 @@ router.get('/api/top', getTopPlaylists);
 router.get('/api/playlist-tracks/:playlistId', getPlaylistTracks);
 
 // Get track info by track ID
-router.get('/api/:track_info', getTrackInfo);
+router.get('/api/trackInfo/:track_info', getTrackInfo);
 
 module.exports = router;

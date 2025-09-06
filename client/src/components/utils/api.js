@@ -1,6 +1,6 @@
 export const fetchTrackDetails = async (trackId) => {
   try {
-    const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/${trackId}`, {
+    const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/trackInfo/${trackId}`, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",

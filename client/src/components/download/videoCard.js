@@ -7,14 +7,15 @@ const VideoCard = ({ video, isSelected, onSelect }) => {
       onClick={() => onSelect(video)}
     >
       <img
-        src={video.snippet.thumbnails.default.url}
-        alt={video.snippet.title}
+        src={video.thumbnail}       // use your thumbnail field
+        alt={video.title}           // use your title field
         className="rounded-lg object-cover w-full h-44 mb-2"
       />
       <div className="text-center w-full">
         <h5 className="font-semibold text-sm text-gray-900 dark:text-white line-clamp-2">
-          {video.snippet.title}
+          {video.title}              // use your title field
         </h5>
+        <p className="text-xs text-gray-500 dark:text-gray-400">{video.channel}</p>
       </div>
     </div>
   );

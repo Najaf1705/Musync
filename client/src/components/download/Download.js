@@ -15,25 +15,37 @@ const Download = () => {
   const [loading, setLoading] = useState(false); // <-- loading state
 
   // Refactored handleSearch to allow calling without event
-  const handleSearch = async (e) => {
-    if (e) e.preventDefault();
-    if (!downloadQuery) return;
-    setLoading(true); // start loading
-    const API_KEY = process.env.REACT_APP_YOUTUBE_KEY2;
-    const maxResults = 20;
-    const apiUrl = `https://www.googleapis.com/youtube/v3/search?key=${API_KEY}&part=snippet&q=${downloadQuery}&maxResults=${maxResults}&type=video`;
+const handleSearch = async (e) => {
+  if (e) e.preventDefault();
+  if (!downloadQuery) return;
+  setLoading(true);
+  const apiUrl = `${process.env.REACT_APP_BACKEND_URL}/api/searchYtSong?q=${encodeURIComponent(downloadQuery)}`;
 
-    try {
-      const response = await fetch(apiUrl);
-      const data = await response.json();
-      dispatch(setDownloadSearchResults(data.items || []));
-      setSelectedVideo(null);
-    } catch (error) {
-      console.error(error);
-    } finally {
-      setLoading(false); // stop loading
-    }
-  };
+  try {
+    const response = await fetch(apiUrl, {
+      method: 'GET',
+      headers: { 'Content-Type': 'application/json' },
+    });
+    const data = await response.json();
+
+    // Normalize results to match VideoList expectations
+    const normalizedResults = (data.results || []).map(video => ({
+      videoId: video.videoId,
+      title: video.title,
+      thumbnail: video.thumbnail,
+      channel: video.channel
+    }));
+
+    console.log("Normalized results:", normalizedResults);
+    dispatch(setDownloadSearchResults(normalizedResults));
+    setSelectedVideo(null);
+  } catch (error) {
+    console.error(error);
+  } finally {
+    setLoading(false);
+  }
+};
+
 
   // Call handleSearch on mount if downloadQuery is not empty
   useEffect(() => {
@@ -50,18 +62,16 @@ const Download = () => {
 
   const handleDownload = async () => {
     if (selectedVideo) {
-      const videoId = selectedVideo.id.videoId;
-      const url = `https://youtube-mp36.p.rapidapi.com/dl?id=${videoId}`;
-      const options = {
-        method: 'GET',
-        headers: {
-          'X-RapidAPI-Key': process.env.REACT_APP_RAPID_KEY,
-          'X-RapidAPI-Host': 'youtube-mp36.p.rapidapi.com',
-        },
-      };
-
+      const videoId = selectedVideo.videoId;
+      const url = `${process.env.REACT_APP_BACKEND_URL}/api/downloadSong?id=${videoId}`;
       try {
-        const response = await fetch(url, options);
+        const response = await fetch(url, {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          credentials: 'include'
+        });
         const result = await response.json();
         if (result.link) {
           window.open(result.link);

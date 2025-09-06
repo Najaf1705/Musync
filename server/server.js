@@ -42,6 +42,7 @@ app.use(require('./routes/spotifyRoute'));
 app.use(require('./routes/likedsongsRoute'));
 app.use(require('./routes/playlistRoute'));
 app.use(require('./routes/recommendRoute'));
+app.use(require('./routes/ytRoute'));
 
 app.get("/", (req,res)=>{
   res.send("hello")
@@ -50,3 +51,8 @@ app.get("/", (req,res)=>{
 app.listen(port,'0.0.0.0', ()=>{
   console.log(`running on port  ff${port}`);
 })
+
+app.use((req, res, next) => {
+  console.log("No route matched in ytRoute. Path was:", req.originalUrl);
+  next();
+});

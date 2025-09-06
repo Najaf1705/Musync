@@ -42,7 +42,7 @@ const Playlist = () => {
     try {
       setLoading(true);
       const promises = selectedPlaylist.songs.map(async (song) => {
-        const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/${song}`);
+        const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/trackinfo/${song}`);
         if (!response.ok) throw new Error(`Failed to fetch song ID: ${song}`);
         return await response.json();
       });
