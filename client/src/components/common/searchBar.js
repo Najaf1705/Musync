@@ -1,7 +1,15 @@
 import React, { useState, useEffect } from "react";
+import useDebounce from "../../hooks/debounceInput";
 
 const SearchBar = (props) => {
   const {songName, setSongName, handleSubmit}=props;
+  const debouncedValue=useDebounce(songName,800);
+
+  useEffect(()=>{
+    if (debouncedValue.trim()) {
+      handleSubmit(null,debouncedValue);
+    }
+  },[debouncedValue]);
 
   return (
     <form onSubmit={handleSubmit} className="flex justify-center items-center mt-1 gap-2">

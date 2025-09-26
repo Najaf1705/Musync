@@ -17,6 +17,7 @@ const SongCard = ({ item, index }) => {
   const likedSongs = userPlaylists?.find(playlist => playlist.playlistName === "Liked Songs")?.songs || [];
   const [isLiked, setIsLiked] = useState(likedSongs?.includes(item.id));
   const [likeLoading, setLikeLoading] = useState(false);
+  const [likeThrottled, setLikeThrottled] = useState(false);
 
   // Local state for colors
   const [bgColor, setBgColor] = useState("#181818");
@@ -50,22 +51,28 @@ const SongCard = ({ item, index }) => {
       return;
     }
     if (likeLoading) return;
-    setLikeLoading(true);
 
-    try {
-      setIsLiked(!isLiked); // Optimistically update the like state
-      isLiked ? showSuccessToast("Song unliked") : showSuccessToast("Song liked");
-      const resultAction = await dispatch(toggleLikeSongThunk(item.id));
-      if (toggleLikeSongThunk.fulfilled.match(resultAction)) {
-        setIsLiked(resultAction.payload.isLiked);
-      } else {
-        showErrorToast("Failed to toggle like");
-        setIsLiked(isLiked); // Revert optimistic update on error
+    if (!likeThrottled) {
+      setLikeThrottled(true);
+      setLikeLoading(true);
+      try {
+        setIsLiked(!isLiked); // Optimistically update the like state
+        isLiked ? showSuccessToast("Song unliked") : showSuccessToast("Song liked");
+        const resultAction = await dispatch(toggleLikeSongThunk(item.id));
+        if (toggleLikeSongThunk.fulfilled.match(resultAction)) {
+          setIsLiked(resultAction.payload.isLiked);
+        } else {
+          showErrorToast("Failed to toggle like");
+          setIsLiked(isLiked); // Revert optimistic update on error
+        }
+      } catch {
+        showErrorToast("Like toggle failed.");
+      } finally {
+        setTimeout(() => {
+          setLikeThrottled(false)
+          setLikeLoading(false);
+        }, 2000); // 2 seconds throttle
       }
-    } catch {
-      showErrorToast("Like toggle failed.");
-    } finally {
-      setLikeLoading(false);
     }
   };
 

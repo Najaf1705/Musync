@@ -142,11 +142,6 @@ const Home = () => {
           loading={loading}
           // setLoading={setLoading}
         />
-        {/* {playlistModal && (
-          <CreatePlaylist
-            playlistModal={setPlaylistModal}
-          />
-        )} */}
       </div>
       <Outlet />
     </div>
