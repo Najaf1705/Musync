@@ -43,6 +43,7 @@ app.use(require('./routes/likedsongsRoute'));
 app.use(require('./routes/playlistRoute'));
 app.use(require('./routes/recommendRoute'));
 app.use(require('./routes/ytRoute'));
+app.use(require('./routes/najafMockRoute'));
 
 app.get("/", (req,res)=>{
   res.send("hello")
