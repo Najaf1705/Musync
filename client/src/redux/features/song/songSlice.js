@@ -30,6 +30,7 @@ const songSlice = createSlice({
     likedSongs: [],
     userPlaylists: null,
     topSongs: [],
+    topsongsLoading: false,
     searchResults: null,
     searchedPlaylistData: null,
     selectedPlaylist: null,
@@ -107,14 +108,15 @@ const songSlice = createSlice({
 
       // Top Songs
       .addCase(fetchTopSongsThunk.pending, (state) => {
-        state.loading = false;
+        state.topsongsLoading = true;
         state.error = null;
       })
       .addCase(fetchTopSongsThunk.fulfilled, (state, action) => {
+        state.topsongsLoading = false;
         state.topSongs = action.payload;
       })
       .addCase(fetchTopSongsThunk.rejected, (state, action) => {
-        state.loading = false;
+        state.topsongsLoading = false;
         state.error = action.error.message;
       })
 

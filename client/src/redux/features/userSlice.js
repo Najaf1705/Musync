@@ -11,6 +11,7 @@ const userSlice = createSlice({
   initialState,
   reducers: {
     setUser: (state, action) => {
+      console.log("Setting user in slice:", action.payload);
       state.user = action.payload;
       state.isLoggedIn = true; // ✅ Automatically mark as logged in
     },

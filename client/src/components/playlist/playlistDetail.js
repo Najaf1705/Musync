@@ -33,13 +33,13 @@ function PlaylistDetail({ selectedPlaylistData, setDisplaySongs, selectedPlaylis
       <div className="flex flex-wrap justify-center mx-1">
         {loading ? (
           // Skeleton loader for loading state
-          Array.from({ length: 6 }).map((_, index) => (
+          Array.from({ length: Math.min(10, selectedPlaylistData?.songs?.length || 0) }).map((_, index) => (
             <div
               key={index}
               className="w-40 sm:w-56 h-64 bg-gray-700 animate-pulse rounded-lg m-2"
             ></div>
           ))
-        ) : selectedPlaylistSongsData.length > 0 ? (
+        ) : songs.length > 0 ? (
           paginatedSongs.map((item, index) => (
             <SongCard key={item.id} item={item} index={index} />
           ))

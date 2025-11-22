@@ -43,7 +43,6 @@ export const useAuthUtils = () => {
             // prepare payload
             const payload = { email, type: type || "email" };
             if (password !== null) payload.password = password;
-            console.log(`${process.env.REACT_APP_BACKEND_URL}/api/login`);
 
             const res = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/login`, {
                 method: "POST",
@@ -53,7 +52,7 @@ export const useAuthUtils = () => {
             });
 
             const serRes = await res.json();
-            console.log("Login response:", serRes);
+            // console.log("Login response:", serRes);
 
             if (!res.ok) {
                 const msg =

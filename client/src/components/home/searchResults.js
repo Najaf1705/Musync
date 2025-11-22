@@ -9,8 +9,6 @@ import CustomPagination from "../common/CustomPagination"; // <-- import here
 
 const SearchResults = ({ setSongName, displayPlaylistSongs, setDisplayPlaylistSongs }) => {
   const { searchResults, searchedPlaylistData, loading } = useSelector(state => state.songs);
-  // console.log("searchResults: ", searchResults);
-  // console.log("searchedPlaylistData: ", searchedPlaylistData);
 
   const dispatch = useDispatch();
   const [selectedPlaylistData, setSelectedPlaylistData] = useState(null);

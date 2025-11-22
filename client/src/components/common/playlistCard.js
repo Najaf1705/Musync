@@ -1,8 +1,9 @@
 import { useDispatch } from 'react-redux';
 import { deletePlaylistThunk, setSelectedPlaylistThunk } from '../../redux/features/song/songThunks';
-import { FiDelete, FiTrash } from 'react-icons/fi';
+import { FiTrash } from 'react-icons/fi';
 import { useDisclosure } from '@heroui/react';
 import RemovePlaylistModal from './RemovePlaylistModal';
+// import { useNavigate } from 'react-router-dom';
 
 const PlaylistCard = ({
   parentComponent,
@@ -13,6 +14,7 @@ const PlaylistCard = ({
   showDeleteButton = true
 
 }) => {
+  // const navigate = useNavigate();
   const dispatch = useDispatch();
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
 
@@ -33,6 +35,7 @@ const PlaylistCard = ({
       setSelectedPlaylistData(playlist);
       fetchSelectedPlaylistSongs(playlist.name);
     }
+    // navigate(`/playlist/${playlist.id}`);
   };
 
   const handleDeletePlaylist = () => {

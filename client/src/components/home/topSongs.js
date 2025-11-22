@@ -1,12 +1,12 @@
 import React from "react";
 import SongCard from "../common/songCard";
 
-const TopSongs = ({ topSongs, loading }) => {
+const TopSongs = ({ topSongs, loadingTopsongs }) => {
   return (
-    <div>
+    <div className="">
       <h3 className="mt-2 text-xl font-semibold">Top Songs</h3>
       <div className="flex flex-wrap justify-center mx-1">
-        {loading ? (
+        {loadingTopsongs ? (
           // Skeleton loader for loading state
           Array.from({ length: 6 }).map((_, index) => (
             <div

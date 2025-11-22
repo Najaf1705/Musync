@@ -18,9 +18,6 @@ import { clearUser, setAuthReady, setUser } from './redux/features/userSlice'; /
 const App = () => {
   const [selectedSong, setSelectedSong] = useState('');
   const dispatch = useDispatch();
-  // const userDetails = useSelector((state) => state.user.user);
-  // const likedSongsId = useSelector((state) => state.songs.likedSongs);
-  // dispatch(fetchLikedSongs(userDetails._id));
 
   useEffect(() => {
     dispatch(fetchTopSongsThunk());
@@ -41,7 +38,7 @@ const App = () => {
 
       if (res.ok) {
         const user = await res.json();
-        console.log("serverprofile response", user);
+        // console.log("serverprofile response", user);
         dispatch(setUser(user));
         dispatch(setUserSongsThunk({ likedSongs: user.likedSongs, userPlaylists: user.playlists })); // set liked songs
       } else {
@@ -53,8 +50,6 @@ const App = () => {
 
     verify();
   }, [dispatch]);
-
-  // console.log("user Song slice",useSelector((state)=>state.songs));
 
   return (
     <div className="flex flex-col min-h-screen">

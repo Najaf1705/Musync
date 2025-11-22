@@ -40,6 +40,7 @@ const deletePlaylist = async (req, res) => {
   try {
     console.log("Deleting playlist");
     const { playlistName, userId } = req.params;
+    console.log("Playlist to delete:", playlistName, "for user:", userId);
     const user = await User.findById(userId);
     if (!user) {
       return res.status(404).json({ error: 'User not found' });

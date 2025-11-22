@@ -1,7 +1,6 @@
-import React, { useState, useEffect, useCallback } from "react";
-import { useNavigate, Outlet } from "react-router-dom";
+import React, { useState, useEffect } from "react";
+import { Outlet } from "react-router-dom";
 import { useSelector, useDispatch } from 'react-redux';
-import { toast } from "react-toastify";
 import SearchBar from "../common/searchBar";
 import RecentSearches from "./recentSearches";
 import SearchResults from "./searchResults";
@@ -12,24 +11,15 @@ import { showErrorToast } from "../utils/toast";
 
 
 const Home = () => {
-  const navigate = useNavigate();
   const dispatch = useDispatch();
   const userDetails = useSelector((state) => state.user.user);
-  const likedSongs = useSelector((state) => state.songs.likedSongs);
-  const isLoggedIn = useSelector((state) => state.user.isLoggedIn);
   const topSongs = useSelector((state) => state.songs.topSongs);
+  const loadingTopsongs = useSelector((state) => state.songs.topsongsLoading);
 
   const [songName, setSongName] = useState("");
-  const [songData, setSongData] = useState(null);
-  const [playlistData, setPlaylistData] = useState(null);
-  const [loading, setLoading] = useState(false);
   const [selectedPlaylist, setSelectedPlaylist] = useState(null);
-  const [selectedPlaylistName, setSelectedPlaylistName] = useState(null);
   const [playlistTracks, setPlaylistTracks] = useState([]);
   const [recentSearches, setRecentSearches] = useState([]);
-  const [playlistModal, setPlaylistModal] = useState(false);
-  const [cardColors, setCardColors] = useState([]);
-  const [cardTextColors, setCardTextColors] = useState([]);
   const [displayPlaylistSongs, setDisplayPlaylistSongs] = useState(false);
 
 
@@ -86,7 +76,7 @@ const Home = () => {
       showErrorToast('Failed to search songs');
     }
   };
-  
+
 
   const handleRemoveRecent = (removedItem) => {
     const updatedSearches = recentSearches.filter((item) => item !== removedItem);
@@ -105,7 +95,9 @@ const Home = () => {
     <div className="pb-6">
       <div className="mx-4">
         <h3 className="text-2xl font-semibold mb-4">
-          {getGreeting()} {userDetails?.name?.split(" ")[0] || "Luffy"}
+          {getGreeting()} {userDetails?.name
+            ? userDetails.name.split(" ")[0].charAt(0).toUpperCase() + userDetails.name.split(" ")[0].slice(1).toLowerCase()
+            : "Luffy"}
         </h3>
         <SearchBar
           songName={songName}
@@ -119,28 +111,14 @@ const Home = () => {
           handleSubmit={handleSubmit}
         />
         <SearchResults
-          songData={songData}
-          playlistData={playlistData}
-          selectedPlaylist={selectedPlaylist}
-          setSelectedPlaylist={setSelectedPlaylist}
-          setSelectedPlaylistName={setSelectedPlaylistName}
-          playlistTracks={playlistTracks}
           setSongName={setSongName}
-          cardColors={cardColors}
-          cardTextColors={cardTextColors}
-          setCardColors={setCardColors}
-          setCardTextColors={setCardTextColors}
-          loading={loading}
-          playlists={userDetails?.playlists}
-          setPlaylistModal={setPlaylistModal}
-          login={isLoggedIn}
           displayPlaylistSongs={displayPlaylistSongs}
           setDisplayPlaylistSongs={setDisplayPlaylistSongs}
         />
         <TopSongs
           topSongs={topSongs}
-          loading={loading}
-          // setLoading={setLoading}
+          loadingTopsongs={loadingTopsongs}
+        // setLoading={setLoading}
         />
       </div>
       <Outlet />
