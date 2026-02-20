@@ -17,7 +17,8 @@ const allowedOrigins = [
   'http://localhost:3000', // For local development
   'http://localhost', // For local development
   'http://192.168.1.109:3000', // For local development
-  'https://musync-enzoe.vercel.app' // For production
+  'https://musync-enzoe.vercel.app', // For production
+  'https://musync.najaf.in' // For production
 ];
 
 app.set("trust proxy", 1);
