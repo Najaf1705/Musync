@@ -85,7 +85,10 @@ const App = () => {
         >
           {`Najaf`}
         </span>
-        {` All rights reserved.`}
+        {` All rights reserved. `}
+        <a href="https://najaf.in/privacy-policy" target="_blank" rel="noopener noreferrer"
+          className='text-purple-300'
+        >Privacy Policy</a>
       </footer>
     </div>
   )
