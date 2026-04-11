@@ -103,12 +103,15 @@ export const searchSongsAndPlaylistsThunk = createAsyncThunk(
                 }
             });
 
+            console.log("searres", response);
+
             if (!response.ok) {
                 const errorData = await response.json();
                 throw new Error(errorData.message || 'Search failed');
             }
 
             const data = await response.json();
+            // console.log("data", data);
 
             // Validate response structure
             if (!data.tracks || !data.playlists) {
@@ -120,7 +123,7 @@ export const searchSongsAndPlaylistsThunk = createAsyncThunk(
             const returnData = {
                 tracks: {
                     ...data.tracks,
-                    items: data.tracks.items.map(track => ({
+                    items: data.tracks.map(track => ({
                         ...track,
                         isLiked: false // Initialize like status
                     }))

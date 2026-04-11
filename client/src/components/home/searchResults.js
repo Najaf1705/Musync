@@ -113,11 +113,11 @@ const SearchResults = ({ setSongName, displayPlaylistSongs, setDisplayPlaylistSo
       {/* Playlists */}
       {displayPlaylistSongs === false ? (
         <>
-          {searchedPlaylistData?.items?.length > 0 ? (
+          {searchedPlaylistData?.length > 0 ? (
             <div>
               <h4 className="text-lg font-semibold mt-4 mb-2">Playlists</h4>
               <div className="flex flex-wrap justify-center pb-3 mx-1">
-                {searchedPlaylistData.items
+                {searchedPlaylistData
                   .filter(playlist => playlist?.id)
                   .map(playlist => (
                     <PlaylistCard
