@@ -125,7 +125,7 @@ export const searchSongsAndPlaylistsThunk = createAsyncThunk(
                     ...data.tracks,
                     items: data.tracks.map(track => ({
                         ...track,
-                        isLiked: false // Initialize like status
+                        isLiked: false, // Initialize like status
                     }))
                 },
                 playlists: data.playlists
@@ -149,9 +149,9 @@ export const addSongToPlaylistThunk = createAsyncThunk(
     'songs/addSongToPlaylist',
     async ({ playlistId, playlistName, songId }, { dispatch, rejectWithValue, getState }) => {
         dispatch(addSongToPlaylistRed({ playlistId, songId }));
-        const state=getState();
-        const userId=state.user.user._id;
-        console.log("useriddddddddd",userId)
+        const state = getState();
+        const userId = state.user.user._id;
+        console.log("useriddddddddd", userId)
         try {
             const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/addToPlaylist/${playlistName}/${songId}/${userId}`, {
                 method: 'POST',
@@ -251,7 +251,7 @@ export const deletePlaylistThunk = createAsyncThunk(
     'songs/deletePlaylist',
     async ({ playlistName }, { dispatch, rejectWithValue, getState }) => {
         const state = getState();
-        const userId=state.user.user._id;
+        const userId = state.user.user._id;
         dispatch(removePlaylistRed(playlistName));
         try {
             const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/delete-playlist/${playlistName}/${userId}`, {

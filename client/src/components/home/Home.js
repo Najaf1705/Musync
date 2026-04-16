@@ -111,6 +111,7 @@ const Home = () => {
           handleSubmit={handleSubmit}
         />
         <SearchResults
+          songName={songName}
           setSongName={setSongName}
           displayPlaylistSongs={displayPlaylistSongs}
           setDisplayPlaylistSongs={setDisplayPlaylistSongs}

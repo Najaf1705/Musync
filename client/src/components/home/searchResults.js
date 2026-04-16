@@ -7,7 +7,7 @@ import { setSearchedPlaylistDataThunk, setSearchResultsThunk } from "../../redux
 import CustomPagination from "../common/CustomPagination"; // <-- import here
 
 
-const SearchResults = ({ setSongName, displayPlaylistSongs, setDisplayPlaylistSongs }) => {
+const SearchResults = ({ songName, setSongName, displayPlaylistSongs, setDisplayPlaylistSongs }) => {
   const { searchResults, searchedPlaylistData, loading } = useSelector(state => state.songs);
 
   const dispatch = useDispatch();
@@ -28,9 +28,12 @@ const SearchResults = ({ setSongName, displayPlaylistSongs, setDisplayPlaylistSo
       const playlistData = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/playlist-tracks/${pid}`);
       if (playlistData.ok) {
         const playlistDataResponse = await playlistData.json();
-        if (!playlistDataResponse?.items?.length) return;
-        const transformedPlaylistDataResponse = playlistDataResponse.items.map(item => item.track)
-        console.log("transformedPlaylistDataResponse", transformedPlaylistDataResponse);
+        // console.log("pd", playlistDataResponse)
+
+        if (!playlistDataResponse?.songs?.length) return;
+
+        const transformedPlaylistDataResponse = playlistDataResponse.songs.map(item => item)
+        // console.log("transformedPlaylistDataResponse", transformedPlaylistDataResponse);
 
         setSelectedPlaylistSongsData(transformedPlaylistDataResponse);
       }
@@ -82,7 +85,7 @@ const SearchResults = ({ setSongName, displayPlaylistSongs, setDisplayPlaylistSo
   return (
     <div>
       {/* Songs */}
-      {searchResults?.items?.length > 0 ? (
+      {searchResults?.items?.length > 0 && (
         <div>
           <h4 className="text-xl font-semibold mt-4 mb-2">
             <i
@@ -108,7 +111,13 @@ const SearchResults = ({ setSongName, displayPlaylistSongs, setDisplayPlaylistSo
             </div>
           )}
         </div>
-      ) : null}
+      )
+      }
+      {songName !== "" && searchResults?.items?.length === 0 &&
+        (
+          <div>No results for {songName}</div>
+        )
+      }
 
       {/* Playlists */}
       {displayPlaylistSongs === false ? (
@@ -133,7 +142,7 @@ const SearchResults = ({ setSongName, displayPlaylistSongs, setDisplayPlaylistSo
               </div>
             </div>
           ) : null
-        }
+          }
         </>
       ) : (
         <PlaylistDetail

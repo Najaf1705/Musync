@@ -7,6 +7,7 @@ import PlaylistDetail from "./playlistDetail";
 import { createPlaylistThunk, deletePlaylistThunk } from "../../redux/features/song/songThunks";
 import CreatePlaylistModal from "../common/CreatePlaylistModal";
 import { useDisclosure } from "@heroui/react";
+import { fetchTrackDetails } from "../utils/api";
 
 const Playlist = () => {
   const navigate = useNavigate();
@@ -38,17 +39,17 @@ const Playlist = () => {
     setSelectedPlaylistSongsData([]);
 
     if (!selectedPlaylist?.songs?.length) return;
+    console.log("Fsd", selectedPlaylist.songs);
 
     try {
       setLoading(true);
       const promises = selectedPlaylist.songs.map(async (song) => {
-        const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/trackinfo/${song}`);
-        if (!response.ok) throw new Error(`Failed to fetch song ID: ${song}`);
-        return await response.json();
+        return await fetchTrackDetails(song);
       });
 
       const allSongDetails = await Promise.all(promises);
       setSelectedPlaylistSongsData(allSongDetails);
+      console.log("allsongs", allSongDetails);
     } catch (error) {
       console.error("Error fetching songs:", error);
     } finally {
@@ -72,7 +73,7 @@ const Playlist = () => {
                     ...playlist,
                     id: playlist._id || playlist.id,
                     name: playlist.playlistName,
-                    images: [{ url: "/images/playlists.png" }],
+                    images: [{},{},{ url: "/images/playlists.png" }],
                     owner: { display_name: "You" }
                   }}
                   parentComponent="playlist"

@@ -9,7 +9,9 @@ export const fetchTrackDetails = async (trackId) => {
     });
 
     if (!response.ok) throw new Error(`Failed to fetch track details for ID: ${trackId}`);
-    return await response.json();
+    const trackDetails=await response.json();
+    console.log("trackDet", trackDetails);
+    return trackDetails;
   } catch (error) {
     console.error(`Error fetching track details for ID ${trackId}:`, error);
     return null;

@@ -28,8 +28,8 @@ const SongCard = ({ item, index }) => {
   }, [likedSongs, item.id]);
 
   useEffect(() => {
-    if (item.image[2]?.url) {
-      Vibrant.from(item.image[2].url)
+    if (item.images[2]?.url) {
+      Vibrant.from(item.images[2].url)
         .getPalette()
         .then((palette) => {
           const dominantColor = palette.Vibrant?.hex || "#181818";
@@ -82,12 +82,12 @@ const SongCard = ({ item, index }) => {
     <div
       className="rounded-md md:rounded-l overflow-hidden w-40 md:w-56 shadow-lg flex m-2 p-1 md:p-2 flex-col transition-shadow hover:shadow-2xl bg-neutral-900"
       style={{ backgroundColor: bgColor, color: textColor }}
-      title={`${item.name} - ${item.artists ? item.artists?.primary?.name : "Unknown Artist"}`}
+      title={`${item.name} - ${item.artists ? item.artists?.primary[0]?.name : "Unknown Artist"}`}
     >
       <div className="relative aspect-square w-full">
         <img
           loading="lazy"
-          src={item.image[2]?.url}
+          src={item.images[2]?.url}
           className="w-full h-full object-cover rounded-t-md md:rounded-t-l"
           alt={item.name || 'Song'}
         />
@@ -131,7 +131,7 @@ const SongCard = ({ item, index }) => {
           {item.name || 'Unknown'}
         </div>
         <p className="text-xs sm:text-sm truncate">
-          {`${item.name} - ${item.artists ? item.artists?.primary[0]?.name : "Unknown Artist"}`}
+          {`${item.artists ? item.artists?.primary[0]?.name : "Unknown Artist"}`}
         </p>
       </div>
     </div>

@@ -15,7 +15,7 @@ const authenticate = async (req, res, next) => {
     console.log('Decoded token:', decoded);
     
     // Add debug logging
-    console.log('Decoded token _id:', decoded._id);
+    console.log('Decoded token_id:', decoded._id);
     
     // Validate MongoDB ID format (24 chars hexadecimal)
     if (!decoded._id || !/^[0-9a-fA-F]{24}$/.test(decoded._id)) {
