@@ -29,7 +29,7 @@ const Playlist = () => {
   useEffect(() => {
     if (!isAuthReady) return;
     if (!isLoggedIn) {
-      navigate('/');
+      navigate('/', {replace: true});
       showInfoToast("Log in to see your playlists");
     }
   }, [isLoggedIn, isAuthReady, navigate]);
@@ -39,7 +39,6 @@ const Playlist = () => {
     setSelectedPlaylistSongsData([]);
 
     if (!selectedPlaylist?.songs?.length) return;
-    console.log("Fsd", selectedPlaylist.songs);
 
     try {
       setLoading(true);
@@ -49,7 +48,6 @@ const Playlist = () => {
 
       const allSongDetails = await Promise.all(promises);
       setSelectedPlaylistSongsData(allSongDetails);
-      console.log("allsongs", allSongDetails);
     } catch (error) {
       console.error("Error fetching songs:", error);
     } finally {

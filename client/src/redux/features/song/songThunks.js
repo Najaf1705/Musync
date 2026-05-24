@@ -30,7 +30,6 @@ export const fetchTopSongsThunk = createAsyncThunk(
     'songs/fetchTopSongs',
     async () => {
         try {
-            console.log("Fetching top songs...");
             const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/topSongs`, {
                 method: "POST",
                 headers: {
@@ -62,7 +61,6 @@ export const toggleLikeSongThunk = createAsyncThunk(
     'songs/toggleLike',
     async (songId, { rejectWithValue, dispatch }) => {
         try {
-            console.log("Toggling like for song:", songId);
             dispatch(toggleLikeSongRed(songId)); // Optimistically update the state
             const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/toggle-like/${songId}`, {
                 method: 'POST',
@@ -93,7 +91,6 @@ export const toggleLikeSongThunk = createAsyncThunk(
 export const searchSongsAndPlaylistsThunk = createAsyncThunk(
     'songs/search',
     async (query, { rejectWithValue }) => {
-        console.log("Searching dongs and playlists");
         try {
             const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/search?q=${encodeURIComponent(query)}`, {
                 method: 'GET',
@@ -103,22 +100,17 @@ export const searchSongsAndPlaylistsThunk = createAsyncThunk(
                 }
             });
 
-            console.log("searres", response);
-
             if (!response.ok) {
                 const errorData = await response.json();
                 throw new Error(errorData.message || 'Search failed');
             }
 
             const data = await response.json();
-            // console.log("data", data);
 
             // Validate response structure
             if (!data.tracks || !data.playlists) {
                 throw new Error('Invalid response format from server');
             }
-
-            console.log('Search results:', data);
 
             const returnData = {
                 tracks: {
@@ -130,8 +122,6 @@ export const searchSongsAndPlaylistsThunk = createAsyncThunk(
                 },
                 playlists: data.playlists
             };
-
-            console.log('Transformed search results:', returnData);
 
             // Transform data if needed and return
             return returnData;
@@ -150,8 +140,12 @@ export const addSongToPlaylistThunk = createAsyncThunk(
     async ({ playlistId, playlistName, songId }, { dispatch, rejectWithValue, getState }) => {
         dispatch(addSongToPlaylistRed({ playlistId, songId }));
         const state = getState();
-        const userId = state.user.user._id;
-        console.log("useriddddddddd", userId)
+        const userId = state.user.user?._id;
+        if (!userId) {
+            dispatch(removeSongFromPlaylistRed({ playlistId, songId }));
+            return rejectWithValue('User not authenticated');
+        }
+
         try {
             const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/addToPlaylist/${playlistName}/${songId}/${userId}`, {
                 method: 'POST',
@@ -185,7 +179,6 @@ export const removeSongFromPlaylistThunk = createAsyncThunk(
         try {
             const state = getState();
             const userId = state.user.user._id;
-            console.log("Removing song from playlist:", { playlistId, songId, userId });
             const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/removeFromPlaylist/${playlistName}/${songId}/${userId}`, {
                 method: 'POST',
                 headers: {
@@ -214,7 +207,6 @@ export const createPlaylistThunk = createAsyncThunk(
     'songs/createPlaylist',
     async ({ playlistName, userId, songId = null }, { dispatch, rejectWithValue }) => {
         dispatch(addNewPlaylistRed({ playlistName, songId }));
-        console.log("Creating playlist:", { playlistName, userId, songId });
         try {
             // throw new Error('Failed to create playlist');
             const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/create-playlist/${playlistName}/${userId}`, {
@@ -228,10 +220,9 @@ export const createPlaylistThunk = createAsyncThunk(
                 throw new Error('Failed to create playlist');
             }
             const data = await response.json();
-            console.log("Playlist created:", data);
 
             if (songId) {
-                dispatch(addSongToPlaylistThunk({ playlistId: data._id, playlistName, userId, songId }));
+                await dispatch(addSongToPlaylistThunk({ playlistId: data._id, playlistName, songId })).unwrap();
             }
 
             showSuccessToast(`Playlist "${playlistName}" created successfully!`);

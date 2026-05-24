@@ -107,7 +107,6 @@ const TopPL = (props) => {
           setLoading(true);
           const response = await fetch(`/api/playlist-tracks/${selectedPlaylist}`);
           const data = await response.json();
-          // console.log(data);
           setPlaylistTracks(data.items);
         } catch (error) {
           console.error(error);

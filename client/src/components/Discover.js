@@ -37,7 +37,7 @@ const Discover = (props) => {
         return;
       }
     } catch (error) {
-      console.log("Error in finding song");
+      console.error("Error in finding song");
     }
   };
 

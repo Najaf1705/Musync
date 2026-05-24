@@ -1,12 +1,24 @@
-const bcrypt = require('bcryptjs');
-const User = require('../models/userSchema');
+const authService = require('../services/authService');
 
-// Check if user exists by email utility function
-const checkUserExistsByEmail = async (email) => {
-  if (!email) return false;
-  const user = await User.findOne({ email });
-  return user;
+// utils/setAuthCookie.js
+const setAuthCookie = (res, token, options = {}) => {
+  const isProd = process.env.NODE_ENV === "production";
+
+  const defaultOptions = {
+    httpOnly: true,
+    secure: isProd,
+    sameSite: isProd ? "none" : "lax",
+    maxAge: 24 * 60 * 60 * 1000, // 1 day
+    path: "/",
+  };
+
+  res.cookie(
+    options.name || "jtoken",
+    token,
+    { ...defaultOptions, ...options }
+  );
 };
+
 
 // User existence controller
 const userExists = async (req, res) => {
@@ -16,8 +28,8 @@ const userExists = async (req, res) => {
       return res.status(400).json({ error: 'Email is required' });
     }
 
-    const user = await checkUserExistsByEmail(email);
-    return res.status(200).json({ exists: !!user, message: user ? 'User exists' : 'User does not exist' });
+    const exists = await authService.getUserByEmail(email);
+    return res.status(200).json({ exists, message: exists ? 'User exists' : 'User does not exist' });
   } catch (error) {
     console.error('Error checking user existence:', error);
     return res.status(500).json({ error: 'Internal server error' });
@@ -25,109 +37,151 @@ const userExists = async (req, res) => {
 };
 
 
-
-
-// Login Controller
-const login = async (req, res) => {
+const googleLogin = async (req, res) => {
   try {
-    const { email, password = null, type } = req.body;
-    console.log("Login request:", { email, password, type });
+    const { token, password=null } = req.body;
+    // if(!token)throw { status: 400, message: "Token is required" };
+    // const googleUserDetails=await authService.getGoogleUserDetails(token);
 
-    if (!email) {
-      return res.status(400).json({ error: 'Please provide email' });
-    }
+    // const user=await authService.getUserByEmail(googleUserDetails.email)
 
-    const user = await checkUserExistsByEmail(email);
-    if (!user) {
-      return res.status(404).json({ error: 'User not found' });
-    }
+    const user = await authService.googleSignup(token, password);
 
-    // If not Google login, validate password
-    if (type !== 'google') {
-      if (!password) {
-        return res.status(400).json({ error: 'Please provide password' });
-      }
+    const authToken = await user.generateAuthToken();
+    setAuthCookie(res, authToken);
 
-      const isMatch = await bcrypt.compare(password, user.password);
-      if (!isMatch) {
-        return res.status(401).json({ error: 'Invalid credentials' });
-      }
-    }
-
-    // Generate JWT token
-    const token = await user.generateAuthToken();
-
-    // Set JWT in cookie
-    res.cookie("jtoken", token, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
-      maxAge: 24 * 60 * 60 * 1000 // 1 day
-    });
-
-    // Return safe user data
     return res.status(200).json({
       message: "Logged in successfully",
-      user: {
-        
-        _id: user._id,
-        name: user.name,
-        email: user.email,
-        likedSongs: user.likedSongs,
-        playlists: user.playlists,
-        image: user.image,
-      },
+      user: authService.formatUserResponse(user),
     });
-
   } catch (error) {
-    console.error('Login error:', error);
-    res.status(500).json({ error: error.message || 'Server Error' });
+    console.error('Google login error:', error);
+    const status = error.status || 500;
+    res.status(status).json({ error: error.message || 'Server Error' });
   }
 };
 
-// Signup Controller
-const signup = async (req, res) => {
+const googleSignup = async (req, res) => {
   try {
-    const { name, email, password, image } = req.body;
+    const { name, email, image = null } = req.body;
 
-    if (!name || !email || !password) {
-      return res.status(400).json({ error: 'Please provide all details' });
-    }
-
-    const existingUser = await checkUserExistsByEmail(email);
-    if (existingUser) {
-      return res.status(409).json({ error: 'User already exists' });
-    }
-
-    const newUser = new User({ name, email, password, image });
-    await newUser.save();
+    const newUser = await authService.googleSignup(name, email, image);
 
     const token = await newUser.generateAuthToken();
-
-    res.cookie("jtoken", token, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
-      maxAge: 24 * 60 * 60 * 1000
-    });
+    setAuthCookie(res, token);
 
     return res.status(201).json({
       message: "User registered successfully",
-      user: {
-        id: newUser._id,
-        name: newUser.name,
-        email: newUser.email,
-        likedSongs: newUser.likedSongs,
-        playlists: newUser.playlists,
-        image: newUser.image,
-      },
+      user: authService.formatUserResponse(newUser),
+    });
+  } catch (error) {
+    console.error('Google signup error:', error);
+    const status = error.status || 500;
+    res.status(status).json({ error: error.message || 'Server Error' });
+  }
+};
+
+
+// Login Controller
+const normalLogin = async (req, res) => {
+  try {
+    const { email, password = null, otp = null, otpId = null, type = null } = req.body;
+
+    console.log("Login request:", { email, type });
+
+    if (!email || !type) {
+      return res.status(400).json({
+        error: "Please provide email and login type"
+      });
+    }
+
+    let user;
+
+    if (type === "password") {
+      user = await authService.loginWithPassword(email, password);
+    } else if (type === "otp") {
+      user = await authService.loginWithOtp(email, otp, otpId);
+    } else {
+      return res.status(400).json({
+        error: "Invalid login type"
+      });
+    }
+
+    const token = await user.generateAuthToken();
+    setAuthCookie(res, token);
+
+    return res.status(200).json({
+      message: "Logged in successfully",
+      user: authService.formatUserResponse(user),
+    });
+
+  } catch (error) {
+    console.error("Login error:", error);
+    const status = error.status || 500;
+    res.status(status).json({
+      error: error.message || "Server Error"
+    });
+  }
+};
+// Signup Controller
+const normalSignup = async (req, res) => {
+  try {
+    const { name, email, password, image = null, otp = null, otpId = null } = req.body;
+
+    const result = await authService.signup(name, email, password, image, otpId, otp);
+
+    if (result && result.status === 'otp_required') {
+      return res.status(200).json(result);
+    }
+
+    const token = await result.generateAuthToken();
+    setAuthCookie(res, token);
+
+    return res.status(201).json({
+      message: "User registered successfully",
+      user: authService.formatUserResponse(result),
     });
 
   } catch (error) {
     console.error('Signup error:', error);
-    res.status(500).json({ error: 'Internal server error' });
+    const status = error.status || 500;
+    res.status(status).json({ error: error.message || 'Internal server error' });
   }
 };
+
+const generateOtp = async (req, res) => {
+  try {
+    const { email } = req.body;
+
+    const result = await authService.generateOtp(email);
+
+    return res.status(200).json(result);
+
+  } catch (error) {
+    console.error(error);
+    const status = error.status || 500;
+    return res.status(status).json({
+      message: error.message || "Failed to send OTP"
+    });
+  }
+};
+const validateOtp = async (req, res) => {
+  try {
+    const { otpId, otp } = req.body;
+
+    const result = await authService.validateOtpCode(otpId, otp);
+
+    return res.status(200).json(result);
+
+  } catch (error) {
+    console.error(error);
+    const status = error.status || 500;
+    return res.status(status).json({
+      message: error.message || "Failed to verify OTP",
+    });
+  }
+};
+
 
 // Logout Controller
 const logout = (req, res) => {
@@ -142,8 +196,12 @@ const serverProfile = (req, res) => {
 };
 
 module.exports = {
-  login,
-  signup,
+  normalLogin,
+  googleLogin,
+  googleSignup,
+  normalSignup,
+  generateOtp,
+  validateOtp,
   userExists,
   logout,
   serverProfile,

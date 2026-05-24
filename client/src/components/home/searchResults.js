@@ -28,17 +28,15 @@ const SearchResults = ({ songName, setSongName, displayPlaylistSongs, setDisplay
       const playlistData = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/playlist-tracks/${pid}`);
       if (playlistData.ok) {
         const playlistDataResponse = await playlistData.json();
-        // console.log("pd", playlistDataResponse)
 
         if (!playlistDataResponse?.songs?.length) return;
 
         const transformedPlaylistDataResponse = playlistDataResponse.songs.map(item => item)
-        // console.log("transformedPlaylistDataResponse", transformedPlaylistDataResponse);
 
         setSelectedPlaylistSongsData(transformedPlaylistDataResponse);
       }
     } catch (error) {
-      console.log("Error fetching playlist songs");
+      console.error("Error fetching playlist songs");
     } finally {
       setLoadingPlaylistSongs(false)
     }

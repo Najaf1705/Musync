@@ -9,19 +9,19 @@ import {
 } from './songThunks';
 
 import {
-  setUserSongsRed as _setUserSongsRed,
-  setTopSongsRed as _setTopSongsRed,
-  setSearchResultsRed as _setSearchResultsRed,
-  setSearchedPlaylistDataRed as _setSearchedPlaylistDataRed,
-  setSelectedPlaylistRed as _setSelectedPlaylistRed,
-  setPlaylistTracksRed as _setPlaylistTracksRed,
-  addSongToPlaylistRed as _addSongToPlaylistRed,
-  removeSongFromPlaylistRed as _removeSongFromPlaylistRed,
-  addNewPlaylistRed as _addNewPlaylistRed,
-  removePlaylistRed as _removePlaylistRed,
-  setLikedSongsRed as _setLikedSongsRed,
-  toggleLikeSongRed as _toggleLikeSongRed,
-  clearSongSliceRed as _clearSongSliceRed,
+  setUserSongs as _setUserSongsRed,
+  setTopSongs as _setTopSongsRed,
+  setSearchResults as _setSearchResultsRed,
+  setSearchedPlaylistData as _setSearchedPlaylistDataRed,
+  setSelectedPlaylist as _setSelectedPlaylistRed,
+  setPlaylistTracks as _setPlaylistTracksRed,
+  addSongToPlaylist as _addSongToPlaylistRed,
+  removeSongFromPlaylist as _removeSongFromPlaylistRed,
+  addNewPlaylist as _addNewPlaylistRed,
+  removePlaylist as _removePlaylistRed,
+  setLikedSongs as _setLikedSongsRed,
+  toggleLikeSong as _toggleLikeSongRed,
+  clearSongSlice as _clearSongSliceRed,
 } from './songReducers';
 
 const songSlice = createSlice({
@@ -121,20 +121,32 @@ const songSlice = createSlice({
       })
 
       // Add Song to Playlist
+      .addCase(addSongToPlaylistThunk.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
       .addCase(addSongToPlaylistThunk.rejected, (state) => {
+        state.loading = false;
         showErrorToast("Failed to add song to playlist");
         state.error = 'Something went wrong';
       })
       .addCase(addSongToPlaylistThunk.fulfilled, (state) => {
+        state.loading = false;
         state.error = null;
       })
 
       // Remove Song from Playlist
+      .addCase(removeSongFromPlaylistThunk.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
       .addCase(removeSongFromPlaylistThunk.rejected, (state) => {
+        state.loading = false;
         showErrorToast("Failed to remove song from playlist");
         state.error = 'Something went wrong';
       })
       .addCase(removeSongFromPlaylistThunk.fulfilled, (state) => {
+        state.loading = false;
         state.error = null;
       });
   }

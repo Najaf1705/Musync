@@ -6,8 +6,6 @@ import { useNavigate } from 'react-router-dom';
 
 function PlaylistDetail({ selectedPlaylistData, setDisplaySongs, selectedPlaylistSongsData, loading }) {
   const navigate=useNavigate();
-  console.log("selectedPlaylistData", selectedPlaylistData);
-  console.log("selectedPlaylistSongsData", selectedPlaylistSongsData);
 
   const [songPage, setSongPage] = useState(1);
   const SONGS_PER_PAGE = 10;
@@ -52,7 +50,7 @@ function PlaylistDetail({ selectedPlaylistData, setDisplaySongs, selectedPlaylis
             </h3>
             <button
               className="mt-4 px-4 py-2 bg-green-500 text-white rounded-sm hover:bg-green-600 transition"
-              onClick={() => navigate('/')}
+              onClick={() => navigate('/', {replace: true})}
             >Add Songs
             </button>
           </div>

@@ -1,142 +1,60 @@
-const User = require('../models/userSchema');
+const playlistService = require('../services/playlistService');
 
 // Create a new playlist
 const createPlaylist = async (req, res) => {
   try {
     const { playlistName, userId } = req.params;
-    const user = await User.findById(userId);
 
-    if (!user) {
-      return res.status(404).json({ error: 'User not found' });
-    }
-
-    if (!Array.isArray(user.playlists)) {
-      // If it's not an array or undefined, initialize it as an empty array
-      user.playlists = [];
-    }
-
-    const playlistExists = user.playlists.some((playlist) => playlist.playlistName === playlistName);
-
-    if (playlistExists) {
-      return res.status(400).json({ error: 'Playlist name already exists' });
-    }
-
-    const newPlaylist = { playlistName, songs: [] };
-
-    // Push the new playlist object into the user's playlists array
-    user.playlists.push(newPlaylist);
-    console.log(newPlaylist);
-    await user.save();
+    const newPlaylist = await playlistService.createNewPlaylist(userId, playlistName);
     res.status(201).json(newPlaylist);
   } catch (error) {
     console.error('Error creating playlist:', error);
-    res.status(500).json({ error: 'Internal Server Error' });
+    const status = error.status || 500;
+    res.status(status).json({ error: error.message || 'Internal Server Error' });
   }
 };
-
 
 // Delete a playlist
 const deletePlaylist = async (req, res) => {
   try {
-    console.log("Deleting playlist");
     const { playlistName, userId } = req.params;
-    console.log("Playlist to delete:", playlistName, "for user:", userId);
-    const user = await User.findById(userId);
-    if (!user) {
-      return res.status(404).json({ error: 'User not found' });
-    }
-    const playlistIndex = user.playlists.findIndex(p => p.playlistName === playlistName);
-    if (playlistIndex === -1) {
-      return res.status(404).json({ error: 'Playlist not found' });
-    }
-    // Remove the playlist from the user's playlists array
-    user.playlists.splice(playlistIndex, 1);
-    await user.save();
-    return res.status(200).json({ message: 'Playlist deleted successfully' });
+
+    const result = await playlistService.deleteExistingPlaylist(userId, playlistName);
+    return res.status(200).json(result);
   } catch (error) {
     console.error('Error deleting playlist:', error);
-    res.status(500).json({ error: 'Internal Server Error' });
+    const status = error.status || 500;
+    res.status(status).json({ error: error.message || 'Internal Server Error' });
   }
 };
-
 
 // Add a song to a playlist
 const addToPlaylist = async (req, res) => {
   try {
     const { playlistName, songId, userId } = req.params;
 
-    // Defensive check for missing params
-    if (!userId || !playlistName || !songId) {
-      return res.status(400).json({ error: 'Missing required parameters' });
-    }
-
-    const user = await User.findById(userId);
-    if (!user) {
-      return res.status(404).json({ error: 'User not found' });
-    }
-
-    const playlist = user.playlists.find(p => p.playlistName === playlistName);
-    if (!playlist) {
-      return res.status(404).json({ error: 'Playlist not found' });
-    }
-
-    if (playlist.songs.includes(songId)) {
-      return res.status(400).json({ error: 'Song already exists in the playlist' });
-    }
-
-    playlist.songs.push(songId);
-    await user.save();
-
-    return res.status(200).json({ message: 'Song added to the playlist' });
-
+    const result = await playlistService.addSongToExistingPlaylist(userId, playlistName, songId);
+    return res.status(200).json(result);
   } catch (error) {
     console.error('Error adding to playlist:', error);
-    res.status(500).json({ error: 'Internal Server Error' });
+    const status = error.status || 500;
+    res.status(status).json({ error: error.message || 'Internal Server Error' });
   }
 };
 
-
-
-
+// Remove a song from a playlist
 const removeFromPlaylist = async (req, res) => {
-  console.log("Removing song from playlist");
-
   try {
     const { playlistName, songId, userId } = req.params;
 
-    // Defensive check
-    if (!userId || !playlistName || !songId) {
-      return res.status(400).json({ error: 'Missing required parameters' });
-    }
-
-    const user = await User.findById(userId);
-    if (!user) {
-      return res.status(404).json({ error: 'User not found' });
-    }
-
-    const playlist = user.playlists.find(p => p.playlistName === playlistName);
-    if (!playlist) {
-      console.log("Playlist not found");
-      return res.status(404).json({ error: 'Playlist not found' });
-    }
-
-    if (!playlist.songs.includes(songId)) {
-      console.log("Song not found in playlist");
-      return res.status(400).json({ error: 'Song not found in playlist' });
-    }
-
-    // Remove the song
-    playlist.songs = playlist.songs.filter(id => id !== songId);
-
-    await user.save();
-    return res.status(200).json({ message: 'Song removed from the playlist' });
-
+    const result = await playlistService.removeSongFromExistingPlaylist(userId, playlistName, songId);
+    return res.status(200).json(result);
   } catch (error) {
     console.error('Error removing song from playlist:', error);
-    res.status(500).json({ error: 'Internal Server Error' });
+    const status = error.status || 500;
+    res.status(status).json({ error: error.message || 'Internal Server Error' });
   }
 };
-
 
 module.exports = {
   createPlaylist,

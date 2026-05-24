@@ -21,6 +21,7 @@ const Navbar = () => {
 
   useEffect(() => {
     if (userDetails && userDetails.image) {
+      console.log("img", userDetails.image)
       setProfilePictureURL(userDetails.image);
     } else {
       setProfilePictureURL(defaultProfilePicture);
@@ -41,7 +42,7 @@ const Navbar = () => {
 
       dispatch(clearUser());
       dispatch(clearSongSliceThunk());
-      navigate('/');
+      navigate('/', {replace: true});
       showSuccessToast("Logged out Successfully");
     } catch (error) {
       console.error('Logout error:', error);

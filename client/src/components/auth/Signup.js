@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { GoogleOAuthProvider, GoogleLogin } from '@react-oauth/google';
 import { jwtDecode } from "jwt-decode";
-import { NavLink, useNavigate } from 'react-router-dom';
+import { NavLink, useNavigate, useLocation } from 'react-router-dom';
 import { useAuthUtils } from './authUtils';
 import {
   Button,
@@ -14,9 +14,12 @@ import {
 import { useSelector } from 'react-redux';
 
 const Signup = () => {
+  const location=useLocation();
   const { isLoggedIn } = useSelector((state) => state.user);
-  const { signupUser, userExists, loginUser, signupLoading } = useAuthUtils();
+  const { normalSignup, userExists, loginUser, signupLoading } = useAuthUtils();
   const navigate = useNavigate();
+  const initialUserData=location?.state || {};
+
 
   // const { isOpen, onOpen, onClose, onOpenChange } = useDisclosure();
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -24,12 +27,12 @@ const Signup = () => {
 
   useEffect(() => {
     if (isLoggedIn) {
-      navigate('/'); // Redirect to home or dashboard
+      navigate('/', {replace: true}); // Redirect to home or dashboard
     }
   }, [isLoggedIn, navigate]);
 
   const [userData, setUserData] = useState({
-    name: "", email: "", password: "", cpassword: ""
+    name: "", email: initialUserData.email, password: initialUserData.password, cpassword: initialUserData.password
   });
   const [passwordMismatch, setPasswordMismatch] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
@@ -52,12 +55,10 @@ const Signup = () => {
     const { email, name, picture } = decoded;
     setGoogleSignupUserDetails({ name, email, image: picture });
     const user = await userExists(email);
-    console.log("user", user);
     if (user) {
       // If user exists, log them in
       await loginUser({ email, type: "google" });
     } else {
-      console.log("user details", googleSignupUserDetails);
       // If user does not exist, set details for signup
       setIsModalOpen(true);
     }
@@ -70,7 +71,7 @@ const Signup = () => {
           <form
             onSubmit={(e) => {
               e.preventDefault();
-              signupUser(userData);
+              normalSignup(userData);
             }}
             className={`space-y-6 ${signupLoading ? "opacity-50 cursor-not-allowed" : ""}`}
           >
@@ -222,9 +223,8 @@ const Signup = () => {
             <form
               onSubmit={async(e) => {
                 e.preventDefault();
-                console.log("Creating password for Google user:", googleSignupUserDetails);
                 setGoogleSignupUserDetails({ ...googleSignupUserDetails, password: modalPass, type: "google" });
-                await signupUser({...googleSignupUserDetails, password: modalPass });
+                await normalSignup({...googleSignupUserDetails, password: modalPass });
                 setGoogleSignupUserDetails(null);
               }}
             >

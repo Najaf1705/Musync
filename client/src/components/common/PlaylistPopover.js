@@ -33,7 +33,6 @@ const PlaylistPopover = ({ songId }) => {
   };
 
   const handleRemove = () => {
-    console.log("Removing song from playlist:", { playlistId: selectedPlaylist._id, songId });
     if (selectedPlaylist) {
       dispatch(removeSongFromPlaylistThunk({
         playlistId: selectedPlaylist._id,
@@ -93,7 +92,6 @@ const PlaylistPopover = ({ songId }) => {
                         addToPlaylist(playlist._id, playlist.playlistName);
                         showSuccessToast(`Added song to ${playlist.playlistName}`);
                       } else {
-                        console.log(playlist)
                         setSelectedPlaylist(playlist);
                         onOpen(); // open modal
                       }

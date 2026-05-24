@@ -10,7 +10,6 @@ export const fetchTrackDetails = async (trackId) => {
 
     if (!response.ok) throw new Error(`Failed to fetch track details for ID: ${trackId}`);
     const trackDetails=await response.json();
-    console.log("trackDet", trackDetails);
     return trackDetails;
   } catch (error) {
     console.error(`Error fetching track details for ID ${trackId}:`, error);
@@ -20,7 +19,6 @@ export const fetchTrackDetails = async (trackId) => {
 
 export const fetchTopSongs = async () => {
   try {
-    console.log("Fetching top songs...");
     const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/topSongs`, {
       method: "POST",
       headers: {

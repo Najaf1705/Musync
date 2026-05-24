@@ -36,7 +36,6 @@ const handleSearch = async (e) => {
       channel: video.channel
     }));
 
-    console.log("Normalized results:", normalizedResults);
     dispatch(setDownloadSearchResults(normalizedResults));
     setSelectedVideo(null);
   } catch (error) {

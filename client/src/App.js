@@ -1,9 +1,12 @@
 import { useEffect, useState } from 'react';
 import { Toaster } from 'react-hot-toast';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { Route, Routes } from "react-router-dom";
 import Login from './components/auth/Login.js';
 import Signup from './components/auth/Signup.js';
+import Otp from './components/auth/Otp.js';
+import Password from './components/auth/Password.js';
+import Setpassword from './components/auth/Setpassword.js';
 import Navbar from './components/common/Navbar.js';
 import Discover from './components/Discover';
 import Download from './components/download/Download';
@@ -14,10 +17,13 @@ import Profile from './components/Profile';
 import "./index.css";
 import { clearSongSliceThunk, fetchTopSongsThunk, setUserSongsThunk } from './redux/features/song/songThunks.js'; // adjust path as needed
 import { clearUser, setAuthReady, setUser } from './redux/features/userSlice'; // adjust path as needed
+import GoogleOneTapLogin from './components/auth/GoogleOneTapLogin.js';
 
 const App = () => {
   const [selectedSong, setSelectedSong] = useState('');
   const dispatch = useDispatch();
+  const isLoggedIn = useSelector((state) => state.user.isLoggedIn);
+  const isAuthReady = useSelector((state) => state.user.isAuthReady);
 
   useEffect(() => {
     dispatch(fetchTopSongsThunk());
@@ -28,7 +34,6 @@ const App = () => {
   };
 
   useEffect(() => {
-    console.log(process.env.REACT_APP_BACKEND_URL);
     const verify = async () => {
       const res = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/serverprofile`, {
         method: "GET",
@@ -38,7 +43,6 @@ const App = () => {
 
       if (res.ok) {
         const user = await res.json();
-        // console.log("serverprofile response", user);
         dispatch(setUser(user));
         dispatch(setUserSongsThunk({ likedSongs: user.likedSongs, userPlaylists: user.playlists })); // set liked songs
       } else {
@@ -53,6 +57,7 @@ const App = () => {
 
   return (
     <div className="flex flex-col min-h-screen">
+      {isAuthReady && !isLoggedIn && <GoogleOneTapLogin />}
       <Toaster position="bottom-center" limit={5} />
       <Navbar />
       <div className="flex-1 text-white pt-16 pb-6">
@@ -72,6 +77,10 @@ const App = () => {
           <Route path="/download" element={<Download selectedSong={selectedSong} />} />
           <Route path="/profile" element={<Profile />} />
           <Route path="/login" element={<Login />} />
+          <Route path="/login/otp" element={<Otp />} />
+          <Route path="/register/otp" element={<Otp />} />
+          <Route path="/login/password" element={<Password />} />
+          <Route path="/register/setpassword" element={<Setpassword />} />
           <Route path="/signup" element={<Signup />} />
           <Route path="/playlists" element={<Playlists />} />
           <Route path="*" element={<Errorpage />} />

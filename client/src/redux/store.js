@@ -6,10 +6,15 @@ import downloadReducer from './features/downloadSlice'; // Import the downloadSl
 
 const store = configureStore({
     reducer: {
-        user: userReducer, // Add the user reducer
-        songs: songReducer, // Add the user reducer
-        download: downloadReducer, // Import the downloadSlice reducer
+        user: userReducer,
+        songs: songReducer,
+        download: downloadReducer,
     },
+    middleware: (getDefaultMiddleware) =>
+        getDefaultMiddleware({
+            serializableCheck: false,
+        }),
+    devTools: process.env.NODE_ENV !== 'production',
 });
 
 export default store;

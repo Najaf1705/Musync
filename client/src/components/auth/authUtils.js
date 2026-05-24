@@ -1,9 +1,10 @@
 import { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { useNavigate } from "react-router-dom";
+import { replace, useNavigate } from "react-router-dom";
 import { setUserSongsThunk } from "../../redux/features/song/songThunks";
 import { setUser } from "../../redux/features/userSlice";
 import { showErrorToast, showInfoToast, showSuccessToast } from "../utils/toast";
+import { getOtp, getOtpThunk, googleLoginThunk, googleSignupThunk, normalLoginThunk, normalSignupThunk } from "../../redux/features/authThunks";
 
 export const useAuthUtils = () => {
     const [invalidCredentialsErr, setInvalidCredentialsErr] = useState("");
@@ -29,109 +30,192 @@ export const useAuthUtils = () => {
             const data = await response.json();
             return !!data.exists; // expects { exists: true/false }
         } catch (error) {
-            console.error("Error checking user existence:", error);
             return false; // default to false on error
         }
     };
 
-    // ✅ Handle login logic
-    const loginUser = async (userData) => {
-        const { email, password = null, type } = userData;
+    const googleLogin = async ({token, password=null}) => {
         try {
             setLoginLoading(true);
 
-            // prepare payload
-            const payload = { email, type: type || "email" };
-            if (password !== null) payload.password = password;
+            const responseJson = await dispatch(
+                googleLoginThunk({token, password})
+            ).unwrap();
 
-            const res = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/login`, {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                credentials: "include",
-                body: JSON.stringify(payload),
-            });
+            // ✅ Existing user → login success
+            if (responseJson.user) {
+                dispatch(setUser(responseJson.user));
 
-            const serRes = await res.json();
-            // console.log("Login response:", serRes);
+                dispatch(
+                    setUserSongsThunk({
+                        likedSongs: responseJson.user.likedSongs,
+                        userPlaylists: responseJson.user.playlists,
+                    })
+                );
 
-            if (!res.ok) {
-                const msg =
-                    res.status === 404
-                        ? "User not found"
-                        : res.status === 401
-                            ? "Invalid credentials"
-                            : serRes?.error || "Login failed";
-
-                setInvalidCredentialsErr(msg);
-                setTimeout(() => setInvalidCredentialsErr(""), 3000);
+                showSuccessToast("Logged in Successfully");
+                navigate("/", {replace: true});
                 return;
             }
+        } catch (error) {
+            if (error?.status===409) {
+                showInfoToast("Create a suitable password");
 
-            // ✅ Login success
-            dispatch(setUser(serRes.user));
+                navigate("/register/setpassword", {
+                    replace: true,
+                    state: {
+                        token // 🔥 critical
+                    },
+                });
+
+                return;
+            }
+            showErrorToast(error?.data?.message || "Login failed");
+        } finally {
+            setLoginLoading(false);
+        }
+    };
+
+
+    // const googleSignup = async (signupData) => {
+    //     try {
+    //         setSignupLoading(true);
+
+    //         const responseJson = await dispatch(
+    //             googleSignupThunk(signupData)
+    //         ).unwrap();
+
+    //         dispatch(setUser(responseJson.user));
+
+    //         dispatch(
+    //             setUserSongsThunk({
+    //                 likedSongs: responseJson.user.likedSongs,
+    //                 userPlaylists: responseJson.user.playlists,
+    //             })
+    //         );
+
+    //         showSuccessToast("Signed in Successfully");
+    //         navigate("/");
+    //         return;
+    //     } catch (error) {
+    //         const status = error?.status;
+
+    //         if (status === 400) {
+    //             showErrorToast("Invalid email");
+    //             return;
+    //         }
+
+    //         showErrorToast(error?.data?.message || "Signup failed");
+    //     } finally {
+    //         setSignupLoading(false);
+    //     }
+    // };
+
+
+
+
+    const normalLogin = async (loginData) => {
+        try {
+            setLoginLoading(true);
+
+            const response = await dispatch(
+                normalLoginThunk(loginData)
+            ).unwrap();
+
+            dispatch(setUser(response.user));
+
             dispatch(
                 setUserSongsThunk({
-                    likedSongs: serRes.user.likedSongs,
-                    userPlaylists: serRes.user.playlists,
+                    likedSongs: response.user.likedSongs,
+                    userPlaylists: response.user.playlists,
                 })
             );
 
-            showSuccessToast("Logged in Successfully");
-            navigate("/");
+            showSuccessToast("Logged in successfully");
+            navigate("/", {replace: true});
+
         } catch (error) {
-            console.error("Login Error:", error);
-            setInvalidCredentialsErr("Network error");
-            setTimeout(() => setInvalidCredentialsErr(""), 3000);
+            const status = error?.status;
+
+            if (status === 400) return showErrorToast("Invalid email");
+            if (status === 401) return showErrorToast("Incorrect password");
+
+            if (status === 404) {
+                showInfoToast("User not found, please register");
+
+                navigate("/signup", {
+                    replace: true,
+                    state: loginData,
+                    parent: "login"
+                });
+
+                return;
+            }
+
+            showErrorToast("Login failed");
+
         } finally {
             setLoginLoading(false);
         }
     };
 
     // Handle signup logic
-    const signupUser = async (userData) => {
-        const { name, email, password, image=null } = userData;
-
+    const normalSignup = async (signupData) => {
         try {
             setSignupLoading(true);
 
-            const res = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/signup`, {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                credentials: "include",
-                body: JSON.stringify({ name, email, password, image }),
-            });
+            const responseJson = await dispatch(
+                normalSignupThunk(signupData)
+            ).unwrap();
+            console.log("user data at reg", responseJson);
 
-            if (res.status === 400) {
-                showErrorToast("Please fill all the fields");
+            if(responseJson.status==="otp_required"){
+                navigate('/register/otp', {
+                    replace: true,
+                    state: {...signupData, otpId: responseJson.otpId},
+                    parent: "signup",
+                })
                 return;
             }
 
-            if (res.status === 409) {
-                showInfoToast("User already exists! Try logging in");
-                navigate("/login");
-                return;
-            }
+            dispatch(setUser(responseJson.user));
 
-            if (res.status === 201) {
-                const data = await res.json();
+            dispatch(
+                setUserSongsThunk({
+                    likedSongs: responseJson.user.likedSongs,
+                    userPlaylists: responseJson.user.playlists,
+                })
+            );
 
-                // ✅ backend already logs the user in after signup
-                dispatch(setUser(data.user));
-                dispatch(
-                    setUserSongsThunk({
-                        likedSongs: data.user.likedSongs,
-                        userPlaylists: data.user.playlists,
-                    })
-                );
-
-                showSuccessToast("Registered Successfully");
-                navigate("/");
-            }
+            showSuccessToast("Signed in Successfully");
+            navigate("/", {replace: true});
+            return;
         } catch (error) {
-            console.error("Signup Error:", error);
-            showErrorToast("Something went wrong during signup");
+            const status = error?.status;
+
+            if (status === 400) {
+                showErrorToast("Invalid email");
+                return;
+            }
+
+            showErrorToast(error?.data?.message || "Signup failed");
         } finally {
             setSignupLoading(false);
+        }
+    };
+
+    const generateOtp = async (email) => {
+        try {
+            const response = await dispatch(getOtpThunk(email)).unwrap();
+
+            showSuccessToast(
+                `OTP sent to ${email}. OTP Id: ${response.otpId}`
+            );
+
+            return { otpId: response.otpId };
+
+        } catch (error) {
+            showErrorToast(error?.data?.message || "OTP error");
         }
     };
 
@@ -142,7 +226,10 @@ export const useAuthUtils = () => {
         loginLoading,
         signupLoading,
         userExists,
-        loginUser,
-        signupUser,
+        normalLogin,
+        normalSignup,
+        googleLogin,
+        // googleSignup,
+        generateOtp
     };
 };

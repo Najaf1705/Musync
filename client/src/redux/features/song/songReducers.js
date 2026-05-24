@@ -1,4 +1,4 @@
-export const setUserSongsRed = (state, action) => {
+export const setUserSongs = (state, action) => {
     const { likedSongs, userPlaylists } = action.payload;
     state.likedSongs = likedSongs || [];
     state.userPlaylists = [
@@ -12,59 +12,55 @@ export const setUserSongsRed = (state, action) => {
 };
 
 
-export const setTopSongsRed = (state, action) => {
+export const setTopSongs = (state, action) => {
     state.topSongs = action.payload;
 };
 
 
-export const setSearchResultsRed = (state, action) => {
+export const setSearchResults = (state, action) => {
     state.searchResults = action.payload;
 };
 
 
-export const setSearchedPlaylistDataRed = (state, action) => {
+export const setSearchedPlaylistData = (state, action) => {
     state.searchedPlaylistData = action.payload;
 };
 
 
-export const setSelectedPlaylistRed = (state, action) => {
+export const setSelectedPlaylist = (state, action) => {
     state.selectedPlaylist = action.payload;
 };
 
 
-export const setPlaylistTracksRed = (state, action) => {
+export const setPlaylistTracks = (state, action) => {
     state.playlistTracks = action.payload;
 };
 
 
 
-export const addSongToPlaylistRed = (state, action) => {
+export const addSongToPlaylist = (state, action) => {
+    if (!state.userPlaylists) return;
     const { playlistId, songId } = action.payload;
     const playlist = state.userPlaylists.find(playlist => playlist._id === playlistId);
-    if (playlist) {
-        if (!playlist.songs.includes(songId)) {
-            playlist.songs.push(songId);
-            return;
-        }
+    if (playlist && !playlist.songs.includes(songId)) {
+        playlist.songs.push(songId);
     }
 };
 
 
 
-export const removeSongFromPlaylistRed = (state, action) => {
+export const removeSongFromPlaylist = (state, action) => {
+    if (!state.userPlaylists) return;
     const { playlistId, songId: sid } = action.payload;
     const playlist = state.userPlaylists.find(playlist => playlist._id === playlistId);
-    if (playlist) {
-        if (playlist.songs.includes(sid)) {
-            playlist.songs = playlist.songs.filter(songId => songId !== sid);
-            return;
-        }
+    if (playlist && playlist.songs.includes(sid)) {
+        playlist.songs = playlist.songs.filter(songId => songId !== sid);
     }
 };
 
 
 
-export const addNewPlaylistRed = (state, action) => {
+export const addNewPlaylist = (state, action) => {
     const { playlistName, songId = null } = action.payload;
     if (!state.userPlaylists) {
         state.userPlaylists = [];
@@ -74,7 +70,7 @@ export const addNewPlaylistRed = (state, action) => {
 
 
 
-export const removePlaylistRed = (state, action) => {
+export const removePlaylist = (state, action) => {
     const playlistName = action.payload;
     state.userPlaylists = state.userPlaylists.filter(playlist => playlist.playlistName !== playlistName);
     // if (state.selectedPlaylist && state.selectedPlaylist.playlistName===playlistName) {
@@ -84,33 +80,37 @@ export const removePlaylistRed = (state, action) => {
 
 
 
-export const setLikedSongsRed = (state, action) => {
-    state.likedSongs = action.payload;
-    state.userPlaylists.filter((playlist) => {
-        if (playlist.playlistName === "Liked Songs") {
-            playlist.songs = action.payload;
-        }
-    })
-};
+export const setLikedSongs = (state, action) => {
+    state.likedSongs = action.payload || [];
+    if (!state.userPlaylists) return;
 
-
-
-export const toggleLikeSongRed = (state, action) => {
-    console.log("Toggling like for song:", action.payload);
-    const song = action.payload;
-    const exists = state.likedSongs.find(s => s === song);
-
-    if (exists) {
-        state.likedSongs = state.likedSongs.filter(s => s !== song);
-    } else {
-        state.likedSongs.push(song);
+    const likedPlaylist = state.userPlaylists.find((playlist) => playlist.playlistName === "Liked Songs");
+    if (likedPlaylist) {
+        likedPlaylist.songs = state.likedSongs;
     }
-    setLikedSongsRed(state, { payload: state.likedSongs }); // Update likedSongs in the state
 };
 
 
 
-export const clearSongSliceRed = (state) => {
+export const toggleLikeSong = (state, action) => {
+    const song = action.payload;
+    const exists = state.likedSongs.includes(song);
+
+    state.likedSongs = exists
+        ? state.likedSongs.filter((s) => s !== song)
+        : [...state.likedSongs, song];
+
+    if (!state.userPlaylists) return;
+
+    const likedPlaylist = state.userPlaylists.find((playlist) => playlist.playlistName === "Liked Songs");
+    if (likedPlaylist) {
+        likedPlaylist.songs = state.likedSongs;
+    }
+};
+
+
+
+export const clearSongSlice = (state) => {
     state.likedSongs = [];
     state.userPlaylists = null;
     // state.topSongs = [];
