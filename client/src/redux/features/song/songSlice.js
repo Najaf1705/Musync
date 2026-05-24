@@ -98,7 +98,7 @@ const songSlice = createSlice({
       })
       .addCase(searchSongsAndPlaylistsThunk.fulfilled, (state, action) => {
         state.loading = false;
-        state.searchResults = action.payload.tracks;
+        state.searchResults = action.payload.songs;
         state.searchedPlaylistData = action.payload.playlists;
       })
       .addCase(searchSongsAndPlaylistsThunk.rejected, (state, action) => {

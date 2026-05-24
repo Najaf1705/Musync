@@ -108,15 +108,15 @@ export const searchSongsAndPlaylistsThunk = createAsyncThunk(
             const data = await response.json();
 
             // Validate response structure
-            if (!data.tracks || !data.playlists) {
+            if (!data.songs || !data.playlists) {
                 throw new Error('Invalid response format from server');
             }
 
             const returnData = {
-                tracks: {
-                    ...data.tracks,
-                    items: data.tracks.map(track => ({
-                        ...track,
+                songs: {
+                    ...data.songs,
+                    items: data.songs.map(song => ({
+                        ...song,
                         isLiked: false, // Initialize like status
                     }))
                 },

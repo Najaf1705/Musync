@@ -47,11 +47,6 @@ app.options("*", cors(corsOptions));
 
 app.set("trust proxy", 1);
 
-app.use((req, res, next) => {
-  console.log("No route matched in ytRoute. Path was:", req.originalUrl);
-  next();
-});
-
 app.use(express.json());
 app.use(require('./routes/authRoute'));
 app.use(require('./routes/jiosaavnRoute'));
@@ -61,6 +56,11 @@ app.use(require('./routes/playlistRoute'));
 app.use(require('./routes/recommendRoute'));
 app.use(require('./routes/ytRoute'));
 app.use(require('./routes/najafMockRoute'));
+
+app.use((req, res) => {
+  console.log("No route matched. Path was:", req.originalUrl);
+  res.status(404).json({ error: 'Not Found' });
+});
 
 console.log(process.env.EMAIL);
 console.log(process.env.EMAIL_PASSWORD);

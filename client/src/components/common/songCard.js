@@ -28,8 +28,8 @@ const SongCard = ({ item, index }) => {
   }, [likedSongs, item.id]);
 
   useEffect(() => {
-    if (item.images[2]?.url) {
-      Vibrant.from(item.images[2].url)
+    if (item.image) {
+      Vibrant.from(item.image)
         .getPalette()
         .then((palette) => {
           const dominantColor = palette.Vibrant?.hex || "#181818";
@@ -76,20 +76,20 @@ const SongCard = ({ item, index }) => {
     }
   };
 
-  if (!item || !item.name || !item.artists) return null;
+  if (!item || !item.songName || !item.artists) return null;
 
   return (
     <div
       className="rounded-md md:rounded-l overflow-hidden w-40 md:w-56 shadow-lg flex m-2 p-1 md:p-2 flex-col transition-shadow hover:shadow-2xl bg-neutral-900"
       style={{ backgroundColor: bgColor, color: textColor }}
-      title={`${item.name} - ${item.artists ? item.artists?.primary[0]?.name : "Unknown Artist"}`}
+      title={`${item.songName} - ${item.artists ? item.artists?.primaryArtist[0]?.name : "Unknown Artist"}`}
     >
       <div className="relative aspect-square w-full">
         <img
           loading="lazy"
-          src={item.images[2]?.url}
+          src={item.image}
           className="w-full h-full object-cover rounded-t-md md:rounded-t-l"
-          alt={item.name || 'Song'}
+          alt={item.songName || 'Song'}
         />
         <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent opacity-0 hover:opacity-100 transition-opacity flex items-end justify-center">
           <div className="flex gap-5 mb-4">
@@ -108,7 +108,7 @@ const SongCard = ({ item, index }) => {
               title="Download"
 
               onClick={() => {
-                dispatch(setDownloadQuery(item.name));
+                dispatch(setDownloadQuery(item.songName));
                 navigate('/download');
               }}
             ></i>
@@ -128,10 +128,10 @@ const SongCard = ({ item, index }) => {
           className="font-semibold text-sm md:text-sm truncate"
           style={{ color: textColor }}
         >
-          {item.name || 'Unknown'}
+          {item.songName || 'Unknown'}
         </div>
         <p className="text-xs sm:text-sm truncate">
-          {`${item.artists ? item.artists?.primary[0]?.name : "Unknown Artist"}`}
+          {`${item.artists ? item.artists?.primaryArtist[0]?.name : "Unknown Artist"}`}
         </p>
       </div>
     </div>

@@ -71,7 +71,7 @@ const Playlist = () => {
                     ...playlist,
                     id: playlist._id || playlist.id,
                     name: playlist.playlistName,
-                    images: [{},{},{ url: "/images/playlists.png" }],
+                    image: "/images/playlists.png",
                     owner: { display_name: "You" }
                   }}
                   parentComponent="playlist"

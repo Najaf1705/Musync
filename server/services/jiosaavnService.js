@@ -1,18 +1,28 @@
+const { transformSong, transformPlaylist } = require("../transformers");
+
 const BASE_URL = 'https://saavn.sumit.co/api';
 
 // Search for songs and playlists
 const searchSongs = async (query, page = 0, limit = 20) => {
   try {
     const response = await fetch(
-      `${BASE_URL}/search?query=${encodeURIComponent(query)}&page=${page}&limit=${limit}`
+      `${BASE_URL}/search/songs?query=${encodeURIComponent(query)}&page=${page}&limit=${limit}`
     );
     
     if (!response.ok) {
       throw new Error(`API error: ${response.status}`);
     }
     
-    const data = await response.json();
-    return data;
+    const responseData = await response.json();
+    const results = responseData?.data?.results || responseData?.results;
+
+    if (!Array.isArray(results)) {
+      throw new Error('Unexpected API response format for searchSongs');
+    }
+
+    const transformedData = results.map((song) => transformSong(song));
+    console.log('FDssdf', transformedData);
+    return transformedData;
   } catch (error) {
     console.error('Error searching songs:', error);
     throw error;
@@ -30,8 +40,16 @@ const searchPlaylists = async (query, page = 0, limit = 10) => {
       throw new Error(`API error: ${response.status}`);
     }
     
-    const data = await response.json();
-    return data;
+    const responseData = await response.json();
+    const results = responseData?.data?.results || responseData?.results;
+
+    if (!Array.isArray(results)) {
+      throw new Error('Unexpected API response format for searchSongs');
+    }
+
+    const transformedData = results.map((playlist) => transformPlaylist(playlist));
+    console.log('FDssdf', transformedData);
+    return transformedData;
   } catch (error) {
     console.error('Error searching playlists:', error);
     throw error;
@@ -41,18 +59,29 @@ const searchPlaylists = async (query, page = 0, limit = 10) => {
 // Get song details by song ID
 const getSongDetails = async (songId) => {
   try {
+    console.log(`${BASE_URL}/songs/${encodeURIComponent(songId)}`);
     const response = await fetch(
-      `${BASE_URL}/songs?id=${encodeURIComponent(songId)}`
+      `${BASE_URL}/songs/${encodeURIComponent(songId)}`
     );
     
     if (!response.ok) {
-      throw new Error(`API error: ${response.status}`);
+      const errorBody = await response.text().catch(() => null);
+      throw {
+        status: response.status,
+        message: `API error: ${response.status}`,
+        body: errorBody,
+      };
     }
     
-    const data = await response.json();
-    return data;
+    const result = await response.json();
+    console.log(result.data[0]);
+    const transformedData=transformSong(result.data[0]);
+    return transformedData;
   } catch (error) {
     console.error('Error fetching song details:', error);
+    if (!error.status) {
+      throw { status: 500, message: error.message || 'Error fetching song details' };
+    }
     throw error;
   }
 };
