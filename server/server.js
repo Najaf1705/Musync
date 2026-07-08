@@ -18,7 +18,8 @@ const allowedOrigins = [
   "http://localhost",
   "http://192.168.1.109:3000",
   "https://musync-enzoe.vercel.app",
-  "https://musync.najaf.in"
+  "https://musync.najaf.in",
+  "http://192.168.49.2:30080"
 ];
 
 const corsOptions = {

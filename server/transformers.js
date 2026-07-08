@@ -1,4 +1,4 @@
-export function transformSong(data) {
+function transformSong(data) {
   return {
     id: data.id,
     songName: data.name,
@@ -12,7 +12,7 @@ export function transformSong(data) {
   };
 }
 
-export function transformPlaylist(data) {
+function transformPlaylist(data) {
   return {
     id: data.id,
     playlistName: data.name,
@@ -20,3 +20,8 @@ export function transformPlaylist(data) {
     image: data.image[2]?.url,
   };
 }
+
+module.exports = {
+  transformSong,
+  transformPlaylist
+};
