@@ -66,7 +66,7 @@ const PlaylistPopover = ({ songId }) => {
         >
           <i className="fa-solid fa-plus cursor-pointer text-white text-sm md:text-xl hover:text-green-400 transition" title="Add to playlist"></i>
         </DropdownTrigger>
-        {isAuthLoading && isAuthenticated &&
+        {!isAuthLoading && isAuthenticated &&
           <DropdownMenu
             aria-label="Dynamic Actions"
             className="bg-gray-700 rounded-md p-0 text-white min-w-36 shadow-xl shadow-gray-900/50"

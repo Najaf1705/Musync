@@ -1,21 +1,22 @@
 const User = require('../models/userSchema');
+const mongoose = require('mongoose');
 
 // Find user by ID
-const findUserById = async (userId) => {
-  if (!userId) return null;
-  return await User.findById(userId);
+const findUserByIdentifier = async (userIdentifier) => {
+  if (!userIdentifier) return null;
+  return await User.findOne({ email: userIdentifier });
 };
 
 // Find playlist by name
-const findPlaylistByName = async (userId, playlistName) => {
-  const user = await User.findById(userId);
+const findPlaylistByName = async (userIdentifier, playlistName) => {
+  const user = await findUserByIdentifier(userIdentifier);
   if (!user) return null;
   return user.playlists.find(p => p.playlistName === playlistName);
 };
 
 // Create playlist
-const createPlaylist = async (userId, playlistName) => {
-  const user = await User.findById(userId);
+const createPlaylist = async (userIdentifier, playlistName) => {
+  const user = await findUserByIdentifier(userIdentifier  );
   if (!user) return null;
 
   if (!Array.isArray(user.playlists)) {
@@ -29,8 +30,8 @@ const createPlaylist = async (userId, playlistName) => {
 };
 
 // Delete playlist
-const deletePlaylist = async (userId, playlistName) => {
-  const user = await User.findById(userId);
+const deletePlaylist = async (userIdentifier, playlistName) => {
+  const user = await findUserByIdentifier(userIdentifier);
   if (!user) return null;
 
   const playlistIndex = user.playlists.findIndex(p => p.playlistName === playlistName);
@@ -42,8 +43,8 @@ const deletePlaylist = async (userId, playlistName) => {
 };
 
 // Add song to playlist
-const addSongToPlaylist = async (userId, playlistName, songId) => {
-  const user = await User.findById(userId);
+const addSongToPlaylist = async (userIdentifier, playlistName, songId) => {
+  const user = await findUserByIdentifier(userIdentifier);
   if (!user) return null;
 
   const playlist = user.playlists.find(p => p.playlistName === playlistName);
@@ -57,8 +58,8 @@ const addSongToPlaylist = async (userId, playlistName, songId) => {
 };
 
 // Remove song from playlist
-const removeSongFromPlaylist = async (userId, playlistName, songId) => {
-  const user = await User.findById(userId);
+const removeSongFromPlaylist = async (userIdentifier, playlistName, songId) => {
+  const user = await findUserByIdentifier(userIdentifier);
   if (!user) return null;
 
   const playlist = user.playlists.find(p => p.playlistName === playlistName);
@@ -72,15 +73,15 @@ const removeSongFromPlaylist = async (userId, playlistName, songId) => {
 };
 
 // Get all playlists for user
-const getUserPlaylists = async (userId) => {
-  const user = await User.findById(userId);
+const getUserPlaylists = async (userIdentifier) => {
+  const user = await findUserByIdentifier(userIdentifier);
   if (!user) return null;
   return user.playlists;
 };
 
 // Get playlist songs
-const getPlaylistSongs = async (userId, playlistName) => {
-  const user = await User.findById(userId);
+const getPlaylistSongs = async (userIdentifier, playlistName) => {
+  const user = await findUserByIdentifier(userIdentifier);
   if (!user) return null;
 
   const playlist = user.playlists.find(p => p.playlistName === playlistName);
@@ -90,7 +91,7 @@ const getPlaylistSongs = async (userId, playlistName) => {
 };
 
 module.exports = {
-  findUserById,
+  findUserByIdentifier,
   findPlaylistByName,
   createPlaylist,
   deletePlaylist,

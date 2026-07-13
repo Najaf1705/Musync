@@ -1,12 +1,12 @@
 const playlistRepository = require('../repositories/playlistRepository');
 
 // Create playlist
-const createNewPlaylist = async (userId, playlistName) => {
-  if (!userId || !playlistName) {
-    throw { status: 400, message: 'User ID and playlist name are required' };
+const createNewPlaylist = async (userIdentifier, playlistName) => {
+  if (!userIdentifier || !playlistName) {
+    throw { status: 400, message: 'User identifier and playlist name are required' };
   }
 
-  const user = await playlistRepository.findUserById(userId);
+  const user = await playlistRepository.findUserByIdentifier(userIdentifier);
   if (!user) {
     throw { status: 404, message: 'User not found' };
   }
@@ -21,42 +21,42 @@ const createNewPlaylist = async (userId, playlistName) => {
     throw { status: 400, message: 'Playlist name already exists' };
   }
 
-  const newPlaylist = await playlistRepository.createPlaylist(userId, playlistName);
+  const newPlaylist = await playlistRepository.createPlaylist(userIdentifier, playlistName);
   return newPlaylist;
 };
 
 // Delete playlist
-const deleteExistingPlaylist = async (userId, playlistName) => {
-  if (!userId || !playlistName) {
-    throw { status: 400, message: 'User ID and playlist name are required' };
+const deleteExistingPlaylist = async (userIdentifier, playlistName) => {
+  if (!userIdentifier || !playlistName) {
+    throw { status: 400, message: 'User identifier and playlist name are required' };
   }
 
-  const user = await playlistRepository.findUserById(userId);
+  const user = await playlistRepository.findUserByIdentifier(userIdentifier);
   if (!user) {
     throw { status: 404, message: 'User not found' };
   }
 
-  const playlist = await playlistRepository.findPlaylistByName(userId, playlistName);
+  const playlist = await playlistRepository.findPlaylistByName(userIdentifier, playlistName);
   if (!playlist) {
     throw { status: 404, message: 'Playlist not found' };
   }
 
-  await playlistRepository.deletePlaylist(userId, playlistName);
+  await playlistRepository.deletePlaylist(userIdentifier, playlistName);
   return { message: 'Playlist deleted successfully' };
 };
 
 // Add song to playlist
-const addSongToExistingPlaylist = async (userId, playlistName, songId) => {
-  if (!userId || !playlistName || !songId) {
-    throw { status: 400, message: 'User ID, playlist name, and song ID are required' };
+const addSongToExistingPlaylist = async (userIdentifier, playlistName, songId) => {
+  if (!userIdentifier || !playlistName || !songId) {
+    throw { status: 400, message: 'User identifier, playlist name, and song ID are required' };
   }
 
-  const user = await playlistRepository.findUserById(userId);
+  const user = await playlistRepository.findUserByIdentifier(userIdentifier);
   if (!user) {
     throw { status: 404, message: 'User not found' };
   }
 
-  const playlist = await playlistRepository.findPlaylistByName(userId, playlistName);
+  const playlist = await playlistRepository.findPlaylistByName(userIdentifier, playlistName);
   if (!playlist) {
     throw { status: 404, message: 'Playlist not found' };
   }
@@ -65,22 +65,22 @@ const addSongToExistingPlaylist = async (userId, playlistName, songId) => {
     throw { status: 400, message: 'Song already exists in the playlist' };
   }
 
-  await playlistRepository.addSongToPlaylist(userId, playlistName, songId);
+  await playlistRepository.addSongToPlaylist(userIdentifier, playlistName, songId);
   return { message: 'Song added to the playlist' };
 };
 
 // Remove song from playlist
-const removeSongFromExistingPlaylist = async (userId, playlistName, songId) => {
-  if (!userId || !playlistName || !songId) {
-    throw { status: 400, message: 'User ID, playlist name, and song ID are required' };
+const removeSongFromExistingPlaylist = async (userIdentifier, playlistName, songId) => {
+  if (!userIdentifier || !playlistName || !songId) {
+    throw { status: 400, message: 'User identifier, playlist name, and song ID are required' };
   }
 
-  const user = await playlistRepository.findUserById(userId);
+  const user = await playlistRepository.findUserByIdentifier(userIdentifier);
   if (!user) {
     throw { status: 404, message: 'User not found' };
   }
 
-  const playlist = await playlistRepository.findPlaylistByName(userId, playlistName);
+  const playlist = await playlistRepository.findPlaylistByName(userIdentifier, playlistName);
   if (!playlist) {
     throw { status: 404, message: 'Playlist not found' };
   }
@@ -89,42 +89,42 @@ const removeSongFromExistingPlaylist = async (userId, playlistName, songId) => {
     throw { status: 400, message: 'Song not found in playlist' };
   }
 
-  await playlistRepository.removeSongFromPlaylist(userId, playlistName, songId);
+  await playlistRepository.removeSongFromPlaylist(userIdentifier, playlistName, songId);
   return { message: 'Song removed from the playlist' };
 };
 
 // Get user playlists
-const getUserPlaylists = async (userId) => {
-  if (!userId) {
-    throw { status: 400, message: 'User ID is required' };
+const getUserPlaylists = async (userIdentifier) => {
+  if (!userIdentifier) {
+    throw { status: 400, message: 'User identifier is required' };
   }
 
-  const user = await playlistRepository.findUserById(userId);
+  const user = await playlistRepository.findUserByIdentifier(userIdentifier);
   if (!user) {
     throw { status: 404, message: 'User not found' };
   }
 
-  const playlists = await playlistRepository.getUserPlaylists(userId);
+  const playlists = await playlistRepository.getUserPlaylists(userIdentifier);
   return playlists;
 };
 
 // Get playlist songs
-const getPlaylistSongs = async (userId, playlistName) => {
-  if (!userId || !playlistName) {
-    throw { status: 400, message: 'User ID and playlist name are required' };
+const getPlaylistSongs = async (userIdentifier, playlistName) => {
+  if (!userIdentifier || !playlistName) {
+    throw { status: 400, message: 'User identifier and playlist name are required' };
   }
 
-  const user = await playlistRepository.findUserById(userId);
+  const user = await playlistRepository.findUserByIdentifier(userIdentifier);
   if (!user) {
     throw { status: 404, message: 'User not found' };
   }
 
-  const playlist = await playlistRepository.findPlaylistByName(userId, playlistName);
+  const playlist = await playlistRepository.findPlaylistByName(userIdentifier, playlistName);
   if (!playlist) {
     throw { status: 404, message: 'Playlist not found' };
   }
 
-  const songs = await playlistRepository.getPlaylistSongs(userId, playlistName);
+  const songs = await playlistRepository.getPlaylistSongs(userIdentifier, playlistName);
   return songs;
 };
 

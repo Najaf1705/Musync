@@ -13,9 +13,7 @@ const Playlist = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
-  const userDetails = useSelector((state) => state.user.user);
-  const isLoggedIn = useSelector((state) => state.user.isLoggedIn);
-  const isAuthReady = useSelector((state) => state.user.isAuthReady);
+  const {isAuthLoading, isAuthenticated, user} = useSelector((state) => state.auth);
   const userPlaylists = useSelector((state) => state.songs.userPlaylists);
 
   const [loading, setLoading] = useState(false);
@@ -27,12 +25,11 @@ const Playlist = () => {
   const [playlistName, setPlaylistName] = useState('');
 
   useEffect(() => {
-    if (!isAuthReady) return;
-    if (!isLoggedIn) {
+    if (!isAuthLoading && !isAuthenticated) {
       navigate('/', {replace: true});
       showInfoToast("Log in to see your playlists");
     }
-  }, [isLoggedIn, isAuthReady, navigate]);
+  }, [isAuthLoading, isAuthenticated, navigate, userPlaylists]);
 
   const fetchSelectedPlaylistSongs = async (pname) => {
     const selectedPlaylist = userPlaylists.find((playlist) => playlist.playlistName === pname);
@@ -55,7 +52,7 @@ const Playlist = () => {
     }
   };
 
-  if (!userDetails) return <div>Loading...</div>;
+  if (!user) return <div>Loading...</div>;
 
   return (
     <div className="home">
@@ -115,7 +112,7 @@ const Playlist = () => {
             showErrorToast("Playlist with this name already exists.");
             return;
           }
-          dispatch(createPlaylistThunk({ playlistName: playlistName.trim(), userId: userDetails._id }));
+          dispatch(createPlaylistThunk({ playlistName: playlistName.trim()}));
           setPlaylistName('');
           onClose();
         }}

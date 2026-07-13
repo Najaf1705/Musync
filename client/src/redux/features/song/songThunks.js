@@ -136,16 +136,10 @@ export const addSongToPlaylistThunk = createAsyncThunk(
     'songs/addSongToPlaylist',
     async ({ playlistId, playlistName, songId }, { dispatch, rejectWithValue, getState }) => {
         dispatch(addSongToPlaylistRed({ playlistId, songId }));
-        const state = getState();
-        const userId = state.user.user?._id;
-        if (!userId) {
-            dispatch(removeSongFromPlaylistRed({ playlistId, songId }));
-            return rejectWithValue('User not authenticated');
-        }
 
         try {
             const response = await axios.post(
-                `${process.env.REACT_APP_BACKEND_URL}/api/addToPlaylist/${playlistName}/${songId}/${userId}`,
+                `${process.env.REACT_APP_BACKEND_URL}/api/addToPlaylist/${playlistName}/${songId}`,
                 {},
                 {
                     headers: {
@@ -177,9 +171,7 @@ export const removeSongFromPlaylistThunk = createAsyncThunk(
     async ({ playlistId, playlistName, songId }, { dispatch, rejectWithValue, getState }) => {
         dispatch(removeSongFromPlaylistRed({ playlistId, songId }));
         try {
-            const state = getState();
-            const userId = state.user.user._id;
-            const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/removeFromPlaylist/${playlistName}/${songId}/${userId}`, {
+            const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/removeFromPlaylist/${playlistName}/${songId}`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -205,11 +197,11 @@ export const removeSongFromPlaylistThunk = createAsyncThunk(
 
 export const createPlaylistThunk = createAsyncThunk(
     'songs/createPlaylist',
-    async ({ playlistName, userId, songId = null }, { dispatch, rejectWithValue }) => {
+    async ({ playlistName, songId = null }, { dispatch, rejectWithValue }) => {
         dispatch(addNewPlaylistRed({ playlistName, songId }));
         try {
             // throw new Error('Failed to create playlist');
-            const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/create-playlist/${playlistName}/${userId}`, {
+            const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/create-playlist/${playlistName}`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -241,11 +233,9 @@ export const createPlaylistThunk = createAsyncThunk(
 export const deletePlaylistThunk = createAsyncThunk(
     'songs/deletePlaylist',
     async ({ playlistName }, { dispatch, rejectWithValue, getState }) => {
-        const state = getState();
-        const userId = state.user.user._id;
         dispatch(removePlaylistRed(playlistName));
         try {
-            const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/delete-playlist/${playlistName}/${userId}`, {
+            const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/delete-playlist/${playlistName}`, {
                 method: 'DELETE',
                 headers: {
                     'Content-Type': 'application/json'
