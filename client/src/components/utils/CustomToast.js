@@ -1,9 +1,16 @@
 // components/CustomToast.js
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
 import { FiCheckCircle, FiXCircle, FiInfo, FiX } from 'react-icons/fi';
 
 export default function CustomToast({ t, message, type }) {
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    const raf = requestAnimationFrame(() => setMounted(true));
+    return () => cancelAnimationFrame(raf);
+  }, []);
+
   const styleMap = {
     success: {
       bg: 'border border-green-500 bg-green-50 text-green-700 shadow-md hover:shadow-lg',
@@ -20,10 +27,13 @@ export default function CustomToast({ t, message, type }) {
   };
 
   const { bg, Icon } = styleMap[type] || styleMap.info;
+  const animationClasses = mounted
+    ? 'translate-y-0 opacity-100'
+    : 'translate-y-4 opacity-0';
 
   return (
     <div
-      className={`w-72 max-w-sm px-4 py-4 rounded flex items-center justify-between gap-3 ${bg}`}
+      className={`w-72 max-w-sm px-4 py-4 rounded flex items-center justify-between gap-3 ${bg} transform transition-all duration-300 ease-out ${animationClasses}`}
     >
       <div className="flex items-center gap-2">
         <Icon className="w-5 h-5" />

@@ -12,7 +12,7 @@ const SongCard = ({ item, index }) => {
   const navigate = useNavigate();
 
   const [isPopoverOpen, setIsPopoverOpen] = useState(false);
-  const isLoggedIn = useSelector(state => state.user.isLoggedIn);
+  const { user: userDetails, isAuthenticated, isAuthLoading } = useSelector((state) => state.auth);
   const userPlaylists = useSelector(state => state.songs.userPlaylists);
   const likedSongs = userPlaylists?.find(playlist => playlist.playlistName === "Liked Songs")?.songs || [];
   const [isLiked, setIsLiked] = useState(likedSongs?.includes(item.id));
@@ -46,7 +46,7 @@ const SongCard = ({ item, index }) => {
   }, [item]);
 
   const handleLike = async () => {
-    if (!isLoggedIn) {
+    if (!isAuthLoading && !isAuthenticated) {
       showInfoToast("Please log in to like songs.");
       return;
     }

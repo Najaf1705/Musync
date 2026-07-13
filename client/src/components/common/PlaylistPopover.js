@@ -17,7 +17,6 @@ import CreatePlaylistModal from './CreatePlaylistModal';
 const PlaylistPopover = ({ songId }) => {
   const dispatch = useDispatch();
   const playlists = useSelector(state => state.songs.userPlaylists)?.filter(p => p.playlistName !== "Liked Songs") || [];
-  const { isAuthReady, isLoggedIn, user: userDetails } = useSelector(state => state.user);
 
   const { isOpen, onOpen, onClose, onOpenChange } = useDisclosure();
   const [selectedPlaylist, setSelectedPlaylist] = useState(null);
@@ -27,6 +26,7 @@ const PlaylistPopover = ({ songId }) => {
   const [isCreateOpen, setIsCreateOpen] = useState(false);
   const [newPlaylistName, setNewPlaylistName] = useState('');
 
+  const { user: userDetails, isAuthenticated, isAuthLoading } = useSelector((state) => state.auth);
 
   const addToPlaylist = (playlistId, playlistName) => {
     dispatch(addSongToPlaylistThunk({ playlistId, playlistName, songId }));
@@ -57,8 +57,7 @@ const PlaylistPopover = ({ songId }) => {
       >
         <DropdownTrigger
           onClick={() => {
-            if (!isAuthReady) return;
-            if (!isLoggedIn) {
+            if (!isAuthLoading && !isAuthenticated) {
               showInfoToast("Please log in to manage playlists.");
               return;
             }
@@ -67,7 +66,7 @@ const PlaylistPopover = ({ songId }) => {
         >
           <i className="fa-solid fa-plus cursor-pointer text-white text-sm md:text-xl hover:text-green-400 transition" title="Add to playlist"></i>
         </DropdownTrigger>
-        {isAuthReady && isLoggedIn &&
+        {isAuthLoading && isAuthenticated &&
           <DropdownMenu
             aria-label="Dynamic Actions"
             className="bg-gray-700 rounded-md p-0 text-white min-w-36 shadow-xl shadow-gray-900/50"

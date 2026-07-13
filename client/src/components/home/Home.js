@@ -12,7 +12,7 @@ import { showErrorToast } from "../utils/toast";
 
 const Home = () => {
   const dispatch = useDispatch();
-  const userDetails = useSelector((state) => state.user.user);
+  const {user: userDetails, isAuthenticated, isAuthLoading} = useSelector((state) => state.auth);
   const topSongs = useSelector((state) => state.songs.topSongs);
   const loadingTopsongs = useSelector((state) => state.songs.topsongsLoading);
 

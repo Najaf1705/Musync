@@ -1,12 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
-import { clearUser } from '../../redux/features/userSlice';
+import { clearUser } from '../../redux/features/auth/authSlice';
 import { clearSongSliceThunk } from '../../redux/features/song/songThunks';
 import { toast } from 'react-toastify';
 import { AiFillGithub } from "react-icons/ai";
 import { Dropdown, DropdownTrigger, DropdownMenu, DropdownItem, Button } from "@heroui/react";
 import { showErrorToast, showSuccessToast } from '../utils/toast';
+import { logoutUser } from '../../redux/features/auth/authThunks';
 
 
 const defaultProfilePicture = process.env.PUBLIC_URL + '/images/pp.png';
@@ -14,35 +15,20 @@ const defaultProfilePicture = process.env.PUBLIC_URL + '/images/pp.png';
 const Navbar = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  const userDetails = useSelector((state) => state.user.user);
-  const isLoggedIn = useSelector((state) => state.user.isLoggedIn);
+  const user = useSelector((state) => state.auth.isAuthenticated ? state.auth.user : null);
 
-  const [profilePictureURL, setProfilePictureURL] = useState(userDetails?.image || defaultProfilePicture);
-
-  useEffect(() => {
-    if (userDetails && userDetails.image) {
-      console.log("img", userDetails.image)
-      setProfilePictureURL(userDetails.image);
-    } else {
-      setProfilePictureURL(defaultProfilePicture);
-    }
-  }, [userDetails]);
+  // useEffect(() => {
+  //   if (userDetails && userDetails.image) {
+  //     console.log("img", userDetails.image)
+  //     setProfilePictureURL(userDetails.image);
+  //   } else {
+  //     setProfilePictureURL(defaultProfilePicture);
+  //   }
+  // }, [userDetails]);
 
   const handleLogout = async () => {
     try {
-      const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/logout`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        credentials: 'include'
-      });
-
-      if (!response.ok) {
-        throw new Error('Logout failed');
-      }
-
-      dispatch(clearUser());
-      dispatch(clearSongSliceThunk());
-      navigate('/', {replace: true});
+      await dispatch(logoutUser()).unwrap();
       showSuccessToast("Logged out Successfully");
     } catch (error) {
       console.error('Logout error:', error);
@@ -52,7 +38,7 @@ const Navbar = () => {
 
   const navItems = [
     { path: "", label: "Home" },
-    ...(isLoggedIn ? [{ path: "/playlists", label: "Playlists" }] : []),
+    ...(user ? [{ path: "/playlists", label: "Playlists" }] : []),
     {path: "/discover", label: "Discover"},
     {path: "/download", label: "Download"},
   ];
@@ -62,12 +48,12 @@ const Navbar = () => {
       <div className="container mx-auto flex items-center justify-between py-2 px-4">
         {/* Logo and Profile Section */}
         <div className="flex items-center">
-          {isLoggedIn && (
+          {user && (
             <NavLink to="/profile">
               <img
                 className="rounded-full w-8 h-8 mr-4 border-2 border-gray-700 object-cover hover:ring-2 hover:ring-blue-400 transition"
-                src={profilePictureURL}
-                onError={() => setProfilePictureURL(defaultProfilePicture)}
+                src={user.image || defaultProfilePicture}
+                // onError={() => setProfilePictureURL(defaultProfilePicture)}
                 alt="Profile"
               />
             </NavLink>
@@ -102,7 +88,7 @@ const Navbar = () => {
               {label}
             </NavLink>
           ))}
-          {isLoggedIn ? (
+          {user ? (
             <button
               className="text-red-500 hover:text-red-400 transition"
               onClick={handleLogout}
@@ -146,7 +132,7 @@ const Navbar = () => {
                 </NavLink>
               </DropdownItem>
             ))}
-            {isLoggedIn ? (
+            {user ? (
               <DropdownItem key="logout" className="py-2 text-danger" onClick={handleLogout}>
                 Logout
               </DropdownItem>

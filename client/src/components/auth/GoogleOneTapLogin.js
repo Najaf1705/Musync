@@ -1,9 +1,13 @@
 import { useEffect } from "react";
-import { useAuthUtils } from "./authUtils";
 import { jwtDecode } from "jwt-decode";
+import { useDispatch } from "react-redux";
+import { setAuthLoading } from "../../redux/features/auth/authSlice";
+import { authenticateWithGoogle, fetchCurrentUser } from "../../redux/features/auth/authThunks";
+import { useNavigate } from "react-router-dom";
 
 export default function GoogleOneTapLogin() {
-      const { googleLogin } = useAuthUtils();
+    const dispatch = useDispatch();
+    const navigate = useNavigate();
 
     useEffect(() => {
         const loadScript = () => {
@@ -26,10 +30,27 @@ export default function GoogleOneTapLogin() {
         };
 
         const handleCredentialResponse = async (response) => {
-            const decoded = jwtDecode(response.credential);
-            googleLogin({
-                token: response.credential
-            });
+            const idToken = response.credential;
+            const decodedToken = jwtDecode(idToken);
+            console.log(decodedToken); // { sub, email, name, picture, ... }
+            dispatch(setAuthLoading(true));
+            try {
+                const result = await dispatch(authenticateWithGoogle({ idToken })).unwrap();
+
+                if (result.requiresPassword) {
+                    const email = result.email ?? "";
+                    navigate("/setpassword", { state: { email, token: idToken, idToken, usecase: "google" } });
+                    return;
+                }
+
+                await dispatch(fetchCurrentUser()).unwrap();
+                navigate("/");
+            } catch (err) {
+                // eslint-disable-next-line no-console
+                console.error("Google signin error", err);
+            } finally {
+                dispatch(setAuthLoading(false));
+            }
         };
 
         loadScript();

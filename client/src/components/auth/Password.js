@@ -1,40 +1,73 @@
 import React, { useEffect, useState } from 'react';
 import { NavLink, useLocation, useNavigate } from 'react-router-dom';
-import { useAuthUtils } from './authUtils';
+import { loginUser } from '../../redux/features/auth/authThunks';
+import { useDispatch } from 'react-redux';
+import toast from 'react-hot-toast';
+import { showErrorToast, showSuccessToast } from '../utils/toast';
+import { useSelect } from '@heroui/react';
 
 function Password() {
   const location = useLocation();
   const navigate = useNavigate();
-  const { normalLogin, invalidCredentialsErr, loginLoading, isLoggedIn } = useAuthUtils();
+  const dispatch = useDispatch();
+  const isAuthLoading = useSelect((state) => state.auth.isAuthLoading);
+  const isAuthenticated = useSelect((state) => state.auth.isAuthenticated);
   const [email, setEmail] = useState(location?.state?.email || '');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
-  const [pageError, setPageError] = useState('');
+  const [error, setError] = useState('');
+  const [errEntity, setErrEntity] = useState('');
+  const [loginLoading, setLoginLoading] = useState(false);
 
   useEffect(() => {
-    if (isLoggedIn) {
-      navigate('/', {replace: true});
+    if (!isAuthLoading && isAuthenticated) {
+      navigate('/', { replace: true });
     }
-  }, [isLoggedIn, navigate]);
+  }, [isAuthenticated, isAuthLoading, navigate]);
 
   useEffect(() => {
     if (!email) {
-      setPageError('Please enter your email on the login page first.');
+      setError('Please enter your email on the login page first.');
+      console.log('Email not provided. Redirecting to login page.');
     }
   }, [email]);
 
+  const validate = () => {
+    if (!password.trim()) {
+      toast.error("Password is required");
+      return false;
+    }
+    return true;
+  };
+
+
+
   const handlePasswordSubmit = async (e) => {
     e.preventDefault();
+    setError('');
+    setLoginLoading(true);
+
     if (!email) {
-      setPageError('Email is required.');
+      setError('Email is required. Go back to login and enter your email.');
       return;
     }
-    if (!password) {
-      setPageError('Please enter your password.');
-      return;
+
+    if (!validate()) return;
+
+
+    try {
+      await dispatch(loginUser({ email, loginMode: "PASSWORD", password })).unwrap();
+      showSuccessToast("Login successful");
+      navigate("/", {
+        replace: true,
+      });
+    } catch (error) {
+      const msg = error instanceof Error ? error.message : String(error);
+      setError(msg);
+      showErrorToast(msg);
+    } finally {
+      setLoginLoading(false);
     }
-    setPageError('');
-    normalLogin({ email, password, type: "password" });
   };
 
   return (
@@ -47,7 +80,6 @@ function Password() {
           </p>
         </div>
 
-        {invalidCredentialsErr !=="" && <div className="text-red-400 text-sm min-h-[1.5rem] mb-4">{invalidCredentialsErr}</div>}
 
         {email ? (
           <form onSubmit={handlePasswordSubmit} className="space-y-4">
@@ -59,6 +91,7 @@ function Password() {
                 <input
                   type={showPassword ? 'text' : 'password'}
                   id="password"
+                  autoFocus
                   placeholder="Enter your password"
                   className="w-full px-4 py-2 rounded-lg bg-neutral-800 text-white border border-neutral-700 focus:outline-none focus:ring-2 focus:ring-green-400"
                   value={password}
@@ -76,9 +109,8 @@ function Password() {
 
             <button
               type="submit"
-              className={`w-full bg-green-500 hover:bg-green-600 text-white font-semibold py-2 px-4 rounded-lg transition ${
-                loginLoading || !password ? 'opacity-50 cursor-not-allowed' : ''
-              }`}
+              className={`w-full bg-green-500 hover:bg-green-600 text-white font-semibold py-2 px-4 rounded-lg transition ${loginLoading || !password ? 'opacity-50 cursor-not-allowed' : ''
+                }`}
               disabled={loginLoading || !password}
             >
               {loginLoading ? <i className="fa-solid fa-spinner fa-spin" aria-hidden="true"></i> : 'Login'}
@@ -99,6 +131,11 @@ function Password() {
                 Clear
               </button>
             </div>
+            {error &&
+              <div className=" mt-3 mb-0.5 border-2 border-[#f3c3cc] bg-[#fdecef] px-3.5 py-2 font-mono text-[13px] text-black">
+                {error}
+              </div>
+            }
           </form>
         ) : (
           <div className="space-y-4">

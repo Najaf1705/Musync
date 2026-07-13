@@ -1,47 +1,72 @@
 import React, { useEffect, useState } from 'react';
 import { NavLink, useLocation, useNavigate } from 'react-router-dom';
-import { useAuthUtils } from './authUtils';
+import { loginUser, signupUser } from '../../redux/features/auth/authThunks';
+import { useDispatch, useSelector } from 'react-redux';
 
 function Otp() {
   const location = useLocation();
   const navigate = useNavigate();
-  const { normalLogin, normalSignup, invalidCredentialsErr, loginLoading, isLoggedIn } = useAuthUtils();
-  const [userDetails] = useState(location?.state || {});
-  const [parent] = useState(location?.parent); // parent should come from state, not location.parent
+  const dispatch = useDispatch();
+  const {isAuthLoading, isAuthenticated} = useSelector((state) => state.auth);
+  const [email] = useState(location.state?.email ?? "");
+  const [name] = useState(location.state?.name ?? "");
+  const [password] = useState(location.state?.password ?? "");
+  const [otpId] = useState(location.state?.otpId ?? "");
+  const [loginMode] = useState(location.state?.loginMode ?? "");
+  const [usecase] = useState(location?.state?.usecase); 
   const [otp, setOtp] = useState('');
-  const [pageError, setPageError] = useState('');
+  const [error, setError] = useState('');
+  const [errEntity, setErrEntity] = useState('');
+  const [otpLoading, setOtpLoading] = useState(false);
+
+  console.log("Otp component state:", { email, name, password, otpId, loginMode, usecase });
+
+    const setFieldError = (field, message) => {
+    setErrEntity(field);
+    setError(message);
+  };
 
   useEffect(() => {
-    console.log(parent);
-    if (isLoggedIn) {
+    if (!isAuthLoading && isAuthenticated) {
       navigate('/', { replace: true });
     }
-  }, [isLoggedIn, navigate]);
+  }, [isAuthenticated, isAuthLoading, navigate]);
 
-  console.log(userDetails)
 
   useEffect(() => {
-    if (!userDetails.email) {
-      setPageError('Please enter your email on the login page first.');
+    if (!email) {
+      setFieldError("email", 'Please enter your email on the login page first.');
     }
-  }, [userDetails.email]);
+  }, [email]);
 
-  const handleOtpSubmit = (e) => {
+  const handleOtpSubmit = async(e) => {
     e.preventDefault();
-    if (!userDetails.email) {
-      setPageError('Email is required.');
+    if (!email) {
+      setFieldError("email", 'Email is required.');
       return;
     }
     if (otp.length !== 6) {
-      setPageError('Please enter a valid 6-digit OTP.');
+      setFieldError("otp", 'Please enter a valid 6-digit OTP.');
       return;
     }
-    setPageError('');
-    if (parent === "login"){
-      normalLogin({ email: userDetails.email, otp, otpId: userDetails.otpId, type: 'otp' });
-      return;
+    setFieldError("", "");
+
+    try {
+      if (usecase === "signup") {
+        await dispatch(signupUser({ name, email, password, otp, otpId })).unwrap();
+        navigate("/", { replace: true });
+      } else if (usecase === "login") {
+        await dispatch(loginUser({ email, loginMode: "OTP", password, otpId, otp })).unwrap();
+        navigate("/", { replace: true });
+      } else {
+        throw new Error("No verification handler provided for this usecase");
+      }
+    } catch (error) {
+      const msg = error instanceof Error ? error.message : String(error);
+      setFieldError("otp", msg);
+    } finally {
+
     }
-    normalSignup({ name: userDetails.name, email: userDetails.email, otp, otpId: userDetails.otpId, password: userDetails.password });
   };
 
   return (
@@ -50,13 +75,12 @@ function Otp() {
         <div className="text-center mb-6">
           <h2 className="text-3xl font-bold text-white mb-2">Enter OTP</h2>
           <p className="text-neutral-400 text-sm">
-            {userDetails.email ? `OTP sent to ${userDetails.email}` : 'Enter your email on the login page first.'}
+            {email ? `OTP sent to ${email}` : 'Enter your email on the login page first.'}
           </p>
         </div>
 
-        <div className="text-red-400 text-sm min-h-[1.5rem] mb-4">{pageError || invalidCredentialsErr}</div>
 
-        {userDetails.email ? (
+        {email ? (
           <form onSubmit={handleOtpSubmit} className="space-y-4">
             <div>
               <label htmlFor="otp" className="block text-neutral-300 mb-1">
@@ -70,17 +94,17 @@ function Otp() {
                 className="w-full px-4 py-2 rounded-lg bg-neutral-800 text-white border border-neutral-700 focus:outline-none focus:ring-2 focus:ring-green-400 text-center text-2xl tracking-widest"
                 value={otp}
                 onChange={(e) => setOtp(e.target.value.replace(/[^0-9]/g, ''))}
-                disabled={loginLoading}
+                disabled={otpLoading}
               />
             </div>
 
             <button
               type="submit"
-              className={`w-full bg-green-500 hover:bg-green-600 text-white font-semibold py-2 px-4 rounded-lg transition ${loginLoading || otp.length !== 6 ? 'opacity-50 cursor-not-allowed' : ''
+              className={`w-full bg-green-500 hover:bg-green-600 text-white font-semibold py-2 px-4 rounded-lg transition ${otpLoading || otp.length !== 6 ? 'opacity-50 cursor-not-allowed' : ''
                 }`}
-              disabled={loginLoading || otp.length !== 6}
+              disabled={otpLoading || otp.length !== 6}
             >
-              {loginLoading ? <i className="fa-solid fa-spinner fa-spin" aria-hidden="true"></i> : 'Login'}
+              {otpLoading ? <i className="fa-solid fa-spinner fa-spin" aria-hidden="true"></i> : 'Login'}
             </button>
 
             <div className="flex justify-between gap-3">
@@ -109,6 +133,11 @@ function Otp() {
             </NavLink>
           </div>
         )}
+        {error &&
+          <div className=" mt-3 mb-0.5 border-2 border-[#f3c3cc] bg-[#fdecef] px-3.5 py-2 font-mono text-[13px] text-black">
+            {error}
+          </div>
+        }
       </div>
     </div>
   );

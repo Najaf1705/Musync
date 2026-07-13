@@ -16,14 +16,15 @@ import Playlists from './components/playlist/Playlists';
 import Profile from './components/Profile';
 import "./index.css";
 import { clearSongSliceThunk, fetchTopSongsThunk, setUserSongsThunk } from './redux/features/song/songThunks.js'; // adjust path as needed
-import { clearUser, setAuthReady, setUser } from './redux/features/userSlice'; // adjust path as needed
 import GoogleOneTapLogin from './components/auth/GoogleOneTapLogin.js';
+import { fetchCurrentUser } from './redux/features/auth/authThunks.js';
+import { logout, setAuthLoading } from './redux/features/auth/authSlice.js';
 
 const App = () => {
   const [selectedSong, setSelectedSong] = useState('');
   const dispatch = useDispatch();
-  const isLoggedIn = useSelector((state) => state.user.isLoggedIn);
-  const isAuthReady = useSelector((state) => state.user.isAuthReady);
+  const isAuthLoading = useSelector((state) => state.auth.isAuthLoading);
+  const isAuthenticated = useSelector((state) => state.auth.isAuthenticated);
 
   useEffect(() => {
     dispatch(fetchTopSongsThunk());
@@ -33,31 +34,25 @@ const App = () => {
     setSelectedSong(songDetails);
   };
 
-  useEffect(() => {
-    const verify = async () => {
-      const res = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/serverprofile`, {
-        method: "GET",
-        credentials: "include",
-      });
-
-
-      if (res.ok) {
-        const user = await res.json();
-        dispatch(setUser(user));
-        dispatch(setUserSongsThunk({ likedSongs: user.likedSongs, userPlaylists: user.playlists })); // set liked songs
-      } else {
-        dispatch(clearUser());
-        dispatch(clearSongSliceThunk());
+useEffect(() => {
+    const bootstrap = async () => {
+      dispatch(setAuthLoading(true));
+      try {
+        await dispatch(fetchCurrentUser()).unwrap();
+        
+      } catch {
+        dispatch(logout());
+      } finally {
+        dispatch(setAuthLoading(false));
       }
-      dispatch(setAuthReady(true));
     };
 
-    verify();
+    bootstrap();
   }, [dispatch]);
 
   return (
     <div className="flex flex-col min-h-screen">
-      {isAuthReady && !isLoggedIn && <GoogleOneTapLogin />}
+      {!isAuthLoading && !isAuthenticated && <GoogleOneTapLogin />}
       <Toaster position="bottom-center" limit={5} />
       <Navbar />
       <div className="flex-1 text-white pt-16 pb-6">
@@ -78,9 +73,9 @@ const App = () => {
           <Route path="/profile" element={<Profile />} />
           <Route path="/login" element={<Login />} />
           <Route path="/login/otp" element={<Otp />} />
-          <Route path="/register/otp" element={<Otp />} />
+          <Route path="/otp" element={<Otp />} />
           <Route path="/login/password" element={<Password />} />
-          <Route path="/register/setpassword" element={<Setpassword />} />
+          <Route path="/setpassword" element={<Setpassword />} />
           <Route path="/signup" element={<Signup />} />
           <Route path="/playlists" element={<Playlists />} />
           <Route path="*" element={<Errorpage />} />

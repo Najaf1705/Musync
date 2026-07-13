@@ -4,16 +4,15 @@ import { useSelector } from 'react-redux';
 
 const Profile = () => {
   const navigate = useNavigate();
-  const userDetails = useSelector((state) => state.user.user);
-  const isLoggedIn = useSelector((state) => state.user.isLoggedIn);
+  const {user: userDetails, isAuthenticated, isAuthLoading} = useSelector((state) => state.auth);
 
   // Redirect to login if not authenticated
   React.useEffect(() => {
-    if (!isLoggedIn) {
+    if (!isAuthLoading && !isAuthenticated) {
       navigate('/login');
     }
-  }, [isLoggedIn, navigate]);
-
+  }, [isAuthenticated, isAuthLoading, navigate]);
+  
   if (!userDetails) {
     return (
       <div className="flex items-center justify-center min-h-[60vh]">

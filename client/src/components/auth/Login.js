@@ -2,18 +2,21 @@ import React, { useState, useEffect } from 'react'
 import { NavLink, useNavigate } from 'react-router-dom';
 import { GoogleOAuthProvider, GoogleLogin } from '@react-oauth/google';
 import { jwtDecode } from "jwt-decode";
-import { useAuthUtils } from './authUtils'; // adjust path as needed
 import GoogleLoginBtn from './GoogleLoginBtn';
+import { loginUser } from '../../redux/features/auth/authThunks';
+import { useDispatch, useSelector } from 'react-redux';
 
 const Login = () => {
-  const { generateOtp, isLoggedIn, loginLoading } = useAuthUtils();
   const navigate = useNavigate();
+  const dispatch = useDispatch();
+  const {isAuthLoading, isAuthenticated} = useSelector((state) => state.auth);
+  const [loginLoading, setLoginLoading] = useState(false);
 
   useEffect(() => {
-    if (isLoggedIn) {
+    if (!isAuthLoading && isAuthenticated) {
       navigate('/'); // Redirect to home or dashboard
     }
-  }, [isLoggedIn, navigate]);
+  }, [isAuthenticated, isAuthLoading, navigate]);
 
   const [email, setEmail] = useState("");
 
@@ -24,9 +27,9 @@ const Login = () => {
 
   const handleUseOtp = async () => {
     if (isValidEmail(email)) {
-      const generateOtpResponse = await generateOtp(email);
-      const otpId=generateOtpResponse.otpId;
-      navigate('/login/otp', { replace: true, state: { email, otpId } });
+      const res = await dispatch(loginUser({ email, loginMode: "OTP" })).unwrap();
+      const otpId=res.otpId;
+      navigate('/login/otp', { replace: true, state: { email, otpId, loginMode: "OTP", usecase: "login" } });
     }
   };
 
@@ -58,6 +61,7 @@ const Login = () => {
                 id="email"
                 placeholder="Enter your email"
                 autoComplete="off"
+                autoFocus
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 disabled={loginLoading}
@@ -98,14 +102,14 @@ const Login = () => {
         </div>
 
         {/* Google Login */}
-          <GoogleLoginBtn/>
 
         {/* Signup link */}
 
-          <div className="text-center mt-4">
+          <div className="flex justify-between items-center text-center mt-4">
             <NavLink to="/signup" className={`text-green-400 hover:underline text-sm ${loginLoading ? "pointer-events-none opacity-50" : ""}`}>
               Need an account?
             </NavLink>
+            <GoogleLoginBtn/>
           </div>
     
       </div>
