@@ -1,51 +1,40 @@
 const jwt = require("jsonwebtoken");
-const User = require('../models/userSchema');
-const mongoose = require('mongoose');
+const UserRepo = require('../repositories/userRepository');
 
 const authenticate = async (req, res, next) => {
   try {
     console.log('Authentication middleware triggered');
-    const token = req.cookies.jtoken;
+    console.log("Headers:", req.headers);
+    console.log("Cookie header:", req.headers.cookie);
+    console.log("Parsed cookies:", req.cookies);
+    const token = req.cookies?.accessToken || req.cookies?.jtoken;
+    console.log("Token from cookies:", token);
+
     if (!token) {
       return res.status(401).json({ error: "Authentication required - no token found" });
     }
 
-    // Verify and decode the JWT
-    const decoded = jwt.verify(token, process.env.SECRET_KEY);
-    console.log('Decoded token:', decoded);
-    
-    // Add debug logging
-    console.log('Decoded token_id:', decoded._id);
-    
-    // Validate MongoDB ID format (24 chars hexadecimal)
-    if (!decoded._id || !/^[0-9a-fA-F]{24}$/.test(decoded._id)) {
-      return res.status(400).json({ error: "Invalid MongoDB ID format" });
-    }
+    const tverify = jwt.verify(token, process.env.SECRET_KEY);
+    // const userId = tverify.userId || tverify.sub || tverify._id || tverify.email;
+    const email = tverify.email || null;
 
-    // Try to create ObjectId
-    let objectId;
-    try {
-      objectId = new mongoose.Types.ObjectId(decoded._id);
-    } catch (err) {
-      console.log('ObjectId creation error:', err);
-      return res.status(400).json({ error: "Invalid MongoDB ID format" });
-    }
+    let rootuser = await UserRepo.findUserByEmail(email);
 
-    const rootuser = await User.findOne({
-      _id: objectId,  // Use the validated ObjectId
-      "tokens.token": token
-    });
+    // if (!rootuser && email) {
+    //   rootuser = await UserRepo.findUserByEmail(email);
+    // }
 
     if (!rootuser) {
-      return res.status(401).json({ error: "User not found or invalid token" });
+      rootuser = await UserRepo.createUser({
+        email,
+      });
     }
 
-    // Add user context to request
     req.token = token;
     req.rootuser = rootuser;
-    req.userID = rootuser._id;
+    // req.userId = rootuser.userId || rootuser._id?.toString();
+    req.email = rootuser.email || email || null;
     next();
-
   } catch (error) {
     console.log('Auth Error:', error.message);
     if (error.name === 'JsonWebTokenError') {
@@ -56,6 +45,6 @@ const authenticate = async (req, res, next) => {
     }
     return res.status(401).json({ error: "Authentication failed" });
   }
-}
+};
 
 module.exports = authenticate;

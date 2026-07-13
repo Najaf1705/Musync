@@ -72,32 +72,46 @@ const signup = async (name, email, password, image = null, otpId = null, otp = n
   if (!validatePassword(password)) {
     throw { status: 400, message: 'Password must be at least 4 characters' };
   }
+}
 
-  const existingUser = await userRepo.findUserByEmail(email);
+const createNewUser = async (userId) => {
+  const existingUser = await userRepo.findUserByUserId(userId);
   if (existingUser) {
     throw { status: 409, message: 'User already exists' };
   }
 
-  if (!otpId || !otp) {
-    const { otpId: newOtpId } = await generateOtp(email);
-    return {
-      status: 'otp_required',
-      message: 'Email verification required',
-      otpId: newOtpId,
-    };
-  }
-
-  await validateOtpCode(otpId, otp);
-
   const newUser = await userRepo.createUser({
-    name,
-    email,
-    password,
-    image,
+    userId,
   });
 
   return newUser;
 };
+
+// const existingUser = await userRepo.findUserByEmail(email);
+// if (existingUser) {
+//   throw { status: 409, message: 'User already exists' };
+// }
+
+// if (!otpId || !otp) {
+//   const { otpId: newOtpId } = await generateOtp(email);
+//   return {
+//     status: 'otp_required',
+//     message: 'Email verification required',
+//     otpId: newOtpId,
+//   };
+// }
+
+// await validateOtpCode(otpId, otp);
+
+// const newUser = await userRepo.createUser({
+//   name,
+//   email,
+//   password,
+//   image,
+// });
+
+// return newUser;
+// };
 
 // Google login
 // const googleLogin = async (email, image = null) => {
@@ -152,7 +166,7 @@ const googleSignup = async (token, password = null) => {
     return updatedUser;
   }
 
-  if(!password)throw { status: 409, message: "User not found, Create password to continue" };
+  if (!password) throw { status: 409, message: "User not found, Create password to continue" };
 
   // ✅ New user with password
   if (password) {
@@ -234,4 +248,5 @@ module.exports = {
   validateOtpCode,
   getUserByEmail,
   formatUserResponse,
+  createNewUser,
 };

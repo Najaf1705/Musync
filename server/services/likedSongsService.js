@@ -1,51 +1,51 @@
 const likedSongsRepository = require('../repositories/likedSongsRepository');
 
 // Check if song is liked
-const checkIfSongLiked = async (userId, trackId) => {
-  if (!userId || !trackId) {
-    throw { status: 400, message: 'User ID and track ID are required' };
+const checkIfSongLiked = async (userIdentifier, trackId) => {
+  if (!userIdentifier || !trackId) {
+    throw { status: 400, message: 'User identifier and track ID are required' };
   }
 
-  const user = await likedSongsRepository.findUserById(userId);
+  const user = await likedSongsRepository.findUserByIdentifier(userIdentifier);
   if (!user) {
     throw { status: 404, message: 'User not found' };
   }
 
-  const isLiked = await likedSongsRepository.isSongLiked(userId, trackId);
+  const isLiked = await likedSongsRepository.isSongLiked(userIdentifier, trackId);
   return isLiked;
 };
 
 // Get all liked songs for a user
-const getAllLikedSongs = async (userId) => {
-  if (!userId) {
-    throw { status: 400, message: 'User ID is required' };
+const getAllLikedSongs = async (userIdentifier) => {
+  if (!userIdentifier) {
+    throw { status: 400, message: 'User identifier is required' };
   }
 
-  const user = await likedSongsRepository.findUserById(userId);
+  const user = await likedSongsRepository.findUserByIdentifier(userIdentifier);
   if (!user) {
     throw { status: 404, message: 'User not found' };
   }
 
-  const likedSongs = await likedSongsRepository.getUserLikedSongs(userId);
+  const likedSongs = await likedSongsRepository.getUserLikedSongs(userIdentifier);
   return likedSongs;
 };
 
 // Toggle like status for a song
-const toggleSongLike = async (userId, trackId) => {
-  if (!userId || !trackId) {
-    throw { status: 400, message: 'User ID and track ID are required' };
+const toggleSongLike = async (userIdentifier, trackId) => {
+  if (!userIdentifier || !trackId) {
+    throw { status: 400, message: 'User identifier and track ID are required' };
   }
 
-  const user = await likedSongsRepository.findUserById(userId);
+  const user = await likedSongsRepository.findUserByIdentifier(userIdentifier);
   if (!user) {
     throw { status: 404, message: 'User not found' };
   }
 
-  const isCurrentlyLiked = await likedSongsRepository.isSongLiked(userId, trackId);
+  const isCurrentlyLiked = await likedSongsRepository.isSongLiked(userIdentifier, trackId);
 
   if (isCurrentlyLiked) {
     // Unlike: Remove from user's liked songs
-    await likedSongsRepository.removeLikedSong(userId, trackId);
+    await likedSongsRepository.removeLikedSong(userIdentifier, trackId);
 
     // Update song data
     await likedSongsRepository.updateSongLikeCount(trackId, false);
@@ -57,7 +57,7 @@ const toggleSongLike = async (userId, trackId) => {
     };
   } else {
     // Like: Add to user's liked songs
-    await likedSongsRepository.addLikedSong(userId, trackId);
+    await likedSongsRepository.addLikedSong(userIdentifier, trackId);
 
     // Update song data
     await likedSongsRepository.updateSongLikeCount(trackId, true);

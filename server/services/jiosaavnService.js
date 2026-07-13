@@ -78,7 +78,7 @@ const getSongDetails = async (songId) => {
     const transformedData=transformSong(result.data[0]);
     return transformedData;
   } catch (error) {
-    console.error('Error fetching song details:', error);
+    // console.error('Error fetching song details:', error);
     if (!error.status) {
       throw { status: 500, message: error.message || 'Error fetching song details' };
     }

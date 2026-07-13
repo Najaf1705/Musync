@@ -12,7 +12,7 @@ const searchSongs = async (req, res) => {
     const result = await jiosaavnService.searchSongs(q, parseInt(page), parseInt(limit));
     res.json(result);
   } catch (error) {
-    console.error('Error in searchSongs:', error);
+    // console.error('Error in searchSongs:', error);
     res.status(500).json({ error: 'Failed to search songs' });
   }
 };
@@ -29,7 +29,7 @@ const searchPlaylists = async (req, res) => {
     const result = await jiosaavnService.searchPlaylists(q, parseInt(page), parseInt(limit));
     res.json(result);
   } catch (error) {
-    console.error('Error in searchPlaylists:', error);
+    // console.error('Error in searchPlaylists:', error);
     res.status(500).json({ error: 'Failed to search playlists' });
   }
 };
@@ -46,7 +46,7 @@ const getSongDetails = async (req, res) => {
     const result = await jiosaavnService.getSongDetails(id);
     res.json(result);
   } catch (error) {
-    console.error('Error in getSongDetails:', error);
+    // console.error('Error in getSongDetails:', error);
     res.status(500).json({ error: 'Failed to fetch song details' });
   }
 };
@@ -63,7 +63,7 @@ const getPlaylistDetails = async (req, res) => {
     const result = await jiosaavnService.getPlaylistDetails(id);
     res.json(result);
   } catch (error) {
-    console.error('Error in getPlaylistDetails:', error);
+    // console.error('Error in getPlaylistDetails:', error);
     res.status(500).json({ error: 'Failed to fetch playlist details' });
   }
 };
@@ -80,7 +80,7 @@ const getAlbumDetails = async (req, res) => {
     const result = await jiosaavnService.getAlbumDetails(id);
     res.json(result);
   } catch (error) {
-    console.error('Error in getAlbumDetails:', error);
+    // console.error('Error in getAlbumDetails:', error);
     res.status(500).json({ error: 'Failed to fetch album details' });
   }
 };
@@ -97,7 +97,7 @@ const getArtistDetails = async (req, res) => {
     const result = await jiosaavnService.getArtistDetails(id);
     res.json(result);
   } catch (error) {
-    console.error('Error in getArtistDetails:', error);
+    // console.error('Error in getArtistDetails:', error);
     res.status(500).json({ error: 'Failed to fetch artist details' });
   }
 };
@@ -110,7 +110,7 @@ const getTrendingSongs = async (req, res) => {
     const result = await jiosaavnService.getTrendingSongs(parseInt(page), parseInt(limit));
     res.json(result);
   } catch (error) {
-    console.error('Error in getTrendingSongs:', error);
+    // console.error('Error in getTren  dingSongs:', error);
     res.status(500).json({ error: 'Failed to fetch trending songs' });
   }
 };

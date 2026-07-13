@@ -1,5 +1,17 @@
+const mongoose = require('mongoose');
 const User = require('../models/userSchema');
 const Odata = require('../models/dataSchema');
+
+// Find user by ID or email
+const findUserByIdentifier = async (userIdentifier) => {
+  if (!userIdentifier) return null;
+
+  if (mongoose.Types.ObjectId.isValid(userIdentifier)) {
+    return await User.findById(userIdentifier);
+  }
+
+  return await User.findOne({ email: userIdentifier });
+};
 
 // Find user by ID
 const findUserById = async (userId) => {
@@ -8,22 +20,22 @@ const findUserById = async (userId) => {
 };
 
 // Check if song is liked
-const isSongLiked = async (userId, trackId) => {
-  const user = await User.findById(userId);
+const isSongLiked = async (userIdentifier, trackId) => {
+  const user = await findUserByIdentifier(userIdentifier);
   if (!user) return null;
   return user.likedSongs.includes(trackId);
 };
 
 // Get user's liked songs
-const getUserLikedSongs = async (userId) => {
-  const user = await User.findById(userId);
+const getUserLikedSongs = async (userIdentifier) => {
+  const user = await findUserByIdentifier(userIdentifier);
   if (!user) return null;
   return user.likedSongs;
 };
 
 // Add song to liked songs
-const addLikedSong = async (userId, trackId) => {
-  const user = await User.findById(userId);
+const addLikedSong = async (userIdentifier, trackId) => {
+  const user = await findUserByIdentifier(userIdentifier);
   if (!user) return null;
   
   if (!user.likedSongs.includes(trackId)) {
@@ -34,8 +46,8 @@ const addLikedSong = async (userId, trackId) => {
 };
 
 // Remove song from liked songs
-const removeLikedSong = async (userId, trackId) => {
-  const user = await User.findById(userId);
+const removeLikedSong = async (userIdentifier, trackId) => {
+  const user = await findUserByIdentifier(userIdentifier);
   if (!user) return null;
   
   user.likedSongs = user.likedSongs.filter(id => id !== trackId);
@@ -97,6 +109,7 @@ const getTopLikedSongs = async (limit = 10) => {
 };
 
 module.exports = {
+  findUserByIdentifier,
   findUserById,
   isSongLiked,
   getUserLikedSongs,

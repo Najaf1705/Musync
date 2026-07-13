@@ -1,26 +1,35 @@
 const jwt = require("jsonwebtoken");
 const User = require('../models/userSchema');
 
+const UserRepo = require('../repositories/userRepository');
+
 const authenticate = async (req, res, next) => {
   try {
-    const token = req.cookies.jtoken;
-    console.log("Token from cookie:", token);
+    const token = req.cookies.accessToken || req.cookies.jtoken;
+    console.log("Token from cookies:", token);
+    if (!token) {
+      return res.status(401).send("No token provided");
+    }
+
     const tverify = jwt.verify(token, process.env.SECRET_KEY);
-    console.log("Token verified user:", tverify);
-    const rootuser = await User.findOne({ _id: tverify._id, "tokens.token": token });
+    const email = tverify.email;
+
+    let rootuser = await UserRepo.findUserByEmail(email);
 
     if (!rootuser) {
-      throw new Error("User not found");
+      rootuser = await UserRepo.createUser({
+        email,
+      });
     }
+
     req.token = token;
     req.rootuser = rootuser;
-    req.userID = rootuser._id;
-    // req.userName = rootuser.name;
+    req.email = rootuser.email || email || null;
     next();
 
   } catch (error) {
-    res.status(401).send("No token provided");
     console.log(error);
+    return res.status(401).send("No token provided");
   }
 }
 

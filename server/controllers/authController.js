@@ -149,6 +149,30 @@ const normalSignup = async (req, res) => {
   }
 };
 
+
+const createUser = async (req, res) => {
+  try {
+    const authenticatedUser = req.rootuser;
+    if (!authenticatedUser) {
+      return res.status(401).json({ error: "Unauthorized" });
+    }
+    const userId = authenticatedUser.userId; // Assuming userId is a property of the authenticated user
+
+    const result = await authService.createNewUser(userId);
+
+    return res.status(201).json({
+      message: "User created successfully",
+      user: authService.formatUserResponse(result),
+    });
+
+  } catch (error) {
+    console.error('Create user error:', error);
+    const status = error.status || 500;
+    res.status(status).json({ error: error.message || 'Internal server error' });
+  }
+};
+
+
 const generateOtp = async (req, res) => {
   try {
     const { email } = req.body;
@@ -190,9 +214,22 @@ const logout = (req, res) => {
 };
 
 // Profile Controller
-const serverProfile = (req, res) => {
-  console.log("Fetching user profile");
-  res.status(200).json(req.rootuser);
+const serverProfile = async (req, res) => {
+  try {
+    console.log("Fetching user profile");
+
+    let user = req.rootuser;
+    if (!user) {
+      // const fallbackEmail = req.email || `user-${Date.now()}@example.com`;
+      user = await authService.createNewUser(user.email);
+    }
+
+    res.status(200).json(user);
+  } catch (error) {
+    console.error("Profile error:", error);
+    const status = error.status || 500;
+    res.status(status).json({ error: error.message || "Internal server error" });
+  }
 };
 
 module.exports = {
@@ -205,4 +242,5 @@ module.exports = {
   userExists,
   logout,
   serverProfile,
+  createUser,
 };

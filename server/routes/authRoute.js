@@ -19,12 +19,13 @@ router.post('/api/signup/normal', authController.normalSignup);
 router.post('/api/signup/google', authController.googleSignup);
 
 router.post('/api/otp', authController.generateOtp);
+router.post('/api/newuser', authController.createUser);
 
 
 // Logout
 router.post('/api/logout', authController.logout);
 
 // Profile Endpoint
-router.get('/api/serverprofile', authenticate, authController.serverProfile);
+router.get('/api/user', authenticate, authController.serverProfile);
 
 module.exports = router;

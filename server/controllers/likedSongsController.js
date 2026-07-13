@@ -32,9 +32,9 @@ const getLikedSongs = async (req, res) => {
 const toggleLike = async (req, res) => {
   try {
     const { trackId } = req.params;
-    const userId = req.rootuser._id; // From auth middleware
+    const userIdentifier = req.rootuser?.email || req.email; // From auth middleware
 
-    const result = await likedSongsService.toggleSongLike(userId, trackId);
+    const result = await likedSongsService.toggleSongLike(userIdentifier, trackId);
     res.status(200).json(result);
   } catch (error) {
     console.error('Toggle like error:', error);

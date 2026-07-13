@@ -1,16 +1,25 @@
+const mongoose = require('mongoose');
 const User = require('../models/userSchema');
 const Otp = require('../models/otpSchema');
+
+// Find user by user ID
+const findUserByUserId = async (userId) => {
+  if (!userId) return null;
+
+  const byUserId = await User.findOne({ userId });
+  if (byUserId) return byUserId;
+
+  if (mongoose.Types.ObjectId.isValid(userId)) {
+    return await User.findById(userId);
+  }
+
+  return null;
+};
 
 // Find user by email
 const findUserByEmail = async (email) => {
   if (!email) return null;
   return await User.findOne({ email });
-};
-
-// Find user by ID
-const findUserById = async (userId) => {
-  if (!userId) return null;
-  return await User.findById(userId);
 };
 
 // Create new user
@@ -21,7 +30,11 @@ const createUser = async (userData) => {
 
 // Update user
 const updateUser = async (userId, updateData) => {
-  return await User.findByIdAndUpdate(userId, updateData, { new: true });
+  if (mongoose.Types.ObjectId.isValid(userId)) {
+    return await User.findByIdAndUpdate(userId, updateData, { new: true });
+  }
+
+  return await User.findOneAndUpdate({ userId }, updateData, { new: true });
 };
 
 // Find OTP by ID and email
@@ -51,7 +64,7 @@ const findOtpById = async (otpId) => {
 
 module.exports = {
   findUserByEmail,
-  findUserById,
+  findUserByUserId,
   createUser,
   updateUser,
   findOtpByIdAndEmail,

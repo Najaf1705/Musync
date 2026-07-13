@@ -30,16 +30,18 @@ export const fetchTopSongsThunk = createAsyncThunk(
     'songs/fetchTopSongs',
     async () => {
         try {
-            const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/topSongs`, {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                credentials: 'include'
-            });
+            const response = await axios.post(
+                `${process.env.REACT_APP_BACKEND_URL}/api/topSongs`,
+                {},
+                {
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    withCredentials: true,
+                }
+            );
 
-            if (!response.ok) throw new Error("Failed to fetch top songs");
-            const { data: trackIds } = await response.json();
+            const trackIds = response.data?.data || [];
 
             // Then fetch details for each track
             const trackDetailsPromises = trackIds.map(trackId => fetchTrackDetails(trackId));
@@ -62,20 +64,18 @@ export const toggleLikeSongThunk = createAsyncThunk(
     async (songId, { rejectWithValue, dispatch }) => {
         try {
             dispatch(toggleLikeSongRed(songId)); // Optimistically update the state
-            const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/toggle-like/${songId}`, {
-                method: 'POST',
-                credentials: 'include',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({ id: songId }),
-            });
+            const response = await axios.post(
+                `${process.env.REACT_APP_BACKEND_URL}/api/toggle-like/${songId}`,
+                { id: songId },
+                {
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    withCredentials: true,
+                }
+            );
 
-            if (!response.ok) {
-                throw new Error('Failed to toggle like');
-            }
-
-            const data = await response.json();
+            const data = response.data;
             return { songId, isLiked: data.isLiked };
         } catch (error) {
             console.error('Error toggling like:', error);
@@ -92,20 +92,17 @@ export const searchSongsAndPlaylistsThunk = createAsyncThunk(
     'songs/search',
     async (query, { rejectWithValue }) => {
         try {
-            const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/search?q=${encodeURIComponent(query)}`, {
-                method: 'GET',
-                credentials: 'include',
-                headers: {
-                    'Content-Type': 'application/json'
+            const response = await axios.get(
+                `${process.env.REACT_APP_BACKEND_URL}/api/search?q=${encodeURIComponent(query)}`,
+                {
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    withCredentials: true,
                 }
-            });
+            );
 
-            if (!response.ok) {
-                const errorData = await response.json();
-                throw new Error(errorData.message || 'Search failed');
-            }
-
-            const data = await response.json();
+            const data = response.data;
 
             // Validate response structure
             if (!data.songs || !data.playlists) {
@@ -147,15 +144,18 @@ export const addSongToPlaylistThunk = createAsyncThunk(
         }
 
         try {
-            const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/addToPlaylist/${playlistName}/${songId}/${userId}`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                credentials: 'include'
-            });
+            const response = await axios.post(
+                `${process.env.REACT_APP_BACKEND_URL}/api/addToPlaylist/${playlistName}/${songId}/${userId}`,
+                {},
+                {
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    withCredentials: true,
+                }
+            );
 
-            if (!response.ok) {
+            if (response.status !== 200 && response.status !== 201) {
                 throw new Error('Failed to add song to playlist');
             }
 
