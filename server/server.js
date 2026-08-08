@@ -50,7 +50,7 @@ app.set("trust proxy", 1);
 
 app.use(express.json());
 app.use(require('./routes/authRoute'));
-app.use(require('./routes/jiosaavnRoute'));
+// app.use(require('./routes/jiosaavnRoute'));
 app.use(require('./routes/spotifyRoute'));
 app.use(require('./routes/likedsongsRoute'));
 app.use(require('./routes/playlistRoute'));

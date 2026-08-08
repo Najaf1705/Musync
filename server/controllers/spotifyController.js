@@ -1,185 +1,206 @@
 const dotenv = require('dotenv');
-const { transformSong, transformPlaylist } = require('../transformers');
 dotenv.config();
 
 const clientId = process.env.SPOTIFY_CLIENT_ID;
 const clientSecret = process.env.SPOTIFY_CLIENT_SECRET;
-const SAAVN_API_BASE = 'https://saavn.sumit.co/api';
 
-// Function to fetch an access token from Spotify
+const normalizeSpotifyTrack = (track) => ({
+  id: track?.id,
+  songName: track?.name,
+  name: track?.name,
+  image: track?.album?.images?.[0]?.url || track?.images?.[0]?.url || '',
+  album: track?.album || { name: 'Unknown Album' },
+  artists: track?.artists?.length
+    ? { primaryArtist: track.artists.map((artist) => ({ name: artist.name, id: artist.id })) }
+    : { primaryArtist: [{ name: 'Unknown Artist', id: null }] },
+  duration: track?.duration_ms,
+  uri: track?.uri,
+  externalUrl: track?.external_urls?.spotify,
+});
+
+const normalizeSpotifyPlaylist = (playlist) => ({
+  id: playlist?.id,
+  playlistName: playlist?.name,
+  name: playlist?.name,
+  image: playlist?.images?.[0]?.url || '',
+  images: playlist?.images || [],
+  owner: playlist?.owner,
+  tracks: playlist?.tracks,
+  externalUrl: playlist?.external_urls?.spotify,
+});
+
 const getAccessToken = async () => {
   const base64data = Buffer.from(`${clientId}:${clientSecret}`).toString('base64');
   const response = await fetch('https://accounts.spotify.com/api/token', {
     method: 'POST',
     headers: {
-      'Authorization': `Basic ${base64data}`,
+      Authorization: `Basic ${base64data}`,
       'Content-Type': 'application/x-www-form-urlencoded',
     },
     body: 'grant_type=client_credentials',
   });
 
+  if (!response.ok) {
+    throw new Error('Failed to get Spotify access token');
+  }
+
   const data = await response.json();
   return data.access_token;
 };
 
-// Search for a song by name
-const searchSong = async (req, res) => {
-  const songName = req.query.name;
-  const accessToken = await getAccessToken();
+const spotifyFetch = async (url, accessToken) => {
+  const response = await fetch(url, {
+    headers: {
+      Authorization: `Bearer ${accessToken}`,
+      'Content-Type': 'application/json',
+    },
+  });
+
+  if (!response.ok) {
+    throw new Error(`Spotify API request failed with status ${response.status}`);
+  }
+
+  return response.json();
+};
+
+const searchSongs = async (req, res) => {
+  const query = req.query.q || req.query.name;
 
   try {
-    const response = await fetch(`https://saavn.sumit.co/api/search?query=${songName}`, {
-      headers: {
-        // 'Authorization': `Bearer ${accessToken}`,
-      },
-    });
+    const accessToken = await getAccessToken();
+    const data = await spotifyFetch(
+      `https://api.spotify.com/v1/search?q=${encodeURIComponent(query)}&type=track&limit=20`,
+      accessToken
+    );
 
-    const searchData = await response.json();
-    console.log(searchData);
-    res.json(searchData);
+    const songs = (data.tracks?.items || []).map(normalizeSpotifyTrack);
+    res.json(songs);
   } catch (error) {
-    console.error('Error searching for song:', error);
+    console.error('Error searching for songs:', error);
     res.status(500).json({ error: 'Internal server error' });
   }
 };
 
-// Search for playlists by name
+const searchSong = searchSongs;
+
 const searchPlaylists = async (req, res) => {
-  const playlistName = req.query.name;
-  const accessToken = await getAccessToken();
+  const query = req.query.q || req.query.name;
 
   try {
-    const response = await fetch(`https://api.spotify.com/v1/search?q=${playlistName}&type=playlist`, {
-      headers: {
-        'Authorization': `Bearer ${accessToken}`,
-      },
-    });
+    const accessToken = await getAccessToken();
+    const data = await spotifyFetch(
+      `https://api.spotify.com/v1/search?q=${encodeURIComponent(query)}&type=playlist&limit=10`,
+      accessToken
+    );
 
-    const searchData = await response.json();
-    res.json(searchData);
+    const playlists = (data.playlists?.items || []).map(normalizeSpotifyPlaylist);
+    res.json(playlists);
   } catch (error) {
     console.error('Error searching for playlists:', error);
     res.status(500).json({ error: 'Internal server error' });
   }
 };
 
-// Get featured playlists by country
 const getTopPlaylists = async (req, res) => {
-  const country = req.query.country;
-  const accessToken = await getAccessToken();
+  const country = req.query.country || 'US';
 
   try {
-    const response = await fetch(`https://api.spotify.com/v1/browse/featured-playlists?country=${country}`, {
-      headers: {
-        'Authorization': `Bearer ${accessToken}`,
-      },
-    });
+    const accessToken = await getAccessToken();
+    const data = await spotifyFetch(
+      `https://api.spotify.com/v1/browse/featured-playlists?country=${encodeURIComponent(country)}`,
+      accessToken
+    );
 
-    const playListData = await response.json();
-    res.json(playListData);
+    res.json(data.playlists || data);
   } catch (error) {
     console.error('Error fetching top playlists:', error);
     res.status(500).json({ error: 'Internal server error' });
   }
 };
 
-// Get tracks in a playlist
 const getPlaylistTracks = async (req, res) => {
-  const playlistId = req.params.playlistId;
-  // const accessToken = await getAccessToken();
+  const playlistId = req.params.playlistId || req.params.id;
 
   try {
-    const response = await fetch(`https://saavn.sumit.co/api/playlists?id=${playlistId}`, {
-      headers: {
-        // 'Authorization': `Bearer ${accessToken}`,
-      },
-    });
+    const accessToken = await getAccessToken();
+    const data = await spotifyFetch(
+      `https://api.spotify.com/v1/playlists/${playlistId}/tracks?limit=50`,
+      accessToken
+    );
 
-    const playlistData = await response.json();
-    // console.log("pd", playlistData)
-    res.json(transformPlaylist(playlistData.data));
+    res.json(data);
   } catch (error) {
     console.error('Error fetching playlist tracks:', error);
     res.status(500).json({ error: 'Internal server error' });
   }
 };
 
-// Get track info by track ID
-const getTrackInfo = async (req, res) => {
-  const trackId = req.params.track_info;
+const getPlaylistDetails = async (req, res) => {
+  const playlistId = req.params.id;
 
   try {
-    // const accessToken = await getAccessToken();
-    // console.log("TOKEN:", accessToken);
+    const accessToken = await getAccessToken();
+    const data = await spotifyFetch(`https://api.spotify.com/v1/playlists/${playlistId}`, accessToken);
+    res.json(data);
+  } catch (error) {
+    console.error('Error fetching playlist details:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+};
 
-    const response = await fetch(`https://saavn.sumit.co/api/songs?ids=${trackId}`, {
-      headers: {
-        // Authorization: `Bearer ${accessToken}`,
-      },
-    });
+const getTrackInfo = async (req, res) => {
+  const trackId = req.params.id || req.params.track_info;
 
-    
-    const trackInfo=await response.json();
-    console.log("trackinfo", trackInfo)
-    res.json(transformSong(trackInfo.data[0]));
-
+  try {
+    const accessToken = await getAccessToken();
+    const data = await spotifyFetch(`https://api.spotify.com/v1/tracks/${trackId}`, accessToken);
+    res.json(normalizeSpotifyTrack(data));
   } catch (error) {
     console.error('Error fetching track info:', error);
     res.status(500).json({ error: 'Internal server error' });
   }
 };
 
-// Combined search for songs and playlists
 const searchSongsAndPlaylists = async (req, res) => {
-  const query = req.query.q;
-  const accessToken = await getAccessToken();
+  const query = req.query.q || req.query.name;
 
   try {
-    // Search for both tracks and playlists in parallel
-    const [tracksResponse, playlistsMetadataResponse] = await Promise.all([
-      fetch(`https://saavn.sumit.co/api/search/songs?query=${query}&page=0&limit=200`, {
-        headers: {
-          // 'Authorization': `Bearer ${accessToken}`,
-        },
-      }),
-      fetch(`https://saavn.sumit.co/api/search/playlists?query=${query}&page=0&limit=10`, {
-        headers: {
-          // 'Authorization': `Bearer ${accessToken}`,
-        },
-      })
+    const accessToken = await getAccessToken();
+    const [tracksData, playlistsData] = await Promise.all([
+      spotifyFetch(
+        `https://api.spotify.com/v1/search?q=${encodeURIComponent(query)}&type=track&limit=20`,
+        accessToken
+      ),
+      spotifyFetch(
+        `https://api.spotify.com/v1/search?q=${encodeURIComponent(query)}&type=playlist&limit=10`,
+        accessToken
+      ),
     ]);
 
-    if (!tracksResponse.ok || !playlistsMetadataResponse.ok) {
-      throw new Error('Failed to fetch search results');
-    }
-
-    const [tracksData, playlistsMetadata] = await Promise.all([
-      tracksResponse.json(),
-      playlistsMetadataResponse.json()
-    ]);
-
-    
-
-
-    // Combine and send both results
     res.json({
-      tracks: tracksData.data.results.map((track)=>transformSong(track)),
-      playlists: playlistsMetadata.data.results.map(({image, ...playlist})=>({...playlist, images: image}))
+      songs: (tracksData.tracks?.items || []).map(normalizeSpotifyTrack),
+      playlists: (playlistsData.playlists?.items || []).map(normalizeSpotifyPlaylist),
     });
-
-
   } catch (error) {
     console.error('Search error:', error);
     res.status(500).json({ error: 'Failed to search songs and playlists' });
   }
 };
 
-// Export all functions
+const searchAll = searchSongsAndPlaylists;
+const getSongDetails = getTrackInfo;
+const getTrendingSongs = getTopPlaylists;
+
 module.exports = {
   searchSong,
+  searchSongs,
   searchPlaylists,
   getTopPlaylists,
   getPlaylistTracks,
   getTrackInfo,
+  getSongDetails,
+  getPlaylistDetails,
+  getTrendingSongs,
   searchSongsAndPlaylists,
+  searchAll,
 };

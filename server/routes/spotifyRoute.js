@@ -1,22 +1,31 @@
 const express = require('express');
 const router = express.Router();
-const { 
-  searchSongsAndPlaylists,
+const {
+  searchSongs,
+  searchPlaylists,
+  getSongDetails,
+  getPlaylistDetails,
+  getTrendingSongs,
+  searchAll,
   getTopPlaylists,
   getPlaylistTracks,
-  getTrackInfo 
 } = require('../controllers/spotifyController');
 
-// Replace separate search routes with combined search
-router.get('/api/search', searchSongsAndPlaylists);
+// Search endpoints
+router.get('/api/search/songs', searchSongs);
+router.get('/api/search/playlists', searchPlaylists);
+router.get('/api/search', searchAll);
+router.get('/api/search-playlists', searchPlaylists);
 
-// Get featured playlists by country
-router.get('/api/top', getTopPlaylists);
+// Song details
+router.get('/api/trackInfo/:id', getSongDetails);
 
-// Get tracks in a playlist
+// Playlist details
+router.get('/api/playlists/:id', getPlaylistDetails);
 router.get('/api/playlist-tracks/:playlistId', getPlaylistTracks);
 
-// Get track info by track ID
-router.get('/api/trackInfo/:track_info', getTrackInfo);
+// Trending / top playlists
+router.get('/api/trending', getTrendingSongs);
+router.get('/api/top', getTopPlaylists);
 
 module.exports = router;

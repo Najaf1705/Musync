@@ -28,15 +28,19 @@ const SearchResults = ({ songName, setSongName, displayPlaylistSongs, setDisplay
       const playlistData = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/playlist-tracks/${pid}`);
       if (playlistData.ok) {
         const playlistDataResponse = await playlistData.json();
+        const tracks = Array.isArray(playlistDataResponse?.items)
+          ? playlistDataResponse.items
+              .map(item => item?.track || item)
+              .filter(Boolean)
+          : Array.isArray(playlistDataResponse?.songs)
+            ? playlistDataResponse.songs
+            : [];
 
-        if (!playlistDataResponse?.songs?.length) return;
-
-        const transformedPlaylistDataResponse = playlistDataResponse.songs.map(item => item)
-
-        setSelectedPlaylistSongsData(transformedPlaylistDataResponse);
+        if (!tracks.length) return;
+        setSelectedPlaylistSongsData(tracks);
       }
     } catch (error) {
-      console.error("Error fetching playlist songs");
+      console.error("Error fetching playlist songs", error);
     } finally {
       setLoadingPlaylistSongs(false)
     }

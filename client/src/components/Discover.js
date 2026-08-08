@@ -19,10 +19,11 @@ const Discover = (props) => {
 
         // Fetch details for each recommendation
         const detailsPromises = data.map(async (recommendation) => {
-          const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/search?name=${recommendation}`);
+          const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/search?q=${encodeURIComponent(recommendation)}`);
           if (response.ok) {
             const data = await response.json();
-            return data.tracks.items[0];
+            const songs = data.songs ?? data.tracks ?? [];
+            return songs[0] ?? null;
           } else {
             return null;
           }

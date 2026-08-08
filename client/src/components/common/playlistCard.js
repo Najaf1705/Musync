@@ -17,6 +17,8 @@ const PlaylistCard = ({
   // const navigate = useNavigate();
   const dispatch = useDispatch();
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
+  const playlistName = playlist?.playlistName || playlist?.name || 'Untitled Playlist';
+  const playlistImage = playlist?.image || playlist?.images?.[0]?.url || '';
 
   const handlePlaylistSelect = () => {
 
@@ -29,17 +31,17 @@ const PlaylistCard = ({
     if (parentComponent === "playlist") {
       dispatch(setSelectedPlaylistThunk({
         id: playlist.id,
-        name: playlist.playlistName
+        name: playlistName
       }));
       setDisplaySongs(true);
       setSelectedPlaylistData(playlist);
-      fetchSelectedPlaylistSongs(playlist.playlistName);
+      fetchSelectedPlaylistSongs(playlist.playlistName || playlist.name);
     }
     // navigate(`/playlist/${playlist.id}`);
   };
 
   const handleDeletePlaylist = () => {
-    dispatch(deletePlaylistThunk({ playlistName: playlist.playlistName }));
+    dispatch(deletePlaylistThunk({ playlistName }));
   }
 
   return (
@@ -47,21 +49,21 @@ const PlaylistCard = ({
       <div
         className="flex flex-col items-center rounded-lg shadow-md m-2 p-2 w-36 h-48 sm:w-48 sm:h-64 cursor-pointer bg-slate-300/10 hover:bg-slate-300/20 transition backdrop-blur-lg"
         onClick={handlePlaylistSelect}
-        title={`${playlist.playlistName}`}
+        title={playlistName}
       >
         <div className="w-full flex justify-center min-h-20 sm:min-h-24">
           <img
             loading="lazy"
-            src={playlist.image}
+            src={playlistImage}
             className="rounded-lg object-cover w-full h-full"
-            alt={playlist.playlistName}
+            alt={playlistName}
           />
         </div>
         <div className="mt-2 text-center flex-1 flex items-center justify-between w-full px-2">
           <p className="font-semibold text-xs sm:text-sm truncate max-w-[7.5rem] sm:max-w-[10rem] text-left">
-            {playlist.playlistName}
+            {playlistName}
           </p>
-          {playlist.playlistName !== "Liked Songs" && showDeleteButton && (
+          {playlistName !== "Liked Songs" && showDeleteButton && (
             <button
               className="ml-2 text-red-700 hover:text-red-500"
               onClick={e => {
@@ -80,7 +82,7 @@ const PlaylistCard = ({
       <RemovePlaylistModal
         isOpen={isOpen}
         onOpenChange={onOpenChange}
-        playlistName={playlist.playlistName}
+        playlistName={playlistName}
         handleDeletePlaylist={handleDeletePlaylist}
       />
     </>

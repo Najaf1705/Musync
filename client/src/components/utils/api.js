@@ -55,15 +55,15 @@ export const fetchPlaylistTracks = async (playlistId) => {
 
 export const searchSongsAndPlaylists = async (songName) => {
   try {
-    const songResponse = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/search?name=${songName}`);
-    const songs = await songResponse.json();
+    const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/search?q=${encodeURIComponent(songName)}`);
+    const data = await response.json();
 
-    const playlistsResponse = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/search-playlists?name=${songName}`);
-    const playlists = await playlistsResponse.json();
+    const songs = data.songs ?? data.tracks ?? [];
+    const playlists = data.playlists ?? [];
 
     return { songs, playlists };
   } catch (error) {
     console.error("Error searching songs and playlists:", error);
-    return { songs: null, playlists: null };
+    return { songs: [], playlists: [] };
   }
 };

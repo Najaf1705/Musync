@@ -103,24 +103,24 @@ export const searchSongsAndPlaylistsThunk = createAsyncThunk(
             );
 
             const data = response.data;
+            const songs = Array.isArray(data.songs) ? data.songs : Array.isArray(data.tracks) ? data.tracks : [];
+            const playlists = Array.isArray(data.playlists) ? data.playlists : [];
 
             // Validate response structure
-            if (!data.songs || !data.playlists) {
+            if (!Array.isArray(songs) || !Array.isArray(playlists)) {
                 throw new Error('Invalid response format from server');
             }
 
             const returnData = {
                 songs: {
-                    ...data.songs,
-                    items: data.songs.map(song => ({
+                    items: songs.map(song => ({
                         ...song,
-                        isLiked: false, // Initialize like status
+                        isLiked: false,
                     }))
                 },
-                playlists: data.playlists
+                playlists,
             };
 
-            // Transform data if needed and return
             return returnData;
         } catch (error) {
             console.error('Search error:', error);

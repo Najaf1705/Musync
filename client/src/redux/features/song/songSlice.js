@@ -65,8 +65,8 @@ const songSlice = createSlice({
         state.loading = false;
         const { songId, isLiked } = action.payload;
 
-        if (state.searchResults?.tracks?.items) {
-          const song = state.searchResults.tracks.items.find(item => item.id === songId);
+        if (state.searchResults?.items) {
+          const song = state.searchResults.items.find(item => item.id === songId);
           if (song) song.isLiked = isLiked;
         }
 

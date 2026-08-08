@@ -14,6 +14,8 @@ function PlaylistDetail({ selectedPlaylistData, setDisplaySongs, selectedPlaylis
   const paginatedSongs = songs.slice((songPage - 1) * SONGS_PER_PAGE, songPage * SONGS_PER_PAGE);
 
 
+  const playlistTitle = selectedPlaylistData?.playlistName || selectedPlaylistData?.name || 'Playlist';
+
   return (
     <>
       {/* Title and Close Icon Row */}
@@ -24,17 +26,16 @@ function PlaylistDetail({ selectedPlaylistData, setDisplaySongs, selectedPlaylis
           title="Close"
         ></i>
         <h2 className="text-2xl font-semibold">
-          {selectedPlaylistData.name}
+          {playlistTitle}
         </h2>
       </div>
 
       <div className="flex flex-wrap justify-center mx-1">
         {loading ? (
-          // Skeleton loader for loading state
-          Array.from({ length: Math.min(10, selectedPlaylistData?.songs?.length || 0) }).map((_, index) => (
+          Array.from({ length: 6 }).map((_, index) => (
             <div
               key={index}
-              className="w-40 sm:w-56 h-64 bg-gray-700 animate-pulse rounded-lg m-2"
+              className="w-40 sm:w-56 h-64 bg-gray-700/70 animate-pulse rounded-lg m-2"
             ></div>
           ))
         ) : songs.length > 0 ? (
