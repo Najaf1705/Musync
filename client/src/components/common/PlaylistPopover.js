@@ -28,19 +28,30 @@ const PlaylistPopover = ({ songId }) => {
 
   const { user: userDetails, isAuthenticated, isAuthLoading } = useSelector((state) => state.auth);
 
-  const addToPlaylist = (playlistId, playlistName) => {
-    dispatch(addSongToPlaylistThunk({ playlistId, playlistName, songId }));
+  const addToPlaylist = async (playlistId, playlistName) => {
+    try {
+      const result = await dispatch(addSongToPlaylistThunk({ playlistId, playlistName, songId })).unwrap();
+      showInfoToast(result?.alreadyInPlaylist
+        ? `This song is already in ${playlistName}`
+        : `Added song to ${playlistName}`);
+    } catch {
+      // The thunk displays the failure toast and leaves the playlist unchanged.
+    }
   };
 
-  const handleRemove = () => {
+  const handleRemove = async () => {
     if (selectedPlaylist) {
-      dispatch(removeSongFromPlaylistThunk({
-        playlistId: selectedPlaylist._id,
-        playlistName: selectedPlaylist.playlistName,
-        songId
-      }));
-      showSuccessToast(`Removed song from ${selectedPlaylist.playlistName}`);
-      setSelectedPlaylist(null);
+      try {
+        await dispatch(removeSongFromPlaylistThunk({
+          playlistId: selectedPlaylist._id,
+          playlistName: selectedPlaylist.playlistName,
+          songId
+        })).unwrap();
+        showSuccessToast(`Removed song from ${selectedPlaylist.playlistName}`);
+        setSelectedPlaylist(null);
+      } catch {
+        // The thunk displays the failure toast and leaves the playlist unchanged.
+      }
     }
   };
 
@@ -80,7 +91,7 @@ const PlaylistPopover = ({ songId }) => {
               className="max-h-36 overflow-y-auto scrollbar"
             >
               {(playlist) => {
-                const songExists = playlist.songs.includes(songId);
+                const songExists = Array.isArray(playlist.songs) && playlist.songs.includes(songId);
                 return (
                   <DropdownItem
                     key={playlist._id}
@@ -89,7 +100,6 @@ const PlaylistPopover = ({ songId }) => {
                     onClick={() => {
                       if (!songExists) {
                         addToPlaylist(playlist._id, playlist.playlistName);
-                        showSuccessToast(`Added song to ${playlist.playlistName}`);
                       } else {
                         setSelectedPlaylist(playlist);
                         onOpen(); // open modal

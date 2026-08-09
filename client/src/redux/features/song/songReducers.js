@@ -61,11 +61,15 @@ export const removeSongFromPlaylist = (state, action) => {
 
 
 export const addNewPlaylist = (state, action) => {
-    const { playlistName, songId = null } = action.payload;
+    const { playlistName, songId = null, playlistId } = action.payload;
     if (!state.userPlaylists) {
         state.userPlaylists = [];
     }
-    state.userPlaylists.push({ playlistName: playlistName, songs: songId ? [songId] : [], _id: Date.now().toString() });
+    state.userPlaylists.push({
+        playlistName,
+        songs: songId ? [songId] : [],
+        _id: playlistId || Date.now().toString(),
+    });
 };
 
 

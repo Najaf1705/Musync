@@ -1,6 +1,12 @@
 export const fetchTrackDetails = async (trackId) => {
+  const normalizedTrackId = typeof trackId === 'string' ? trackId.trim() : trackId;
+
+  if (!normalizedTrackId || normalizedTrackId === 'null' || normalizedTrackId === 'undefined') {
+    return null;
+  }
+
   try {
-    const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/trackInfo/${trackId}`, {
+    const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/trackInfo/${encodeURIComponent(normalizedTrackId)}`, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
@@ -8,11 +14,11 @@ export const fetchTrackDetails = async (trackId) => {
       credentials: 'include'
     });
 
-    if (!response.ok) throw new Error(`Failed to fetch track details for ID: ${trackId}`);
-    const trackDetails=await response.json();
+    if (!response.ok) throw new Error(`Failed to fetch track details for ID: ${normalizedTrackId}`);
+    const trackDetails = await response.json();
     return trackDetails;
   } catch (error) {
-    console.error(`Error fetching track details for ID ${trackId}:`, error);
+    console.error(`Error fetching track details for ID ${normalizedTrackId}:`, error);
     return null;
   }
 };

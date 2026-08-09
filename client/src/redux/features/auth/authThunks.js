@@ -11,7 +11,7 @@ const normalizeError = (error) => {
 };
 
 const getAuthBase = () => process.env.REACT_APP_AUTH_URL || "https://nauth.najaf.in";
-const getBackendBase = () => process.env.REACT_APP_BACKEND_URL || "https://napi.najaf.in";
+const getBackendBase = () => process.env.REACT_APP_BACKEND_URL || "https://bknd.musync.najaf.in";
 
 const getCurrentUserAuthData = async () => {
   const AUTH_BASE = getAuthBase();

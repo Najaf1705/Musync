@@ -11,7 +11,9 @@ import {
 const initialState = {
     user: null,
     isAuthenticated: false,
-    isAuthLoading: false,
+    // Authentication is unresolved until App finishes the initial /me request.
+    // Protected routes and One Tap must wait for that result after a refresh.
+    isAuthLoading: true,
     error: null,
 };
 

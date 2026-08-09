@@ -4,6 +4,7 @@ import { useDispatch } from "react-redux";
 import { setAuthLoading } from "../../redux/features/auth/authSlice";
 import { authenticateWithGoogle, fetchCurrentUser } from "../../redux/features/auth/authThunks";
 import { useNavigate } from "react-router-dom";
+import { showSuccessToast } from "../utils/toast";
 
 export default function GoogleOneTapLogin() {
     const dispatch = useDispatch();
@@ -44,6 +45,7 @@ export default function GoogleOneTapLogin() {
                 }
 
                 await dispatch(fetchCurrentUser()).unwrap();
+                showSuccessToast("Logged in Successfully");
                 navigate("/");
             } catch (err) {
                 // eslint-disable-next-line no-console

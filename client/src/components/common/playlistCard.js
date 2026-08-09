@@ -1,9 +1,9 @@
 import { useDispatch } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
 import { deletePlaylistThunk, setSelectedPlaylistThunk } from '../../redux/features/song/songThunks';
 import { FiTrash } from 'react-icons/fi';
 import { useDisclosure } from '@heroui/react';
 import RemovePlaylistModal from './RemovePlaylistModal';
-// import { useNavigate } from 'react-router-dom';
 
 const PlaylistCard = ({
   parentComponent,
@@ -14,11 +14,12 @@ const PlaylistCard = ({
   showDeleteButton = true
 
 }) => {
-  // const navigate = useNavigate();
+  const navigate = useNavigate();
   const dispatch = useDispatch();
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
   const playlistName = playlist?.playlistName || playlist?.name || 'Untitled Playlist';
   const playlistImage = playlist?.image || playlist?.images?.[0]?.url || '';
+  const playlistId = playlist?._id || playlist?.id || playlistName;
 
   const handlePlaylistSelect = () => {
 
@@ -30,14 +31,14 @@ const PlaylistCard = ({
 
     if (parentComponent === "playlist") {
       dispatch(setSelectedPlaylistThunk({
-        id: playlist.id,
+        id: playlistId,
         name: playlistName
       }));
+      navigate(`/playlist/${encodeURIComponent(playlistId)}`);
       setDisplaySongs(true);
       setSelectedPlaylistData(playlist);
       fetchSelectedPlaylistSongs(playlist.playlistName || playlist.name);
     }
-    // navigate(`/playlist/${playlist.id}`);
   };
 
   const handleDeletePlaylist = () => {

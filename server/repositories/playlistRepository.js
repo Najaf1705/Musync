@@ -26,7 +26,7 @@ const createPlaylist = async (userIdentifier, playlistName) => {
   const newPlaylist = { playlistName, songs: [] };
   user.playlists.push(newPlaylist);
   await user.save();
-  return newPlaylist;
+  return user.playlists[user.playlists.length - 1];
 };
 
 // Delete playlist

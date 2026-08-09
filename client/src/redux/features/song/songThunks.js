@@ -134,31 +134,24 @@ export const searchSongsAndPlaylistsThunk = createAsyncThunk(
 
 export const addSongToPlaylistThunk = createAsyncThunk(
     'songs/addSongToPlaylist',
-    async ({ playlistId, playlistName, songId }, { dispatch, rejectWithValue, getState }) => {
-        dispatch(addSongToPlaylistRed({ playlistId, songId }));
-
+    async ({ playlistId, playlistName, songId }, { dispatch, rejectWithValue }) => {
         try {
             const response = await axios.post(
-                `${process.env.REACT_APP_BACKEND_URL}/api/addToPlaylist/${playlistName}/${songId}`,
-                {},
-                {
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    withCredentials: true,
-                }
+                `${process.env.REACT_APP_BACKEND_URL}/api/addToPlaylist/${encodeURIComponent(String(playlistName))}/${encodeURIComponent(String(songId))}`,
+                undefined,
+                { withCredentials: true }
             );
 
             if (response.status !== 200 && response.status !== 201) {
                 throw new Error('Failed to add song to playlist');
             }
 
-            const data = await response.json();
-            return data; // Return the updated playlist or relevant data
+            dispatch(addSongToPlaylistRed({ playlistId, songId }));
+            return response.data;
         } catch (error) {
-            dispatch(removeSongFromPlaylistRed({ playlistId, songId }));
-            console.error('Error adding song to playlist:', error);
-            return rejectWithValue(error.message);
+            const errorMessage = error?.response?.data?.message || error?.response?.data?.error || error?.message || 'Failed to add song to playlist';
+            console.error('Error adding song to playlist:', errorMessage, error);
+            return rejectWithValue(errorMessage);
         }
     }
 );
@@ -168,14 +161,10 @@ export const addSongToPlaylistThunk = createAsyncThunk(
 
 export const removeSongFromPlaylistThunk = createAsyncThunk(
     'songs/removeSongFromPlaylist',
-    async ({ playlistId, playlistName, songId }, { dispatch, rejectWithValue, getState }) => {
-        dispatch(removeSongFromPlaylistRed({ playlistId, songId }));
+    async ({ playlistId, playlistName, songId }, { dispatch, rejectWithValue }) => {
         try {
-            const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/removeFromPlaylist/${playlistName}/${songId}`, {
+            const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/removeFromPlaylist/${encodeURIComponent(String(playlistName))}/${encodeURIComponent(String(songId))}`, {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
                 credentials: 'include'
             });
 
@@ -184,9 +173,9 @@ export const removeSongFromPlaylistThunk = createAsyncThunk(
             }
 
             const data = await response.json();
-            return data; // Return the updated playlist or relevant data
+            dispatch(removeSongFromPlaylistRed({ playlistId, songId }));
+            return data;
         } catch (error) {
-            dispatch(addSongToPlaylistRed({ playlistId, songId }));
             console.error('Error removing song from playlist:', error);
             return rejectWithValue(error.message);
         }
@@ -198,14 +187,9 @@ export const removeSongFromPlaylistThunk = createAsyncThunk(
 export const createPlaylistThunk = createAsyncThunk(
     'songs/createPlaylist',
     async ({ playlistName, songId = null }, { dispatch, rejectWithValue }) => {
-        dispatch(addNewPlaylistRed({ playlistName, songId }));
         try {
-            // throw new Error('Failed to create playlist');
-            const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/create-playlist/${playlistName}`, {
+            const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/create-playlist/${encodeURIComponent(String(playlistName))}`, {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
                 credentials: 'include',
             });
             if (!response.ok) {
@@ -217,12 +201,13 @@ export const createPlaylistThunk = createAsyncThunk(
                 await dispatch(addSongToPlaylistThunk({ playlistId: data._id, playlistName, songId })).unwrap();
             }
 
+            dispatch(addNewPlaylistRed({ playlistName: data.playlistName || playlistName, playlistId: data._id, songId }));
+
             showSuccessToast(`Playlist "${playlistName}" created successfully!`);
 
 
             return data; // Return the created playlist data
         } catch (error) {
-            dispatch(removePlaylistRed(playlistName));
             showErrorToast("Failed to create playlist");
             console.error('Error creating playlist:', error);
             return rejectWithValue(error.message);
@@ -232,14 +217,10 @@ export const createPlaylistThunk = createAsyncThunk(
 
 export const deletePlaylistThunk = createAsyncThunk(
     'songs/deletePlaylist',
-    async ({ playlistName }, { dispatch, rejectWithValue, getState }) => {
-        dispatch(removePlaylistRed(playlistName));
+    async ({ playlistName }, { dispatch, rejectWithValue }) => {
         try {
-            const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/delete-playlist/${playlistName}`, {
+            const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/delete-playlist/${encodeURIComponent(String(playlistName))}`, {
                 method: 'DELETE',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
                 credentials: 'include'
             });
 
@@ -248,6 +229,7 @@ export const deletePlaylistThunk = createAsyncThunk(
             }
 
             const data = await response.json();
+            dispatch(removePlaylistRed(playlistName));
             showSuccessToast(`Playlist "${playlistName}" deleted successfully!`);
             return data; // Return any relevant data if needed
         } catch (error) {

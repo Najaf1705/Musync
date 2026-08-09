@@ -3,6 +3,7 @@ import { authenticateWithGoogle, fetchCurrentUser } from '../../redux/features/a
 import { useDispatch } from 'react-redux';
 import { setAuthLoading } from '../../redux/features/auth/authSlice';
 import { useNavigate } from 'react-router-dom';
+import { showSuccessToast } from '../utils/toast';
 
 function GoogleLoginBtn() {
     const dispatch = useDispatch();
@@ -28,6 +29,7 @@ function GoogleLoginBtn() {
                             }
 
                             await dispatch(fetchCurrentUser()).unwrap();
+                            showSuccessToast("Logged in Successfully");
                             navigate("/");
                         } catch (err) {
                             // eslint-disable-next-line no-console

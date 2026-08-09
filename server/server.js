@@ -19,6 +19,8 @@ const allowedOrigins = [
   "http://192.168.1.109:3000",
   "https://musync-enzoe.vercel.app",
   "https://musync.najaf.in",
+  // "https://musynctest.najaf.in:3000",
+  "https://musynctest.najaf.in",
   "http://192.168.49.2:30080"
 ];
 
@@ -58,6 +60,14 @@ app.use(require('./routes/recommendRoute'));
 app.use(require('./routes/ytRoute'));
 app.use(require('./routes/najafMockRoute'));
 
+app.use((error, req, res, next) => {
+  if (error instanceof SyntaxError && error.status === 400 && 'body' in error) {
+    console.warn(`Rejected malformed JSON for ${req.method} ${req.originalUrl}`);
+    return res.status(400).json({ error: 'Request body must be valid JSON' });
+  }
+  return next(error);
+});
+
 app.use((req, res) => {
   console.log("No route matched. Path was:", req.originalUrl);
   res.status(404).json({ error: 'Not Found' });
@@ -73,4 +83,3 @@ app.get("/", (req,res)=>{
 app.listen(port,'0.0.0.0', ()=>{
   console.log(`running on port  ff${port}`);
 })
-

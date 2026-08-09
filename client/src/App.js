@@ -78,6 +78,7 @@ useEffect(() => {
           <Route path="/setpassword" element={<Setpassword />} />
           <Route path="/signup" element={<Signup />} />
           <Route path="/playlists" element={<Playlists />} />
+          <Route path="/playlist/:playlistId" element={<Playlists />} />
           <Route path="*" element={<Errorpage />} />
         </Routes>
       </div>
